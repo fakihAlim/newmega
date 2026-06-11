@@ -34,12 +34,8 @@ function isActiveClass($dirs, $pages = []) {
 <aside class="main-sidebar sidebar-dark-warning elevation-4">
     <!-- Brand Logo -->
     <a href="<?= APP_URL ?>/modules/dashboard/index.php" class="brand-link">
-        <span class="brand-icon d-flex align-items-center justify-content-center ml-2" style="width:30px;height:30px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:8px;">
-            <i class="fas fa-hard-hat text-white" style="font-size:16px;"></i>
-        </span>
-        <span class="brand-text font-weight-bold ml-1">
-            <span class="text-amber">MKM</span> <span class="text-white">Procurement</span>
-        </span>
+        <img src="<?= APP_URL ?>/assets/img/logo-perusahaan.png" alt="Logo PT MKM" class="brand-image img-circle elevation-3" style="opacity: .8; width: 33px; height: 33px; object-fit: cover;">
+        <span class="brand-text font-weight-light ml-2">Procurement</span>
     </a>
 
     <!-- Sidebar -->
