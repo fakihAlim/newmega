@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Redirect to login if accessing root
+RewriteRule ^$ index.php [L]
+
+# Allow direct access to assets and vendor
+RewriteRule ^(assets|vendor)/ - [L]
+
+# Block direct access to includes and database
+RewriteRule ^(includes|database)/ - [F,L]

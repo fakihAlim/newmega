@@ -1,0 +1,7 @@
+# Block execution of any script files inside the uploads directory.
+# This prevents uploaded webshells or malicious PHP files from being executed.
+
+<FilesMatch "\.(php|php3|php4|php5|php7|phtml|pl|py|sh|cgi|asp|aspx|exe|bin)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>

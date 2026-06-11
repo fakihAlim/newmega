@@ -1,0 +1,13 @@
+{
+    "name": "megakarya/procurement",
+    "description": "E-Procurement Application for PT. Mega Karya Modern",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "dompdf/dompdf": "^2.0",
+        "phpoffice/phpspreadsheet": "^5.7"
+    },
+    "autoload": {
+        "psr-4": {}
+    }
+}

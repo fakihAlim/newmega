@@ -1,0 +1,348 @@
+<?php
+/**
+ * Global Helper Functions
+ */
+
+/**
+ * Format number to Indonesian Rupiah
+ */
+function formatRupiah($number, $prefix = 'Rp ') {
+    return $prefix . number_format($number, 0, ',', '.');
+}
+
+/**
+ * Parse Rupiah string back to integer/float
+ */
+function parseRupiah($string) {
+    if ($string === null || $string === '') return 0;
+    // Jika sudah berupa int/float PHP murni, kembalikan langsung
+    if (is_int($string) || is_float($string)) return $string;
+    // Hapus semua karakter non-angka (titik ribuan, "Rp", spasi, dll)
+    $parsed = preg_replace('/[^0-9]/', '', (string)$string);
+    return $parsed === '' ? 0 : (float)$parsed;
+}
+
+/**
+ * Format date to Indonesian format
+ */
+function formatDate($date, $format = 'd-M-Y') {
+    if (empty($date)) return '-';
+    return date($format, strtotime($date));
+}
+
+/**
+ * Format datetime
+ */
+function formatDateTime($datetime) {
+    if (empty($datetime)) return '-';
+    return date('d-M-Y H:i', strtotime($datetime));
+}
+
+/**
+ * Generate auto abbreviation from company name (3 chars)
+ */
+function generateAbbreviation($companyName, $pdo = null, $table = null, $column = 'abbreviation') {
+    // Remove common prefixes
+    $name = preg_replace('/^(PT\.?\s*|CV\.?\s*|UD\.?\s*|TB\.?\s*)/i', '', trim($companyName));
+    $name = trim($name);
+    
+    // Split into words
+    $words = preg_split('/\s+/', $name);
+    $words = array_filter($words, function($w) { return strlen($w) > 0; });
+    $words = array_values($words);
+    
+    $count = count($words);
+    $abbr = 'XXX';
+    
+    if ($count === 0) {
+        $abbr = 'XXX';
+    } elseif ($count === 1) {
+        // Single word: take first 3 characters
+        $abbr = strtoupper(substr($words[0], 0, 3));
+        $abbr = str_pad($abbr, 3, 'X');
+    } elseif ($count === 2) {
+        // Two words: first letter of 1st + first two letters of 2nd
+        $first = strtoupper(substr($words[0], 0, 1));
+        $second = strtoupper(substr($words[1], 0, 2));
+        $abbr = str_pad($first . $second, 3, 'X');
+    } else {
+        // 3+ words: first letter of first 3 words
+        $abbr = strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1) . substr($words[2], 0, 1));
+    }
+    
+    // Check duplicates if PDO and table are provided
+    if ($pdo && $table) {
+        $originalAbbr = $abbr;
+        $counter = 1;
+        while (true) {
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM {$table} WHERE {$column} = ?");
+            $stmt->execute([$abbr]);
+            $exists = $stmt->fetchColumn();
+            if (!$exists) {
+                break;
+            }
+            // Duplicate handling strategy: append number or change last letter
+            $abbr = substr($originalAbbr, 0, 2) . $counter;
+            $counter++;
+            if ($counter > 9) {
+                $abbr = substr($originalAbbr, 0, 1) . str_pad($counter, 2, '0', STR_PAD_LEFT);
+            }
+        }
+    }
+    
+    return $abbr;
+}
+
+/**
+ * Generate document number
+ * @param PDO $pdo
+ * @param string $type - 'MR', 'PO', 'Q', 'INV', 'TRF'
+ * @param string $abbreviation - project/vendor/customer abbreviation
+ * @return string
+ */
+function generateDocNumber($pdo, $type, $abbreviation = '') {
+    $year = date('y'); // 2-digit year
+    
+    // Determine table and column based on type
+    $tableMap = [
+        'MR'  => ['table' => 'material_requests', 'column' => 'mr_number'],
+        'PO'  => ['table' => 'purchase_orders', 'column' => 'po_number'],
+        'Q'   => ['table' => 'quotations', 'column' => 'quotation_no'],
+        'INV' => ['table' => 'invoices', 'column' => 'invoice_no'],
+        'TRF' => ['table' => 'warehouse_transfers', 'column' => 'transfer_number'],
+        'CLM' => ['table' => 'claim_notas', 'column' => 'claim_number'],
+    ];
+    
+    if (!isset($tableMap[$type])) {
+        return $type . '-' . $abbreviation . '-' . $year . '-0001';
+    }
+    
+    $table = $tableMap[$type]['table'];
+    $column = $tableMap[$type]['column'];
+    
+    // Pattern to find records for the same type and year: [TYPE]-%-[YY]-%
+    $searchPattern = $type . '-%-' . $year . '-%';
+    
+    $stmt = $pdo->prepare("SELECT {$column} FROM {$table} WHERE {$column} LIKE ? ORDER BY id DESC LIMIT 1");
+    $stmt->execute([$searchPattern]);
+    $last = $stmt->fetchColumn();
+    
+    $nextNum = 1;
+    if ($last) {
+        $parts = explode('-', $last);
+        $lastPart = end($parts);
+        if (is_numeric($lastPart)) {
+            $nextNum = (int)$lastPart + 1;
+        }
+    }
+    
+    // Use 'GEN' if abbreviation is empty
+    $abbr = !empty($abbreviation) ? strtoupper($abbreviation) : 'GEN';
+    
+    return $type . '-' . $abbr . '-' . $year . '-' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+}
+
+/**
+ * Sanitize input
+ */
+function sanitize($input) {
+    if (is_array($input)) {
+        return array_map('sanitize', $input);
+    }
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Flash message helpers
+ */
+function setFlash($type, $message) {
+    $_SESSION['flash'] = ['type' => $type, 'message' => $message];
+}
+
+function getFlash() {
+    if (isset($_SESSION['flash'])) {
+        $flash = $_SESSION['flash'];
+        unset($_SESSION['flash']);
+        return $flash;
+    }
+    return null;
+}
+
+/**
+ * Get status badge HTML
+ */
+function getStatusBadge($status) {
+    $badges = [
+        'draft'               => '<span class="badge badge-secondary">Draft</span>',
+        'pending'             => '<span class="badge badge-warning">Pending Approval</span>',
+        'approved'            => '<span class="badge badge-success">Approved</span>',
+        'rejected'            => '<span class="badge badge-danger">Rejected</span>',
+        'completed'           => '<span class="badge badge-info">Completed</span>',
+        'cancelled'           => '<span class="badge badge-dark">Cancelled</span>',
+        'partially_received'  => '<span class="badge badge-primary">Partially Received</span>',
+        'invoiced'            => '<span class="badge badge-info">Invoiced</span>',
+        'sent'                => '<span class="badge badge-primary">Sent</span>',
+        'paid'                => '<span class="badge badge-success">Paid</span>',
+        'partial_paid'        => '<span class="badge badge-warning">Partial Paid</span>',
+        'planning'            => '<span class="badge badge-secondary">Planning</span>',
+        'active'              => '<span class="badge badge-success">Active</span>',
+        'reimbursed'          => '<span class="badge badge-info">Reimbursed</span>',
+    ];
+    
+    return $badges[$status] ?? '<span class="badge badge-secondary">' . ucfirst(str_replace('_', ' ', $status)) . '</span>';
+}
+
+/**
+ * Get role display name
+ */
+function getRoleName($role) {
+    static $roleCache = null;
+    if ($roleCache === null) {
+        global $pdo;
+        try {
+            $stmt = $pdo->query("SELECT role_key, role_name FROM roles");
+            $roleCache = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        } catch (Exception $e) {
+            $roleCache = [
+                'super_admin'     => 'Super Admin',
+                'finance'         => 'Finance',
+                'gudang'          => 'Gudang',
+                'project_manager' => 'Project Manager',
+            ];
+        }
+    }
+    return $roleCache[$role] ?? $role;
+}
+
+/**
+ * Get multiple role names for display (comma separated)
+ */
+function getUserRolesDisplay($userId) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT r.role_name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = ?");
+    $stmt->execute([$userId]);
+    $roles = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return !empty($roles) ? implode(', ', $roles) : '-';
+}
+
+/**
+ * Get current logged in user data
+ */
+function getCurrentUser() {
+    return $_SESSION['user'] ?? null;
+}
+
+/**
+ * Check if user has specific role
+ */
+function hasRole($roles) {
+    $user = getCurrentUser();
+    if (!$user) return false;
+    
+    $userRoles = $user['roles'] ?? (isset($user['role']) ? [$user['role']] : []);
+    if (is_string($roles)) $roles = [$roles];
+    
+    return !empty(array_intersect($userRoles, $roles));
+}
+
+/**
+ * Upload file helper
+ */
+function uploadFile($file, $destination, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'csv', 'pdf', 'xls', 'xlsx', 'doc', 'docx'], $maxSize = 5242880) {
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return ['success' => false, 'message' => 'Upload error'];
+    }
+    
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedTypes)) {
+        return ['success' => false, 'message' => 'Tipe file tidak diizinkan. Allowed: ' . implode(', ', $allowedTypes)];
+    }
+    
+    if ($file['size'] > $maxSize) {
+        return ['success' => false, 'message' => 'Ukuran file terlalu besar (maks ' . ($maxSize / 1048576) . 'MB)'];
+    }
+    
+    // MIME type checking
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+    
+    $allowedMimes = [
+        'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif',
+        'csv' => ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'], // CSV can be tricky
+        'pdf' => 'application/pdf',
+        'xls' => 'application/vnd.ms-excel',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'doc' => 'application/msword',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    $isValidMime = false;
+    if (isset($allowedMimes[$ext])) {
+        $expectedMime = $allowedMimes[$ext];
+        if (is_array($expectedMime)) {
+            $isValidMime = in_array($mimeType, $expectedMime);
+        } else {
+            $isValidMime = ($mimeType === $expectedMime);
+        }
+    }
+    
+    if (!$isValidMime) {
+        return ['success' => false, 'message' => 'Tipe MIME file tidak sesuai dengan ekstensinya.'];
+    }
+    
+    // Create directory if not exists
+    if (!is_dir($destination)) {
+        mkdir($destination, 0777, true);
+    }
+    
+    $filename = uniqid() . '_' . time() . '.' . $ext;
+    $filepath = $destination . '/' . $filename;
+    
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        return ['success' => true, 'filename' => $filename];
+    }
+    
+    return ['success' => false, 'message' => 'Gagal menyimpan file'];
+}
+
+/**
+ * Get user's profile photo URL or default avatar
+ */
+function getProfilePhoto($photo) {
+    if ($photo && file_exists(PROFILES_PATH . '/' . $photo)) {
+        return APP_URL . '/assets/uploads/profiles/' . $photo;
+    }
+    return APP_URL . '/assets/img/default-avatar.png';
+}
+
+/**
+ * Get company logo URL
+ */
+function getCompanyLogo($logo) {
+    if ($logo && file_exists(LOGOS_PATH . '/' . $logo)) {
+        return APP_URL . '/assets/uploads/company_logos/' . $logo;
+    }
+    return null;
+}
+
+/**
+ * CSRF Protection Helpers
+ */
+function generateCsrfToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function validateCsrfToken($token) {
+    if (empty($_SESSION['csrf_token']) || empty($token)) {
+        return false;
+    }
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
+function csrfField() {
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCsrfToken()) . '">';
+}
