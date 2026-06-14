@@ -39,6 +39,7 @@ $AVAILABLE_MODULES = [
         'claim_nota' => 'Claim Nota',
         'vendor_payments' => 'Pembayaran Vendor',
         'customer_payments' => 'Penerimaan Customer',
+        'ledger' => 'General Ledger',
     ],
     'Timesheet' => [
         'timesheet' => 'Timesheet (Input & Approval)',
@@ -136,6 +137,9 @@ function canAccess($moduleKey, $action = 'view') {
             $userPermissions['claim_nota_create'] = $userPermissions['claim_nota'] ?? [];
             $userPermissions['claim_nota_view'] = $userPermissions['claim_nota'] ?? [];
             $userPermissions['claim_nota_approve'] = $userPermissions['claim_nota'] ?? [];
+            
+            $userPermissions['ledger_list'] = $userPermissions['ledger'] ?? [];
+            $userPermissions['ledger_export'] = $userPermissions['ledger'] ?? [];
             
             $userPermissions['timesheet_input'] = $userPermissions['timesheet'] ?? [];
             $userPermissions['timesheet_approve'] = $userPermissions['timesheet'] ?? [];

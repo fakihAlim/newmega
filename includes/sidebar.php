@@ -231,10 +231,10 @@ function isActiveClass($dirs, $pages = []) {
                 </li>
                 <?php endif; ?>
                 
-                <?php if (canAccess('vendor_payments') || canAccess('customer_payments') || canAccess('quotation_list') || canAccess('invoice_list') || canAccess('claim_nota_list')): ?>
+                <?php if (canAccess('vendor_payments') || canAccess('customer_payments') || canAccess('quotation_list') || canAccess('invoice_list') || canAccess('claim_nota_list') || canAccess('ledger_list')): ?>
                 <!-- Finance (Collapsible) -->
-                <li class="nav-item has-treeview <?= isMenuOpen(['vendor_payments','customer_payments','quotations','invoices','claim_nota']) ?>">
-                    <a href="#" class="nav-link <?= isActiveClass(['vendor_payments','customer_payments','quotations','invoices','claim_nota']) ?>">
+                <li class="nav-item has-treeview <?= isMenuOpen(['vendor_payments','customer_payments','quotations','invoices','claim_nota','ledger']) ?>">
+                    <a href="#" class="nav-link <?= isActiveClass(['vendor_payments','customer_payments','quotations','invoices','claim_nota','ledger']) ?>">
                         <i class="nav-icon fas fa-coins"></i>
                         <p>
                             Finance
@@ -279,6 +279,14 @@ function isActiveClass($dirs, $pages = []) {
                             <a href="<?= APP_URL ?>/modules/finance/customer_payments/index.php" class="nav-link <?= isActiveClass(['customer_payments']) ?>">
                                 <i class="nav-icon fas fa-hand-holding-usd"></i>
                                 <p>Penerimaan Customer</p>
+                            </a>
+                        </li>
+                        <?php endif; ?>
+                        <?php if (canAccess('ledger_list')): ?>
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/finance/ledger/index.php" class="nav-link <?= isActiveClass(['ledger']) ?>">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>Buku Kas (Ledger)</p>
                             </a>
                         </li>
                         <?php endif; ?>
