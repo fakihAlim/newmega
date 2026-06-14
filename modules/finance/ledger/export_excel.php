@@ -64,15 +64,17 @@ $openingSql = "
         WHERE nc.status = 'paid'
     ) AS temp
     WHERE tanggal < :start_date
-      AND (:company_id = '' OR company_id = :company_id)
-      AND (:payment_method = '' OR payment_method = :payment_method)
+      AND (:company_id_filter = '' OR company_id = :company_id_val)
+      AND (:payment_method_filter = '' OR payment_method = :payment_method_val)
 ";
 
 $openingStmt = $pdo->prepare($openingSql);
 $openingStmt->execute([
     'start_date' => $startDate,
-    'company_id' => $companyId,
-    'payment_method' => $paymentMethod
+    'company_id_filter' => $companyId,
+    'company_id_val' => $companyId,
+    'payment_method_filter' => $paymentMethod,
+    'payment_method_val' => $paymentMethod
 ]);
 $openingBalance = (float)$openingStmt->fetchColumn();
 
@@ -117,7 +119,7 @@ $ledgerSql = "
         SELECT 
             nc.claim_date AS tanggal,
             nc.claim_number AS no_referensi,
-            CONCAT('Reimburse Nota - Karyawan: ', COALESCE(u.full_name, nc.employee_name_manual)) AS keterangan,
+            CONCAT('Reimburse Nota - Karyawan: ', COALESCE(u.full_name, nc.employee_name)) AS keterangan,
             0 AS debit,
             nc.total_amount AS kredit,
             'Transfer/Cash' AS metode,
@@ -129,8 +131,8 @@ $ledgerSql = "
         WHERE nc.status = 'paid'
     ) AS cashflow_ledger
     WHERE tanggal BETWEEN :start_date AND :end_date
-      AND (:company_id = '' OR company_id = :company_id)
-      AND (:payment_method = '' OR payment_method = :payment_method)
+      AND (:company_id_filter = '' OR company_id = :company_id_val)
+      AND (:payment_method_filter = '' OR metode = :payment_method_val)
     ORDER BY tanggal ASC, no_referensi ASC
 ";
 
@@ -138,8 +140,10 @@ $ledgerStmt = $pdo->prepare($ledgerSql);
 $ledgerStmt->execute([
     'start_date' => $startDate,
     'end_date' => $endDate,
-    'company_id' => $companyId,
-    'payment_method' => $paymentMethod
+    'company_id_filter' => $companyId,
+    'company_id_val' => $companyId,
+    'payment_method_filter' => $paymentMethod,
+    'payment_method_val' => $paymentMethod
 ]);
 $transactions = $ledgerStmt->fetchAll();
 
