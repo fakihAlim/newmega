@@ -180,7 +180,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     </select>
                 </div>
                 <div class="col-md-3 col-sm-12 d-flex align-items-end mb-2">
-                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i> Saring Data</button>
+                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
                     <a href="index.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
                 </div>
             </div>
