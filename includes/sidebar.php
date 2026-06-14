@@ -34,8 +34,12 @@ function isActiveClass($dirs, $pages = []) {
 <aside class="main-sidebar sidebar-dark-warning elevation-4">
     <!-- Brand Logo -->
     <a href="<?= APP_URL ?>/modules/dashboard/index.php" class="brand-link">
-        <img src="<?= APP_URL ?>/assets/img/logo-perusahaan.png" alt="Logo PT MKM" class="brand-image img-circle elevation-3" style="opacity: .8; width: 33px; height: 33px; object-fit: cover;">
-        <span class="brand-text font-weight-light ml-2">Procurement</span>
+        <span class="brand-icon d-flex align-items-center justify-content-center ml-2" style="width:30px;height:30px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:8px;">
+            <i class="fas fa-hard-hat text-white" style="font-size:16px;"></i>
+        </span>
+        <span class="brand-text font-weight-bold ml-1">
+            <span class="text-amber">MKM</span> <span class="text-white">Procurement</span>
+        </span>
     </a>
 
     <!-- Sidebar -->
@@ -227,7 +231,7 @@ function isActiveClass($dirs, $pages = []) {
                 </li>
                 <?php endif; ?>
                 
-                <?php if (canAccess('vendor_payments') || canAccess('customer_payments') || canAccess('quotation_list') || canAccess('invoice_list') || canAccess('claim_nota')): ?>
+                <?php if (canAccess('vendor_payments') || canAccess('customer_payments') || canAccess('quotation_list') || canAccess('invoice_list') || canAccess('claim_nota_list')): ?>
                 <!-- Finance (Collapsible) -->
                 <li class="nav-item has-treeview <?= isMenuOpen(['vendor_payments','customer_payments','quotations','invoices','claim_nota']) ?>">
                     <a href="#" class="nav-link <?= isActiveClass(['vendor_payments','customer_payments','quotations','invoices','claim_nota']) ?>">
@@ -254,6 +258,14 @@ function isActiveClass($dirs, $pages = []) {
                             </a>
                         </li>
                         <?php endif; ?>
+                        <?php if (canAccess('claim_nota_list')): ?>
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/finance/claim_nota/index.php" class="nav-link <?= isActiveClass(['claim_nota']) ?>">
+                                <i class="nav-icon fas fa-receipt"></i>
+                                <p>Claim Nota</p>
+                            </a>
+                        </li>
+                        <?php endif; ?>
                         <?php if (canAccess('vendor_payments')): ?>
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/finance/vendor_payments/index.php" class="nav-link <?= isActiveClass(['vendor_payments']) ?>">
@@ -267,14 +279,6 @@ function isActiveClass($dirs, $pages = []) {
                             <a href="<?= APP_URL ?>/modules/finance/customer_payments/index.php" class="nav-link <?= isActiveClass(['customer_payments']) ?>">
                                 <i class="nav-icon fas fa-hand-holding-usd"></i>
                                 <p>Penerimaan Customer</p>
-                            </a>
-                        </li>
-                        <?php endif; ?>
-                        <?php if (canAccess('claim_nota')): ?>
-                        <li class="nav-item">
-                            <a href="<?= APP_URL ?>/modules/finance/claim_nota/index.php" class="nav-link <?= isActiveClass(['claim_nota']) ?>">
-                                <i class="nav-icon fas fa-receipt"></i>
-                                <p>Claim Nota</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -321,10 +325,10 @@ function isActiveClass($dirs, $pages = []) {
                 </li>
                 <?php endif; ?>
 
-                <?php if (canAccess('report_project_expense') || canAccess('report_vendor_outstanding') || canAccess('report_claim_nota')): ?>
+                <?php if (canAccess('report_project_expense') || canAccess('report_vendor_outstanding')): ?>
                 <!-- Laporan (Collapsible) -->
-                <li class="nav-item has-treeview <?= isMenuOpen(['reports']) ?> <?= isActive([], ['project_expense.php','vendor_outstanding.php','customer_outstanding.php','profit_loss.php','stock_report.php','claim_nota.php']) ? 'menu-open' : '' ?>">
-                    <a href="#" class="nav-link <?= isActiveClass(['reports'], ['project_expense.php','vendor_outstanding.php','customer_outstanding.php','profit_loss.php','stock_report.php','claim_nota.php']) ?>">
+                <li class="nav-item has-treeview <?= isMenuOpen(['reports']) ?> <?= isActive([], ['project_expense.php','vendor_outstanding.php','customer_outstanding.php','profit_loss.php','stock_report.php']) ? 'menu-open' : '' ?>">
+                    <a href="#" class="nav-link <?= isActiveClass(['reports'], ['project_expense.php','vendor_outstanding.php','customer_outstanding.php','profit_loss.php','stock_report.php']) ?>">
                         <i class="nav-icon fas fa-chart-pie"></i>
                         <p>
                             Laporan
@@ -369,14 +373,6 @@ function isActiveClass($dirs, $pages = []) {
                             <a href="<?= APP_URL ?>/modules/reports/stock_report.php" class="nav-link <?= isActiveClass([], 'stock_report.php') ?>">
                                 <i class="nav-icon fas fa-clipboard-check"></i>
                                 <p>Laporan Stok</p>
-                            </a>
-                        </li>
-                        <?php endif; ?>
-                        <?php if (canAccess('report_claim_nota')): ?>
-                        <li class="nav-item">
-                            <a href="<?= APP_URL ?>/modules/reports/claim_nota.php" class="nav-link <?= isActiveClass([], 'claim_nota.php') ?>">
-                                <i class="nav-icon fas fa-receipt"></i>
-                                <p>Laporan Claim Nota</p>
                             </a>
                         </li>
                         <?php endif; ?>

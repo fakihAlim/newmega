@@ -1,412 +1,478 @@
 <?php
 /**
- * Finance - Create Claim Nota
+ * Finance - Claim Nota Create
  */
 require_once __DIR__ . '/../../../includes/auth.php';
 requirePermission('claim_nota', 'create');
 
-$user = getCurrentUser();
-
-// Fetch projects
-$projects = $pdo->query("SELECT id, name, abbreviation FROM projects WHERE status IN ('planning','active') ORDER BY name")->fetchAll();
-
-// Fetch companies
-$companies = $pdo->query("SELECT id, name FROM companies ORDER BY is_default DESC, name")->fetchAll();
-
-// Fetch items for autocomplete
-$items = $pdo->query("SELECT id, item_code, description, uom FROM items WHERE is_active = 1 ORDER BY description")->fetchAll();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $claimDate = $_POST['claim_date'] ?? date('Y-m-d');
-    $projectId = (int)($_POST['project_id'] ?? 0);
-    $companyId = (int)($_POST['company_id'] ?? 0);
-    $employeeName = trim($_POST['employee_name'] ?? '');
-    $storeName = trim($_POST['store_name'] ?? '');
-    $notes = trim($_POST['notes'] ?? '');
-    $action = $_POST['action'] ?? 'draft'; // 'draft' or 'submit'
-    
-    // Items
-    $itemIds = $_POST['item_id'] ?? [];
-    $itemNames = $_POST['item_name'] ?? [];
-    $itemQtys = $_POST['item_qty'] ?? [];
-    $itemUoms = $_POST['item_uom'] ?? [];
-    $itemPrices = $_POST['item_price'] ?? [];
-    
-    if (empty($projectId) || empty($companyId) || empty($employeeName)) {
-        setFlash('danger', 'Proyek, Perusahaan, dan Nama Karyawan wajib diisi.');
-        header('Location: create.php');
-        exit;
-    }
-    
-    if (empty($itemNames) || count(array_filter($itemNames)) === 0) {
-        setFlash('danger', 'Minimal 1 item harus diisi.');
-        header('Location: create.php');
-        exit;
-    }
-    
-    try {
-        $pdo->beginTransaction();
-        
-        // Get project abbreviation for claim number
-        $projStmt = $pdo->prepare("SELECT abbreviation FROM projects WHERE id = ?");
-        $projStmt->execute([$projectId]);
-        $projAbbr = $projStmt->fetchColumn() ?: 'GEN';
-        
-        $claimNumber = generateDocNumber($pdo, 'CLM', $projAbbr);
-        $status = ($action === 'submit') ? 'pending' : 'draft';
-        
-        // Handle receipt photo upload
-        $receiptPhoto = null;
-        if (!empty($_FILES['receipt_photo']['name'])) {
-            $uploadDir = BASE_PATH . '/uploads/claim_receipts';
-            $uploadResult = uploadFile($_FILES['receipt_photo'], $uploadDir, ['jpg','jpeg','png','pdf']);
-            if ($uploadResult['success']) {
-                $receiptPhoto = $uploadResult['filename'];
-            }
-        }
-        
-        // Calculate subtotal
-        $subtotal = 0;
-        foreach ($itemNames as $i => $name) {
-            if (empty(trim($name))) continue;
-            $qty = (float)str_replace(['.', ','], ['', '.'], $itemQtys[$i] ?? 0);
-            $price = (float)str_replace(['.', ','], ['', '.'], $itemPrices[$i] ?? 0);
-            $subtotal += $qty * $price;
-        }
-        
-        // Insert header
-        $stmt = $pdo->prepare("
-            INSERT INTO claim_notas (claim_number, claim_date, project_id, company_id, claimed_by, employee_name, store_name, subtotal, notes, receipt_photo, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([$claimNumber, $claimDate, $projectId, $companyId, $user['id'], $employeeName, $storeName, $subtotal, $notes, $receiptPhoto, $status]);
-        $claimId = $pdo->lastInsertId();
-        
-        // Insert items
-        $stmtItem = $pdo->prepare("
-            INSERT INTO claim_nota_items (claim_id, item_id, item_name, qty, uom, unit_price, total)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ");
-        
-        foreach ($itemNames as $i => $name) {
-            if (empty(trim($name))) continue;
-            $itemId = !empty($itemIds[$i]) ? (int)$itemIds[$i] : null;
-            $qty = (float)str_replace(['.', ','], ['', '.'], $itemQtys[$i] ?? 0);
-            $price = (float)str_replace(['.', ','], ['', '.'], $itemPrices[$i] ?? 0);
-            $total = $qty * $price;
-            $uom = $itemUoms[$i] ?? '';
-            
-            $stmtItem->execute([$claimId, $itemId, trim($name), $qty, $uom, $price, $total]);
-        }
-        
-        $pdo->commit();
-        
-        $msg = ($action === 'submit') ? 'Claim Nota berhasil dibuat dan disubmit untuk approval.' : 'Claim Nota berhasil disimpan sebagai draft.';
-        setFlash('success', $msg);
-        header('Location: index.php');
-        exit;
-        
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        setFlash('danger', 'Gagal menyimpan claim: ' . $e->getMessage());
-        header('Location: create.php');
-        exit;
-    }
-}
-
-$pageTitle = 'Buat Claim Nota';
+$pageTitle = 'Input Claim Nota Baru';
 $breadcrumbs = [
     ['label' => 'Finance', 'url' => '#'],
-    ['label' => 'Claim Nota', 'url' => 'index.php'],
-    ['label' => 'Buat Baru']
+    ['label' => 'Claim Nota', 'url' => APP_URL . '/modules/finance/claim_nota/index.php'],
+    ['label' => 'Baru']
 ];
+
+$user = getCurrentUser();
+
+// Fetch Companies
+$companies = $pdo->query("SELECT id, name FROM companies ORDER BY name ASC")->fetchAll();
+
+// Fetch Projects
+$projects = $pdo->query("SELECT id, name FROM projects ORDER BY name ASC")->fetchAll();
+
+// Fetch Users (for employee selection) with their employee_code
+$users = $pdo->query("
+    SELECT u.id, u.full_name, e.employee_code 
+    FROM users u 
+    LEFT JOIN employees e ON u.id = e.user_id 
+    WHERE u.is_active = 1 
+    ORDER BY u.full_name ASC
+")->fetchAll();
+
+// Fetch existing groups for autocomplete datalist suggestions
+$existingGroups = $pdo->query("SELECT DISTINCT group_name FROM nota_claim_items WHERE group_name IS NOT NULL AND group_name != '' ORDER BY group_name ASC")->fetchAll(PDO::FETCH_COLUMN);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $employeeOption = $_POST['employee_option'] ?? 'select';
+    $employeeId     = $_POST['employee_id'] ?? null;
+    $employeeName   = trim($_POST['employee_name'] ?? '');
+    $companyId      = $_POST['company_id'] ?? '';
+    $claimDate      = $_POST['claim_date'] ?? date('Y-m-d');
+    $notes          = trim($_POST['notes'] ?? '');
+    $status         = $_POST['status'] ?? 'pending';
+
+    // Item details
+    $itemDates  = $_POST['item_date'] ?? [];
+    $projectIds = $_POST['project_id'] ?? [];
+    $groupNames = $_POST['group_name'] ?? [];
+    $itemNames  = $_POST['item_name'] ?? [];
+    $qtys       = $_POST['qty'] ?? [];
+    $prices     = $_POST['price'] ?? [];
+
+    $errors = [];
+
+    // Validation
+    if (empty($companyId)) {
+        $errors[] = "Perusahaan wajib dipilih.";
+    }
+    if (empty($claimDate)) {
+        $errors[] = "Tanggal Klaim wajib diisi.";
+    }
+    if ($employeeOption === 'select') {
+        if (empty($employeeId)) {
+            $errors[] = "Karyawan wajib dipilih.";
+        } else {
+            // Get selected employee's full name
+            $empStmt = $pdo->prepare("SELECT full_name FROM users WHERE id = ?");
+            $empStmt->execute([$employeeId]);
+            $employeeName = $empStmt->fetchColumn();
+        }
+    } else {
+        if (empty($employeeName)) {
+            $errors[] = "Nama Karyawan wajib diisi secara manual.";
+        }
+        $employeeId = null; // Clear if manual input is chosen
+    }
+
+    if (empty($itemNames) || count($itemNames) === 0) {
+        $errors[] = "Minimal harus ada 1 item yang diklaim.";
+    }
+
+    if (empty($errors)) {
+        try {
+            $pdo->beginTransaction();
+
+            // Fetch company details to generate abbreviation for Claim Number
+            $compStmt = $pdo->prepare("SELECT name FROM companies WHERE id = ?");
+            $compStmt->execute([$companyId]);
+            $companyName = $compStmt->fetchColumn() ?: 'GEN';
+            $companyAbbr = generateAbbreviation($companyName);
+
+            // Generate claim number (e.g. CLM-MKM-26-0001)
+            $claimNumber = generateDocNumber($pdo, 'CLM', $companyAbbr);
+
+            // Insert Header
+            $stmtHeader = $pdo->prepare("
+                INSERT INTO nota_claims (claim_number, company_id, employee_name, employee_id, claim_date, total_amount, status, notes, created_by)
+                VALUES (?, ?, ?, ?, ?, 0.00, ?, ?, ?)
+            ");
+            $stmtHeader->execute([$claimNumber, $companyId, $employeeName, $employeeId, $claimDate, $status, $notes, $user['id']]);
+            $claimId = $pdo->lastInsertId();
+
+            $totalClaimAmount = 0;
+
+            // Insert items
+            $stmtItem = $pdo->prepare("
+                INSERT INTO nota_claim_items (claim_id, item_date, project_id, group_name, item_name, qty, price, amount, receipt_photo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+
+            for ($i = 0; $i < count($itemNames); $i++) {
+                $i_date  = $itemDates[$i] ?? $claimDate;
+                $i_proj  = !empty($projectIds[$i]) ? $projectIds[$i] : null;
+                $i_group = !empty($groupNames[$i]) ? trim($groupNames[$i]) : 'Money change';
+                $i_name  = trim($itemNames[$i] ?? '');
+                $i_qty   = parseRupiah($qtys[$i] ?? '1');
+                $i_price = parseRupiah($prices[$i] ?? '0');
+                $i_amount = $i_qty * $i_price;
+
+                if (empty($i_name)) {
+                    continue; // Skip empty rows
+                }
+
+                // Handle Photo Upload
+                $photoFilename = null;
+                if (isset($_FILES['photo']['name'][$i]) && $_FILES['photo']['error'][$i] === UPLOAD_ERR_OK) {
+                    $fileArray = [
+                        'name'     => $_FILES['photo']['name'][$i],
+                        'type'     => $_FILES['photo']['type'][$i],
+                        'tmp_name' => $_FILES['photo']['tmp_name'][$i],
+                        'error'    => $_FILES['photo']['error'][$i],
+                        'size'     => $_FILES['photo']['size'][$i]
+                    ];
+                    $uploadResult = uploadFile($fileArray, UPLOADS_PATH . '/receipts');
+                    if ($uploadResult['success']) {
+                        $photoFilename = $uploadResult['filename'];
+                    } else {
+                        throw new Exception("Gagal mengunggah foto nota pada baris " . ($i + 1) . ": " . $uploadResult['message']);
+                    }
+                }
+
+                $stmtItem->execute([
+                    $claimId,
+                    $i_date,
+                    $i_proj,
+                    $i_group,
+                    $i_name,
+                    $i_qty,
+                    $i_price,
+                    $i_amount,
+                    $photoFilename
+                ]);
+
+                $totalClaimAmount += $i_amount;
+            }
+
+            // Update header's total amount
+            $updateHeader = $pdo->prepare("UPDATE nota_claims SET total_amount = ? WHERE id = ?");
+            $updateHeader->execute([$totalClaimAmount, $claimId]);
+
+            $pdo->commit();
+
+            setFlash('success', "Klaim Nota $claimNumber berhasil disimpan.");
+            header('Location: ' . APP_URL . '/modules/finance/claim_nota/index.php');
+            exit;
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $errors[] = "Terjadi kesalahan: " . $e->getMessage();
+        }
+    }
+
+    if (!empty($errors)) {
+        setFlash('danger', implode('<br>', $errors));
+    }
+}
 
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<form action="" method="POST" enctype="multipart/form-data" id="formClaim">
-<div class="row">
-    <div class="col-md-8">
-        <!-- Header -->
-        <div class="card card-primary card-outline">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-receipt mr-2"></i> Informasi Claim</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Tanggal Claim <span class="text-danger">*</span></label>
-                            <input type="date" name="claim_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title text-primary"><i class="fas fa-file-invoice-dollar mr-2"></i>Form Input Claim Nota</h3>
+        <a href="index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="claimForm">
+        <?= csrfField() ?>
+        <div class="card-body bg-light">
+            <!-- Header Section -->
+            <h5 class="mb-3 text-secondary text-uppercase" style="font-size:14px;letter-spacing:1px;font-weight:600;">1. Informasi Klaim</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Karyawan <span class="text-danger">*</span></label>
+                        <div class="custom-control custom-switch mb-2">
+                            <input type="checkbox" class="custom-control-input" id="switchManualEmployee" name="employee_option" value="manual" <?= (isset($_POST['employee_option']) && $_POST['employee_option'] === 'manual') ? 'checked' : '' ?>>
+                            <label class="custom-control-label font-weight-normal text-muted" for="switchManualEmployee">Input nama manual (bukan akun sistem)</label>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Nama Karyawan <span class="text-danger">*</span></label>
-                            <input type="text" name="employee_name" class="form-control" value="<?= sanitize($user['full_name']) ?>" required placeholder="Nama karyawan yang melakukan pengeluaran">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Proyek <span class="text-danger">*</span></label>
-                            <select class="form-control select2" name="project_id" required style="width:100%;">
-                                <option value="">-- Pilih Proyek --</option>
-                                <?php foreach ($projects as $p): ?>
-                                    <option value="<?= $p['id'] ?>" data-abbr="<?= sanitize($p['abbreviation']) ?>">
-                                        [<?= sanitize($p['abbreviation']) ?>] <?= sanitize($p['name']) ?>
+                        
+                        <!-- Dropdown select -->
+                        <div id="employeeSelectWrapper">
+                            <select name="employee_id" id="employee_id" class="form-control select2" style="width: 100%;">
+                                <option value="">-- Pilih Karyawan --</option>
+                                <?php foreach ($users as $usr): ?>
+                                    <option value="<?= $usr['id'] ?>" <?= (($_POST['employee_id'] ?? '') == $usr['id']) ? 'selected' : '' ?>>
+                                        <?= sanitize($usr['full_name']) ?><?= $usr['employee_code'] ? ' (' . sanitize($usr['employee_code']) . ')' : '' ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Perusahaan (PT) <span class="text-danger">*</span></label>
-                            <select class="form-control select2" name="company_id" required style="width:100%;">
-                                <option value="">-- Pilih Perusahaan --</option>
-                                <?php foreach ($companies as $c): ?>
-                                    <option value="<?= $c['id'] ?>"><?= sanitize($c['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                        
+                        <!-- Free text input -->
+                        <div id="employeeInputWrapper" class="d-none">
+                            <input type="text" name="employee_name" id="employee_name" class="form-control" placeholder="Ketik nama karyawan..." value="<?= htmlspecialchars($_POST['employee_name'] ?? '') ?>">
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Nama Toko</label>
-                            <input type="text" name="store_name" class="form-control" placeholder="Nama toko tempat belanja">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Upload Foto Nota <small class="text-muted">(opsional, jpg/png/pdf)</small></label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="receipt_photo" name="receipt_photo" accept=".jpg,.jpeg,.png,.pdf">
-                                <label class="custom-file-label" for="receipt_photo">Pilih file...</label>
-                            </div>
-                        </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Diklaim Ke Perusahaan <span class="text-danger">*</span></label>
+                        <select name="company_id" class="form-control select2" required style="width: 100%;">
+                            <option value="">-- Pilih Perusahaan --</option>
+                            <?php foreach ($companies as $comp): ?>
+                                <option value="<?= $comp['id'] ?>" <?= (($_POST['company_id'] ?? '') == $comp['id']) ? 'selected' : '' ?>><?= sanitize($comp['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Catatan</label>
-                    <textarea name="notes" class="form-control" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Tanggal Klaim <span class="text-danger">*</span></label>
+                        <input type="date" name="claim_date" class="form-control" value="<?= htmlspecialchars($_POST['claim_date'] ?? date('Y-m-d')) ?>" required>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Catatan Klaim</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Catatan opsional mengenai reimburse ini..."><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Items -->
-        <div class="card card-success card-outline">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title"><i class="fas fa-list mr-2"></i> Detail Item</h3>
-                <button type="button" class="btn btn-success btn-sm ml-auto" id="btnAddRow">
-                    <i class="fas fa-plus mr-1"></i> Tambah Item
-                </button>
+            <hr class="my-4">
+
+            <!-- Detail Items Section -->
+            <h5 class="mb-3 text-secondary text-uppercase d-flex justify-content-between align-items-center" style="font-size:14px;letter-spacing:1px;font-weight:600;">
+                2. Rincian Nota & Pengeluaran
+                <button type="button" class="btn btn-sm btn-info" id="btnAddRow"><i class="fas fa-plus"></i> Tambah Baris</button>
+            </h5>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" id="itemsTable">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th width="12%">Tanggal Nota</th>
+                            <th width="18%">Pilih Proyek (Opsional)</th>
+                            <th width="18%">Kelompok Pengeluaran <span class="text-danger">*</span></th>
+                            <th width="20%">Nama Item/Deskripsi <span class="text-danger">*</span></th>
+                            <th width="8%">Pcs (Qty)</th>
+                            <th width="12%">Harga Satuan</th>
+                            <th width="12%">Jumlah</th>
+                            <th width="10%">Foto Nota</th>
+                            <th width="5%" class="text-center"><i class="fas fa-trash"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered mb-0" id="itemsTable" style="font-size: 13px;">
-                        <thead class="bg-light">
-                            <tr>
-                                <th width="5%" class="text-center">#</th>
-                                <th width="30%">Nama Item</th>
-                                <th width="10%">Qty</th>
-                                <th width="10%">Satuan</th>
-                                <th width="18%">Harga Satuan (Rp)</th>
-                                <th width="18%" class="text-right">Total (Rp)</th>
-                                <th width="5%" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsBody">
-                            <tr class="item-row">
-                                <td class="text-center row-number">1</td>
-                                <td>
-                                    <input type="hidden" name="item_id[]" class="item-id" value="">
-                                    <select class="form-control form-control-sm item-select select2-item" style="width:100%;">
-                                        <option value="">-- Pilih dari Master --</option>
-                                        <?php foreach ($items as $it): ?>
-                                            <option value="<?= $it['id'] ?>" data-name="<?= sanitize($it['description']) ?>" data-uom="<?= sanitize($it['uom']) ?>">
-                                                [<?= sanitize($it['item_code']) ?>] <?= sanitize($it['description']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <input type="text" name="item_name[]" class="form-control form-control-sm mt-1 item-name" placeholder="Atau ketik manual..." required>
-                                </td>
-                                <td><input type="text" name="item_qty[]" class="form-control form-control-sm item-qty" value="1" required></td>
-                                <td><input type="text" name="item_uom[]" class="form-control form-control-sm item-uom" placeholder="pcs"></td>
-                                <td><input type="text" name="item_price[]" class="form-control form-control-sm item-price rupiah-input" placeholder="0"></td>
-                                <td class="text-right font-weight-bold item-total">Rp 0</td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-danger btn-xs btn-remove-row" title="Hapus"><i class="fas fa-times"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr class="bg-light font-weight-bold">
-                                <td colspan="5" class="text-right">TOTAL:</td>
-                                <td class="text-right text-primary" id="grandTotal">Rp 0</td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+
+            <div class="row mt-3">
+                <div class="col-md-6 offset-md-6 text-right">
+                    <h4>Grand Total: <span class="text-danger font-weight-bold" id="grandTotalDisplay">Rp 0</span></h4>
                 </div>
             </div>
+
         </div>
 
-        <!-- Action Buttons -->
-        <div class="card card-body">
-            <div class="d-flex justify-content-between">
-                <a href="index.php" class="btn btn-default"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
-                <div>
-                    <button type="submit" name="action" value="draft" class="btn btn-secondary">
-                        <i class="fas fa-save mr-1"></i> Simpan Draft
-                    </button>
-                    <button type="submit" name="action" value="submit" class="btn btn-primary ml-2">
-                        <i class="fas fa-paper-plane mr-1"></i> Submit untuk Approval
-                    </button>
-                </div>
-            </div>
+        <div class="card-footer bg-white text-right">
+            <input type="hidden" name="status" id="formStatus" value="pending">
+            <a href="index.php" class="btn btn-default mr-2"><i class="fas fa-times mr-1"></i> Batal</a>
+            <button type="button" class="btn btn-primary" onclick="submitForm('pending')"><i class="fas fa-save mr-1"></i> Simpan Klaim</button>
         </div>
-    </div>
-
-    <!-- Side Panel -->
-    <div class="col-md-4">
-        <div class="card card-outline card-warning">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> Petunjuk</h3>
-            </div>
-            <div class="card-body" style="font-size:13px;">
-                <p>Claim Nota digunakan untuk mengklaim dana pribadi karyawan yang dipakai untuk keperluan perusahaan/proyek.</p>
-                <ul>
-                    <li>Pilih <strong>Proyek</strong> dan <strong>Perusahaan</strong> terkait.</li>
-                    <li>Item bisa dipilih dari <strong>Master Data</strong> atau diketik <strong>manual</strong>.</li>
-                    <li>Upload foto nota/struk sebagai bukti (opsional).</li>
-                    <li><strong>Draft</strong> = belum diajukan, <strong>Submit</strong> = langsung ke approval.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    </form>
 </div>
-</form>
+
+<!-- Template Row for Items -->
+<template id="rowTemplate">
+    <tr class="item-row">
+        <td>
+            <input type="date" name="item_date[]" class="form-control form-control-sm item-date-input" value="<?= date('Y-m-d') ?>" required>
+        </td>
+        <td>
+            <select name="project_id[]" class="form-control form-control-sm project-select">
+                <option value="">-- Tanpa Proyek --</option>
+                <?php foreach ($projects as $proj): ?>
+                    <option value="<?= $proj['id'] ?>"><?= sanitize($proj['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </td>
+        <td>
+            <input type="text" name="group_name[]" class="form-control form-control-sm group-input" value="Money change" placeholder="Cth: Money change / Developer" list="groupSuggestions" required>
+        </td>
+        <td>
+            <input type="text" name="item_name[]" class="form-control form-control-sm" placeholder="Deskripsi barang..." required>
+        </td>
+        <td>
+            <input type="text" name="qty[]" class="form-control form-control-sm input-number qty-input text-center" value="1" required>
+        </td>
+        <td>
+            <input type="text" name="price[]" class="form-control form-control-sm input-rupiah price-input text-right" value="0" required>
+        </td>
+        <td class="text-right text-bold text-muted amount-column" style="vertical-align:middle; padding-right:10px;">
+            Rp 0
+        </td>
+        <td>
+            <input type="file" name="photo[]" class="form-control-file photo-input" accept="image/*,application/pdf">
+        </td>
+        <td class="text-center" style="vertical-align:middle;">
+            <button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class="fas fa-times"></i></button>
+        </td>
+    </tr>
+</template>
+
+<datalist id="groupSuggestions">
+    <?php foreach ($existingGroups as $grp): ?>
+        <option value="<?= htmlspecialchars($grp) ?>"></option>
+    <?php endforeach; ?>
+</datalist>
 
 <?php
-// Build items JSON for JS
-$itemsJson = json_encode($items);
-$extraJS = <<<JS
+$extraJS = <<<'JS'
 <script>
-var masterItems = {$itemsJson};
-
 $(document).ready(function() {
-    initSelect2();
-    
-    // File input label
-    $('.custom-file-input').on('change', function() {
-        var fileName = $(this).val().split('\\\\').pop();
-        $(this).next('.custom-file-label').text(fileName || 'Pilih file...');
+    $('.select2').select2({
+        theme: 'bootstrap4',
+        width: '100%'
     });
-    
-    // Item select change - fill name & uom
-    $(document).on('change', '.item-select', function() {
-        var row = $(this).closest('.item-row');
-        var opt = $(this).find(':selected');
-        if (opt.val()) {
-            row.find('.item-name').val(opt.data('name'));
-            row.find('.item-uom').val(opt.data('uom'));
-            row.find('.item-id').val(opt.val());
+
+    // Employee Selection toggle switch logic
+    $('#switchManualEmployee').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#employeeSelectWrapper').addClass('d-none');
+            $('#employee_id').val('').trigger('change').prop('required', false);
+            
+            $('#employeeInputWrapper').removeClass('d-none');
+            $('#employee_name').prop('required', true);
         } else {
-            row.find('.item-id').val('');
+            $('#employeeInputWrapper').addClass('d-none');
+            $('#employee_name').val('').prop('required', false);
+            
+            $('#employeeSelectWrapper').removeClass('d-none');
+            $('#employee_id').prop('required', true);
         }
     });
-    
-    // Manual name input clears master selection
-    $(document).on('input', '.item-name', function() {
-        var row = $(this).closest('.item-row');
-        var sel = row.find('.item-select');
-        if (sel.val() && $(this).val() !== sel.find(':selected').data('name')) {
-            row.find('.item-id').val('');
-        }
-    });
-    
-    // Calculate totals
-    $(document).on('keyup change', '.item-qty, .item-price', function() {
-        calculateRow($(this).closest('.item-row'));
-        calculateGrandTotal();
-    });
-    
-    // Add row
-    $('#btnAddRow').click(function() {
-        var newRow = $('#itemsBody .item-row:first').clone();
-        // Clear values
-        newRow.find('.item-id').val('');
-        newRow.find('.item-name').val('');
-        newRow.find('.item-qty').val('1');
-        newRow.find('.item-uom').val('');
-        newRow.find('.item-price').val('');
-        newRow.find('.item-total').text('Rp 0');
+    // Trigger switch on load in case of post validation failure
+    $('#switchManualEmployee').trigger('change');
+
+    // Dynamic Row Logic
+    var template = $('#rowTemplate').html();
+    var tbody = $('#itemsBody');
+    var rowIndex = 0;
+
+    function addRow() {
+        var html = $(template);
         
-        // Destroy existing select2 and reinit
-        newRow.find('.select2-container').remove();
-        newRow.find('.item-select').removeClass('select2-hidden-accessible').removeAttr('data-select2-id').removeAttr('aria-hidden').removeAttr('tabindex');
-        // Reset select
-        newRow.find('.item-select').val('');
+        // Give unique name to photo input so that index matches PHP side uploads if we manipulate rows,
+        // but since we rely on array index, we keep it as photo[] or align them.
+        // Actually, photo[] works perfectly if we do NOT remove files from the request.
         
-        $('#itemsBody').append(newRow);
-        initSelect2();
-        renumberRows();
+        tbody.append(html);
+        calculateRowAmount(html);
+        rowIndex++;
+    }
+
+    // Add first row by default
+    addRow();
+
+    $('#btnAddRow').on('click', function() {
+        addRow();
     });
-    
-    // Remove row
-    $(document).on('click', '.btn-remove-row', function() {
-        if ($('#itemsBody .item-row').length > 1) {
-            $(this).closest('.item-row').remove();
-            renumberRows();
+
+    // Remove row logic
+    tbody.on('click', '.btn-remove-row', function() {
+        if (tbody.find('.item-row').length > 1) {
+            $(this).closest('tr').remove();
             calculateGrandTotal();
         } else {
-            Swal.fire('Info', 'Minimal harus ada 1 item.', 'info');
+            showError('Harus ada minimal 1 baris item pengeluaran.');
         }
     });
-    
-    // Rupiah formatting
-    $(document).on('keyup', '.rupiah-input', function() {
-        var val = $(this).val().replace(/[^0-9]/g, '');
-        if (val) {
-            $(this).val(parseInt(val).toLocaleString('id-ID'));
+
+    // On changing Project in a row, auto-fill the Group Name field
+    tbody.on('change', '.project-select', function() {
+        var row = $(this).closest('tr');
+        var selectedText = $(this).find('option:selected').text();
+        var groupInput = row.find('.group-input');
+        
+        if ($(this).val() !== '') {
+            groupInput.val(selectedText);
+        } else {
+            groupInput.val('Money change');
         }
     });
+
+    // Recalculate amounts on Qty or Price inputs
+    tbody.on('input', '.qty-input, .price-input', function() {
+        var row = $(this).closest('tr');
+        calculateRowAmount(row);
+    });
+
+    function calculateRowAmount(row) {
+        var qty = parseRupiahString(row.find('.qty-input').val()) || 0;
+        var price = parseRupiahString(row.find('.price-input').val()) || 0;
+        var amount = qty * price;
+        
+        row.find('.amount-column').text(formatRupiahJS(amount));
+        calculateGrandTotal();
+    }
+
+    function calculateGrandTotal() {
+        var grandTotal = 0;
+        tbody.find('.item-row').each(function() {
+            var qty = parseRupiahString($(this).find('.qty-input').val()) || 0;
+            var price = parseRupiahString($(this).find('.price-input').val()) || 0;
+            grandTotal += (qty * price);
+        });
+        $('#grandTotalDisplay').text(formatRupiahJS(grandTotal));
+    }
+
+    function parseRupiahString(str) {
+        if (!str) return 0;
+        return parseFloat(str.replace(/[^0-9]/g, '')) || 0;
+    }
+
+    function formatRupiahJS(num) {
+        return 'Rp ' + num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
 });
 
-function initSelect2() {
-    $('.select2').select2({ theme: 'bootstrap4' });
-    $('.select2-item').each(function() {
-        if (!$(this).data('select2')) {
-            $(this).select2({ theme: 'bootstrap4', placeholder: '-- Pilih dari Master --', allowClear: true });
+function submitForm(status) {
+    var form = $('#claimForm');
+    
+    // Validations
+    if (!$('#switchManualEmployee').is(':checked') && !$('#employee_id').val()) {
+        showError('Pilih Karyawan terlebih dahulu.');
+        return;
+    }
+    if ($('#switchManualEmployee').is(':checked') && !$('#employee_name').val().trim()) {
+        showError('Ketik Nama Karyawan terlebih dahulu.');
+        return;
+    }
+    if (!$('select[name="company_id"]').val()) {
+        showError('Pilih Perusahaan terlebih dahulu.');
+        return;
+    }
+
+    var hasEmptyItem = false;
+    $('input[name="item_name[]"]').each(function() {
+        if (!$(this).val().trim()) {
+            hasEmptyItem = true;
         }
     });
-}
 
-function calculateRow(row) {
-    var qty = parseFloat(row.find('.item-qty').val().replace(/[^0-9]/g, '')) || 0;
-    var price = parseFloat(row.find('.item-price').val().replace(/[^0-9]/g, '')) || 0;
-    var total = qty * price;
-    row.find('.item-total').text('Rp ' + total.toLocaleString('id-ID'));
-}
+    if (hasEmptyItem) {
+        showError('Semua baris Item/Deskripsi wajib diisi.');
+        return;
+    }
 
-function calculateGrandTotal() {
-    var grand = 0;
-    $('#itemsBody .item-row').each(function() {
-        var qty = parseFloat($(this).find('.item-qty').val().replace(/[^0-9]/g, '')) || 0;
-        var price = parseFloat($(this).find('.item-price').val().replace(/[^0-9]/g, '')) || 0;
-        grand += qty * price;
-    });
-    $('#grandTotal').text('Rp ' + grand.toLocaleString('id-ID'));
-}
-
-function renumberRows() {
-    $('#itemsBody .item-row').each(function(i) {
-        $(this).find('.row-number').text(i + 1);
-    });
+    $('#formStatus').val(status);
+    form.submit();
 }
 </script>
 JS;

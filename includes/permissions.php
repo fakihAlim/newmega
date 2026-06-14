@@ -36,9 +36,9 @@ $AVAILABLE_MODULES = [
     'Finance' => [
         'quotation' => 'Quotation',
         'invoice' => 'Invoice',
+        'claim_nota' => 'Claim Nota',
         'vendor_payments' => 'Pembayaran Vendor',
         'customer_payments' => 'Penerimaan Customer',
-        'claim_nota' => 'Claim Nota',
     ],
     'Timesheet' => [
         'timesheet' => 'Timesheet (Input & Approval)',
@@ -50,7 +50,6 @@ $AVAILABLE_MODULES = [
         'report_customer_outstanding' => 'Outstanding Customer',
         'report_profit_loss' => 'Profit & Loss',
         'report_stock' => 'Laporan Stok',
-        'report_claim_nota' => 'Laporan Claim Nota',
     ],
     'Administrasi' => [
         'users' => 'Manajemen User',
@@ -133,13 +132,13 @@ function canAccess($moduleKey, $action = 'view') {
             $userPermissions['invoice_view'] = $userPermissions['invoice'] ?? [];
             $userPermissions['invoice_approve'] = $userPermissions['invoice'] ?? [];
             
-            $userPermissions['timesheet_input'] = $userPermissions['timesheet'] ?? [];
-            $userPermissions['timesheet_approve'] = $userPermissions['timesheet'] ?? [];
-            
             $userPermissions['claim_nota_list'] = $userPermissions['claim_nota'] ?? [];
             $userPermissions['claim_nota_create'] = $userPermissions['claim_nota'] ?? [];
             $userPermissions['claim_nota_view'] = $userPermissions['claim_nota'] ?? [];
             $userPermissions['claim_nota_approve'] = $userPermissions['claim_nota'] ?? [];
+            
+            $userPermissions['timesheet_input'] = $userPermissions['timesheet'] ?? [];
+            $userPermissions['timesheet_approve'] = $userPermissions['timesheet'] ?? [];
         }
     }
     

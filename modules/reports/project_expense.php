@@ -1,7 +1,6 @@
 <?php
 /**
  * Report - Project Expense (Pengeluaran per Proyek)
- * Includes PO expenditure + Claim Nota
  */
 require_once __DIR__ . '/../../includes/auth.php';
 requirePermission('report_project_expense');
@@ -12,7 +11,32 @@ $breadcrumbs = [
     ['label' => 'Pengeluaran Proyek']
 ];
 
-// Fetch all projects with their PO expenditure + Claim Nota
+// Fetch all projects with their PO expenditure
+$sql = "
+    SELECT 
+        p.id, p.name, p.abbreviation, p.status, p.budget,
+        COALESCE(SUM(DISTINCT po_totals.po_total), 0) as total_po,
+        COALESCE(SUM(DISTINCT vp_totals.paid_total), 0) as total_paid
+    FROM projects p
+    LEFT JOIN (
+        SELECT pml.mr_id, po.id as po_id, po.total as po_total
+        FROM purchase_orders po
+        JOIN po_mr_links pml ON pml.po_id = po.id
+        WHERE po.status NOT IN ('draft', 'cancelled', 'rejected')
+    ) po_sub ON po_sub.mr_id IN (
+        SELECT mr.id FROM material_requests mr WHERE mr.project_id = p.id
+    )
+    LEFT JOIN (
+        SELECT po_id, total as po_total FROM purchase_orders WHERE status NOT IN ('draft','cancelled','rejected')
+    ) po_totals ON po_totals.po_id = po_sub.po_id
+    LEFT JOIN (
+        SELECT po_id, SUM(amount) as paid_total FROM vendor_payments GROUP BY po_id
+    ) vp_totals ON vp_totals.po_id = po_sub.po_id
+    GROUP BY p.id
+    ORDER BY p.name
+";
+
+// Simpler approach: get project-level PO spending via MR links
 $sql = "
     SELECT 
         p.id, p.name, p.abbreviation, p.status, p.budget,
@@ -29,11 +53,7 @@ $sql = "
          JOIN po_mr_links pml ON pml.po_id = po.id
          JOIN material_requests mr ON pml.mr_id = mr.id
          WHERE mr.project_id = p.id
-        ) as total_paid,
-        (SELECT COALESCE(SUM(cn.subtotal), 0) 
-         FROM claim_notas cn 
-         WHERE cn.project_id = p.id AND cn.status = 'approved'
-        ) as total_claim
+        ) as total_paid
     FROM projects p
     ORDER BY p.name
 ";
@@ -59,26 +79,23 @@ require_once __DIR__ . '/../../includes/report_print.php';
         <table id="reportTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
             <thead class="bg-light">
                 <tr>
-                    <th width="20%">Nama Proyek</th>
-                    <th width="8%" class="text-center">Status</th>
-                    <th width="7%" class="text-center">MR</th>
-                    <th width="13%" class="text-right">Budget (Rp)</th>
-                    <th width="13%" class="text-right">Nilai PO (Rp)</th>
-                    <th width="13%" class="text-right">Claim Nota (Rp)</th>
-                    <th width="13%" class="text-right">Terbayar (Rp)</th>
-                    <th width="8%" class="text-center">% Terpakai</th>
+                    <th width="25%">Nama Proyek</th>
+                    <th width="10%" class="text-center">Status</th>
+                    <th width="10%" class="text-center">Jumlah MR</th>
+                    <th width="15%" class="text-right">Budget (Rp)</th>
+                    <th width="15%" class="text-right">Nilai PO (Rp)</th>
+                    <th width="15%" class="text-right">Terbayar (Rp)</th>
+                    <th width="10%" class="text-center">% Terpakai</th>
                 </tr>
             </thead>
             <tbody>
                 <?php 
-                $grandBudget = 0; $grandPO = 0; $grandPaid = 0; $grandClaim = 0;
+                $grandBudget = 0; $grandPO = 0; $grandPaid = 0;
                 foreach ($projects as $p): 
-                    $totalExpense = $p['total_po_value'] + $p['total_claim'];
-                    $pctUsed = $p['budget'] > 0 ? round(($totalExpense / $p['budget']) * 100, 1) : 0;
+                    $pctUsed = $p['budget'] > 0 ? round(($p['total_po_value'] / $p['budget']) * 100, 1) : 0;
                     $pctClass = $pctUsed > 90 ? 'text-danger' : ($pctUsed > 70 ? 'text-warning' : 'text-success');
                     $grandBudget += $p['budget'];
                     $grandPO += $p['total_po_value'];
-                    $grandClaim += $p['total_claim'];
                     $grandPaid += $p['total_paid'];
                 ?>
                 <tr>
@@ -87,7 +104,6 @@ require_once __DIR__ . '/../../includes/report_print.php';
                     <td class="text-center"><?= $p['total_mr'] ?></td>
                     <td class="text-right"><?= formatRupiah($p['budget']) ?></td>
                     <td class="text-right font-weight-bold"><?= formatRupiah($p['total_po_value']) ?></td>
-                    <td class="text-right text-info"><?= formatRupiah($p['total_claim']) ?></td>
                     <td class="text-right text-success"><?= formatRupiah($p['total_paid']) ?></td>
                     <td class="text-center font-weight-bold <?= $pctClass ?>">
                         <?= $pctUsed ?>%
@@ -103,7 +119,6 @@ require_once __DIR__ . '/../../includes/report_print.php';
                     <td colspan="3" class="text-right">TOTAL:</td>
                     <td class="text-right"><?= formatRupiah($grandBudget) ?></td>
                     <td class="text-right"><?= formatRupiah($grandPO) ?></td>
-                    <td class="text-right text-info"><?= formatRupiah($grandClaim) ?></td>
                     <td class="text-right text-success"><?= formatRupiah($grandPaid) ?></td>
                     <td></td>
                 </tr>

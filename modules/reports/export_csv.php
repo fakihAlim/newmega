@@ -14,7 +14,6 @@ $permMap = [
     'profit_loss'          => 'report_profit_loss',
     'stock_report'         => 'report_stock',
     'stock_detail'         => 'report_stock',
-    'claim_nota'           => 'report_claim_nota',
 ];
 
 if (!isset($permMap[$type])) die('Tipe laporan tidak valid.');
@@ -53,9 +52,7 @@ if ($type === 'project_expense') {
              JOIN purchase_orders po ON vp.po_id=po.id
              JOIN po_mr_links pml ON pml.po_id=po.id
              JOIN material_requests mr ON pml.mr_id=mr.id
-             WHERE mr.project_id=p.id) as total_paid,
-            (SELECT COALESCE(SUM(cn.subtotal),0) FROM claim_notas cn
-             WHERE cn.project_id=p.id AND cn.status='approved') as total_claim
+             WHERE mr.project_id=p.id) as total_paid
         FROM projects p ORDER BY p.name
     ";
     $rows = $pdo->query($sql)->fetchAll();
@@ -64,11 +61,10 @@ if ($type === 'project_expense') {
     csvRow(['Laporan Pengeluaran Proyek']);
     csvRow(['Tanggal Export: ' . date('d-m-Y H:i')]);
     csvRow([]);
-    csvRow(['No','Nama Proyek','Status','Jumlah MR','Budget (Rp)','Nilai PO (Rp)','Claim Nota (Rp)','Terbayar (Rp)','% Terpakai']);
+    csvRow(['No','Nama Proyek','Status','Jumlah MR','Budget (Rp)','Nilai PO (Rp)','Terbayar (Rp)','% Terpakai']);
     $no = 1;
     foreach ($rows as $p) {
-        $totalExpense = $p['total_po_value'] + $p['total_claim'];
-        $pct = $p['budget'] > 0 ? round(($totalExpense / $p['budget']) * 100, 1) : 0;
+        $pct = $p['budget'] > 0 ? round(($p['total_po_value'] / $p['budget']) * 100, 1) : 0;
         csvRow([
             $no++,
             $p['name'],
@@ -76,7 +72,6 @@ if ($type === 'project_expense') {
             $p['total_mr'],
             csvNum($p['budget']),
             csvNum($p['total_po_value']),
-            csvNum($p['total_claim']),
             csvNum($p['total_paid']),
             $pct . '%',
         ]);
@@ -277,43 +272,6 @@ elseif ($type === 'stock_detail') {
             $tx['project_name'] ?: '-',
             $tx['user_name']    ?: '-',
             $tx['notes']        ?: '-',
-        ]);
-    }
-}
-
-// ════════════════════════════════════════════════════════
-// 7. CLAIM NOTA
-// ════════════════════════════════════════════════════════
-elseif ($type === 'claim_nota') {
-    $sql = "
-        SELECT cn.claim_number, cn.claim_date, cn.employee_name, cn.store_name, cn.subtotal, cn.status, cn.is_reimbursed,
-               p.name as project_name, c.name as company_name
-        FROM claim_notas cn
-        JOIN projects p ON cn.project_id = p.id
-        JOIN companies c ON cn.company_id = c.id
-        WHERE cn.status != 'draft'
-        ORDER BY cn.claim_date DESC
-    ";
-    $rows = $pdo->query($sql)->fetchAll();
-
-    startCSV('Laporan_Claim_Nota_' . date('d-m-Y'));
-    csvRow(['Laporan Claim Nota']);
-    csvRow(['Tanggal Export: ' . date('d-m-Y H:i')]);
-    csvRow([]);
-    csvRow(['No','No. Claim','Tanggal','Karyawan','Proyek','Perusahaan','Toko','Total (Rp)','Status']);
-    $no = 1;
-    foreach ($rows as $r) {
-        $statusText = $r['is_reimbursed'] ? 'Reimbursed' : ucfirst($r['status']);
-        csvRow([
-            $no++,
-            $r['claim_number'],
-            date('d-m-Y', strtotime($r['claim_date'])),
-            $r['employee_name'],
-            $r['project_name'],
-            $r['company_name'],
-            $r['store_name'] ?: '-',
-            csvNum($r['subtotal']),
-            $statusText,
         ]);
     }
 }

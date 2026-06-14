@@ -38,15 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($location)) $errors[] = "Lokasi proyek wajib diisi.";
     
     if (empty($errors)) {
-        // Generate abbreviation
-        $abbreviation = generateAbbreviation($name, $pdo, 'projects', 'abbreviation');
-        
         $stmt = $pdo->prepare("
-            INSERT INTO projects (name, abbreviation, customer_id, project_manager_id, location, start_date, end_date, budget, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')
+            INSERT INTO projects (name, customer_id, project_manager_id, location, start_date, end_date, budget, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
         ");
         
-        if ($stmt->execute([$name, $abbreviation, $customerId, $managerId, $location, $startDate, $endDate, $budget])) {
+        if ($stmt->execute([$name, $customerId, $managerId, $location, $startDate, $endDate, $budget])) {
             setFlash('success', "Proyek berhasil ditambahkan.");
             header('Location: ' . APP_URL . '/modules/master/projects/index.php');
             exit;

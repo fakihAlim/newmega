@@ -54,13 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         if (empty($errors)) {
-            try {
-                $pdo->beginTransaction();
-                
-                $hashedPass = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO users (username, password, full_name, gender, phone, email, address, photo, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)");
-                
-                $stmt->execute([$username, $hashedPass, $fullName, $gender, $phone, $email, $address, $photoFilename]);
+            $hashedPass = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO users (username, password, full_name, gender, phone, email, address, photo, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)");
+            
+            if ($stmt->execute([$username, $hashedPass, $fullName, $gender, $phone, $email, $address, $photoFilename])) {
                 $userId = $pdo->lastInsertId();
                 
                 // Save Roles
@@ -69,15 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmtRole->execute([$userId, $roleId]);
                 }
 
-                $pdo->commit();
                 setFlash('success', 'User berhasil ditambahkan.');
                 header('Location: ' . APP_URL . '/modules/users/index.php');
                 exit;
-            } catch (Exception $e) {
-                if ($pdo->inTransaction()) {
-                    $pdo->rollBack();
-                }
-                $errors[] = "Terjadi kesalahan sistem: " . $e->getMessage();
+            } else {
+                setFlash('danger', 'Terjadi kesalahan sistem saat menyimpan data.');
             }
         }
     }

@@ -110,7 +110,7 @@ function generateDocNumber($pdo, $type, $abbreviation = '') {
         'Q'   => ['table' => 'quotations', 'column' => 'quotation_no'],
         'INV' => ['table' => 'invoices', 'column' => 'invoice_no'],
         'TRF' => ['table' => 'warehouse_transfers', 'column' => 'transfer_number'],
-        'CLM' => ['table' => 'claim_notas', 'column' => 'claim_number'],
+        'CLM' => ['table' => 'nota_claims', 'column' => 'claim_number'],
     ];
     
     if (!isset($tableMap[$type])) {
@@ -186,7 +186,6 @@ function getStatusBadge($status) {
         'partial_paid'        => '<span class="badge badge-warning">Partial Paid</span>',
         'planning'            => '<span class="badge badge-secondary">Planning</span>',
         'active'              => '<span class="badge badge-success">Active</span>',
-        'reimbursed'          => '<span class="badge badge-info">Reimbursed</span>',
     ];
     
     return $badges[$status] ?? '<span class="badge badge-secondary">' . ucfirst(str_replace('_', ' ', $status)) . '</span>';

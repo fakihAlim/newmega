@@ -135,8 +135,11 @@ $(document).ready(function () {
         );
     });
 
-    // Tooltip initialization
-    $('[data-toggle="tooltip"]').tooltip();
+    // Tooltip initialization with delegation and hover-only trigger to prevent click/focus hijacking
+    $('body').tooltip({
+        selector: '[data-toggle="tooltip"]',
+        trigger: 'hover'
+    });
     
     // Duplicate Name Checker for Master Data
     let checkTimeout;
@@ -182,5 +185,35 @@ $(document).ready(function () {
             dt.page.len(len).draw('page');
         });
     };
+
+    // Global toastr fallback using SweetAlert2 toasts to avoid ReferenceErrors
+    if (typeof toastr === 'undefined') {
+        window.toastr = {
+            success: function(message) {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                }).fire({
+                    icon: 'success',
+                    title: message
+                });
+            },
+            error: function(message) {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                }).fire({
+                    icon: 'error',
+                    title: message
+                });
+            }
+        };
+    }
 });
 

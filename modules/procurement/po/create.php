@@ -460,6 +460,43 @@ require_once __DIR__ . '/../../../includes/header.php';
     </div>
 </div>
 
+<!-- Modal Price Comparison -->
+<div class="modal fade" id="modalPriceComparison" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-balance-scale mr-2"></i> Perbandingan Harga Vendor</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="compareItemName" class="font-weight-bold mb-3" style="font-size: 16px;"></div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover table-sm w-100" id="tablePriceComparison" style="font-size:13px;">
+                        <thead class="bg-light">
+                            <tr>
+                                <th width="10%" class="text-center">No</th>
+                                <th width="20%">Tanggal PO</th>
+                                <th width="20%">No. PO</th>
+                                <th width="25%">Nama Vendor</th>
+                                <th width="15%" class="text-right">Harga Satuan</th>
+                                <th width="10%" class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compareResultBody">
+                            <!-- Loaded dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 $extraJS = <<<'JS'
 <script>
@@ -578,6 +615,7 @@ $(document).ready(function() {
                 ${nameInput}
                 <input type="hidden" name="mr_item_id[]" value="${data.mr_item_id || ''}">
                 <input type="hidden" name="mr_header_id[]" value="${data.mr_header_id || ''}">
+                <div class="price-comparison-link mt-1" style="font-size: 11px;"></div>
             </td>
             <td><span class="badge ${isManual ? 'badge-secondary' : 'badge-info'}">${data.mr_number || 'Manual'}</span></td>
             <td>
@@ -630,9 +668,11 @@ $(document).ready(function() {
         if (opt.val()) {
             row.find('.dt-item-name').val(opt.data('description'));
             row.find('.dt-uom').val(opt.data('uom'));
+            checkPriceComparison(row, opt.val());
         } else {
             row.find('.dt-item-name').val('');
             row.find('.dt-uom').val('');
+            row.find('.price-comparison-link').empty();
         }
         updateItemSelects();
     });
@@ -732,6 +772,7 @@ $(document).ready(function() {
                 var $htmlRow = $(html);
                 tbody.append($htmlRow);
                 calculateRow($htmlRow);
+                checkPriceComparison($htmlRow, rowData.item_id);
                 imported++;
                 
                 // Track requester names for auto-fill
@@ -753,6 +794,73 @@ $(document).ready(function() {
             toastr.success(imported + " item MR berhasil ditarik ke dalam tabel PO.");
         }
     });
+
+    function checkPriceComparison(row, itemId) {
+        var linkContainer = row.find('.price-comparison-link');
+        linkContainer.empty();
+        if (!itemId) return;
+        
+        $.getJSON(APP_URL + '/api/get_price_comparison.php', { item_id: itemId }, function(data) {
+            if (data && data.length > 0 && !data.error) {
+                var minPrice = parseIdr(data[0].unit_price);
+                var minPriceFormatted = formatIdr(minPrice);
+                var linkHtml = `<a href="#" class="btn-compare-price text-info font-weight-bold" data-item-id="${itemId}" data-item-name="${row.find('.dt-item-name').val() || row.find('.dt-item-select option:selected').text()}">[🔍 Bandingkan Harga]</a>`;
+                linkContainer.html(linkHtml);
+            }
+        });
+    }
+
+    // Event handler for clicking the price comparison link
+    tbody.on('click', '.btn-compare-price', function(e) {
+        e.preventDefault();
+        var btn = $(this);
+        var itemId = btn.data('item-id');
+        var itemName = btn.data('item-name');
+        
+        var row = btn.closest('tr');
+        $('#modalPriceComparison').data('target-row', row);
+        
+        $('#compareItemName').text(itemName);
+        $('#compareResultBody').html('<tr><td colspan="6" class="text-center">Memuat data...</td></tr>');
+        $('#modalPriceComparison').modal('show');
+        
+        $.getJSON(APP_URL + '/api/get_price_comparison.php', { item_id: itemId }, function(data) {
+            if (data && data.length > 0 && !data.error) {
+                var rowsHtml = '';
+                data.forEach(function(item, idx) {
+                    var formattedPrice = formatIdr(parseFloat(item.unit_price));
+                    var dateFormatted = item.po_date ? item.po_date.split('-').reverse().join('-') : '-';
+                    rowsHtml += `
+                    <tr>
+                        <td class="text-center">${idx + 1}</td>
+                        <td>${dateFormatted}</td>
+                        <td>${item.po_number}</td>
+                        <td>${item.vendor_name}</td>
+                        <td class="text-right font-weight-bold text-success">Rp ${formattedPrice}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-primary btn-sm btn-apply-price" data-price="${item.unit_price}" data-dismiss="modal">Gunakan</button>
+                        </td>
+                    </tr>
+                    `;
+                });
+                $('#compareResultBody').html(rowsHtml);
+            } else {
+                $('#compareResultBody').html('<tr><td colspan="6" class="text-center text-muted">Tidak ada riwayat harga untuk barang ini.</td></tr>');
+            }
+        });
+    });
+
+    // Event handler for applying the selected price
+    $('#modalPriceComparison').on('click', '.btn-apply-price', function() {
+        var price = $(this).data('price');
+        var targetRow = $('#modalPriceComparison').data('target-row');
+        if (targetRow) {
+            targetRow.find('.col-price').val(formatIdr(parseFloat(price)));
+            calculateRow(targetRow);
+        }
+        $('#modalPriceComparison').modal('hide');
+    });
+
     function updateItemSelects() {
         var selectedIds = [];
         $('.dt-item-select').each(function() {

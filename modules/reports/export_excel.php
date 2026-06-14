@@ -22,7 +22,6 @@ $permMap = [
     'profit_loss'          => 'report_profit_loss',
     'stock_report'         => 'report_stock',
     'stock_detail'         => 'report_stock',
-    'claim_nota'           => 'report_claim_nota',
 ];
 
 if (!isset($permMap[$type])) {
@@ -91,21 +90,20 @@ if ($type === 'project_expense') {
              JOIN purchase_orders po ON vp.po_id = po.id
              JOIN po_mr_links pml ON pml.po_id = po.id
              JOIN material_requests mr ON pml.mr_id = mr.id
-             WHERE mr.project_id = p.id) as total_paid,
-            (SELECT COALESCE(SUM(cn.subtotal),0) FROM claim_notas cn
-             WHERE cn.project_id = p.id AND cn.status = 'approved') as total_claim
+             WHERE mr.project_id = p.id) as total_paid
         FROM projects p ORDER BY p.name
     ";
     $rows = $pdo->query($sql)->fetchAll();
 
-    writeTitle($sp, 'Laporan Pengeluaran Proyek', 8, $filename);
+    writeTitle($sp, 'Laporan Pengeluaran Proyek', 7, $filename);
 
-    $headers = ['No','Nama Proyek','Status','Jumlah MR','Budget (Rp)','Nilai PO (Rp)','Claim Nota (Rp)','Terbayar (Rp)'];
+    $headers = ['No','Nama Proyek','Status','Jumlah MR','Budget (Rp)','Nilai PO (Rp)','Terbayar (Rp)'];
     $ws->fromArray($headers, null, 'A3');
-    styleHeader($sp, 'A3:H3');
+    styleHeader($sp, 'A3:G3');
 
     $row = 4; $no = 1;
     foreach ($rows as $p) {
+        $pct = $p['budget'] > 0 ? round(($p['total_po_value']/$p['budget'])*100,1) : 0;
         $ws->fromArray([
             $no++,
             $p['name'],
@@ -113,14 +111,13 @@ if ($type === 'project_expense') {
             $p['total_mr'],
             excelRupiah($p['budget']),
             excelRupiah($p['total_po_value']),
-            excelRupiah($p['total_claim']),
             excelRupiah($p['total_paid']),
         ], null, "A{$row}");
         $row++;
     }
-    if ($row > 4) styleData($sp, "A4:H" . ($row-1));
+    if ($row > 4) styleData($sp, "A4:G" . ($row-1));
 
-    $widths = [5,35,15,12,20,20,20,20];
+    $widths = [5,35,15,12,20,20,20];
     foreach ($widths as $i => $w) $ws->getColumnDimensionByColumn($i+1)->setWidth($w);
 }
 
@@ -374,51 +371,6 @@ elseif ($type === 'stock_detail') {
     if ($row > 5) styleData($sp, "A5:H" . ($row-1));
 
     $widths = [5,18,18,8,18,25,20,30];
-    foreach ($widths as $i => $w) $ws->getColumnDimensionByColumn($i+1)->setWidth($w);
-}
-
-// ═══════════════════════════════════════════════════════════
-// 7. CLAIM NOTA
-// ═══════════════════════════════════════════════════════════
-elseif ($type === 'claim_nota') {
-    $filename = 'Laporan_Claim_Nota_' . date('d-m-Y');
-    $ws->setTitle('Claim Nota');
-
-    $sql = "
-        SELECT cn.claim_number, cn.claim_date, cn.employee_name, cn.store_name, cn.subtotal, cn.status, cn.is_reimbursed,
-               p.name as project_name, c.name as company_name
-        FROM claim_notas cn
-        JOIN projects p ON cn.project_id = p.id
-        JOIN companies c ON cn.company_id = c.id
-        WHERE cn.status != 'draft'
-        ORDER BY cn.claim_date DESC
-    ";
-    $rows = $pdo->query($sql)->fetchAll();
-
-    writeTitle($sp, 'Laporan Claim Nota', 9, $filename);
-    $headers = ['No','No. Claim','Tanggal','Karyawan','Proyek','Perusahaan','Toko','Total (Rp)','Status'];
-    $ws->fromArray($headers, null, 'A3');
-    styleHeader($sp, 'A3:I3');
-
-    $row = 4; $no = 1;
-    foreach ($rows as $r) {
-        $statusText = $r['is_reimbursed'] ? 'Reimbursed' : ucfirst($r['status']);
-        $ws->fromArray([
-            $no++,
-            $r['claim_number'],
-            date('d-m-Y', strtotime($r['claim_date'])),
-            $r['employee_name'],
-            $r['project_name'],
-            $r['company_name'],
-            $r['store_name'] ?: '-',
-            excelRupiah($r['subtotal']),
-            $statusText,
-        ], null, "A{$row}");
-        $row++;
-    }
-    if ($row > 4) styleData($sp, "A4:I" . ($row-1));
-
-    $widths = [5,18,12,20,25,20,15,18,12];
     foreach ($widths as $i => $w) $ws->getColumnDimensionByColumn($i+1)->setWidth($w);
 }
 

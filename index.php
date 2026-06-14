@@ -94,9 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login | <?= APP_NAME ?></title>
 
-    <!-- Google Font: Roboto -->
+    <!-- Google Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -116,13 +117,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .login-box {
             margin: 0;
+        }
+
+        .login-bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .login-bg-decoration .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.05;
+            background: #f59e0b;
+        }
+
+        .login-bg-decoration .circle:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            top: -200px;
+            right: -100px;
+        }
+
+        .login-bg-decoration .circle:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            left: -100px;
+        }
+
+        .login-bg-decoration .circle:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 10%;
+            opacity: 0.03;
+        }
+
+        .login-box {
             position: relative;
             z-index: 1;
         }
 
         .login-card-body {
-            background: #ffffff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
         }
 
         .login-subtitle {
@@ -143,20 +186,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-login {
-            background: #f59e0b;
-            color: #fff;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
             border: none;
             padding: 12px;
             font-size: 15px;
             font-weight: 600;
-            border-radius: 4px;
+            border-radius: 8px;
             letter-spacing: 0.3px;
             transition: all 0.3s ease;
         }
 
         .btn-login:hover {
-            background: #d97706;
+            background: linear-gradient(135deg, #d97706, #b45309);
             transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
         }
 
         .login-features {
@@ -205,13 +248,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body class="hold-transition login-page">
+    <!-- Background Decoration -->
+    <div class="login-bg-decoration">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+
     <div class="login-box">
         <div class="login-logo">
+            <!-- <div class="logo-icon">
+                <i class="fas fa-hard-hat text-white" style="font-size:28px;"></i>
+            </div> -->
+            <br>
             <a href="#">
-                <img src="<?= APP_URL ?>/assets/img/logo-perusahaan.png" alt="Logo PT MKM" style="height: 50px; margin-bottom: 10px; border-radius: 4px;">
-                <br>
-                <span style="color:#f59e0b; font-weight: 700;">MKM</span> <span style="color:#fff; font-weight: 700;">Procurement</span>
+                <span style="color:#f59e0b;">MKM</span> <span style="color:#fff;">Procurement</span>
             </a>
+            <!-- <p class="login-subtitle">E-Procurement Management System</p> -->
         </div>
 
         <div class="card">
