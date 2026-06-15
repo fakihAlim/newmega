@@ -158,7 +158,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             <option value="fa-home" data-icon="fa-home">Rumah (fa-home)</option>
                             <option value="fa-building" data-icon="fa-building">Gedung (fa-building)</option>
                             <option value="fa-tools" data-icon="fa-tools">Peralatan (fa-tools)</option>
-                            <option value="fa-drafting-line" data-icon="fa-drafting-line">Blueprint / Desain (fa-drafting-line)</option>
+                            <option value="fa-drafting-compass" data-icon="fa-drafting-compass">Blueprint / Desain (fa-drafting-compass)</option>
                             <option value="fa-hammer" data-icon="fa-hammer">Palu (fa-hammer)</option>
                             <option value="fa-road" data-icon="fa-road">Jalan / Infrastruktur (fa-road)</option>
                             <option value="fa-warehouse" data-icon="fa-warehouse">Gudang (fa-warehouse)</option>

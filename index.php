@@ -773,7 +773,7 @@ try {
                     </div>
                     <div class="col-md-6 col-lg-3 mb-4">
                         <div class="service-card">
-                            <div class="service-icon-box"><i class="fas fa-drafting-line"></i></div>
+                            <div class="service-icon-box"><i class="fas fa-drafting-compass"></i></div>
                             <h3>Desain & Perencanaan</h3>
                             <p>Gambar kerja detail, perhitungan kekuatan struktur (RAB), dan perencanaan blueprint proyek konstruksi.</p>
                         </div>

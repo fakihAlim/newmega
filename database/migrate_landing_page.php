@@ -129,7 +129,7 @@ try {
         $stmt->execute([
             'Desain Arsitektur & Perencanaan',
             'Gambar kerja detail, perhitungan kekuatan struktur (RAB), dan perencanaan blueprint proyek konstruksi.',
-            'fa-drafting-line',
+            'fa-drafting-compass',
             4
         ]);
         echo "Seeded landing_services.\n";
