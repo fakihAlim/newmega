@@ -78,6 +78,111 @@ $lowStockItems = $pdo->query("
     LIMIT 5
 ")->fetchAll();
 
+// === Executive Dashboard Chart Data ===
+$cashFlowMonths = [];
+$cashFlowIn = [];
+$cashFlowOut = [];
+$projectNames = [];
+$projectBudgets = [];
+$projectActuals = [];
+$categoryNames = [];
+$categorySpent = [];
+
+if (!hasRole(['karyawan'])) {
+    // 1. Query for Cash Flow Trend (Last 6 Months)
+    $cashFlowSql = "
+        SELECT 
+            months.month_label,
+            COALESCE(SUM(cash_in.amount), 0) AS total_in,
+            COALESCE(SUM(cash_out.amount), 0) AS total_out
+        FROM (
+            SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 5 MONTH), '%Y-%m') AS month_label UNION ALL
+            SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 4 MONTH), '%Y-%m') UNION ALL
+            SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 MONTH), '%Y-%m') UNION ALL
+            SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 2 MONTH), '%Y-%m') UNION ALL
+            SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m') UNION ALL
+            SELECT DATE_FORMAT(CURDATE(), '%Y-%m')
+        ) months
+        LEFT JOIN (
+            SELECT DATE_FORMAT(payment_date, '%Y-%m') AS month_label, amount 
+            FROM customer_payments
+        ) cash_in ON months.month_label = cash_in.month_label
+        LEFT JOIN (
+            SELECT DATE_FORMAT(payment_date, '%Y-%m') AS month_label, amount 
+            FROM vendor_payments
+            UNION ALL
+            SELECT DATE_FORMAT(claim_date, '%Y-%m') AS month_label, total_amount AS amount
+            FROM nota_claims WHERE status = 'paid'
+        ) cash_out ON months.month_label = cash_out.month_label
+        GROUP BY months.month_label
+        ORDER BY months.month_label ASC
+    ";
+    $cashFlowData = $pdo->query($cashFlowSql)->fetchAll();
+
+    $indonesianMonths = [
+        '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr', '05' => 'Mei', '06' => 'Jun',
+        '07' => 'Jul', '08' => 'Ags', '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'
+    ];
+    foreach ($cashFlowData as $row) {
+        list($year, $month) = explode('-', $row['month_label']);
+        $label = $indonesianMonths[$month] . ' ' . substr($year, 2);
+        $cashFlowMonths[] = $label;
+        $cashFlowIn[] = (float)$row['total_in'];
+        $cashFlowOut[] = (float)$row['total_out'];
+    }
+
+    // 2. Query for active projects: Budget vs Actual (PO + Claims)
+    $projectSql = "
+        SELECT 
+            p.name, 
+            p.budget,
+            -- PO Expenses
+            (SELECT COALESCE(SUM(po.total), 0) 
+             FROM purchase_orders po 
+             JOIN po_mr_links pml ON pml.po_id = po.id 
+             JOIN material_requests mr ON pml.mr_id = mr.id 
+             WHERE mr.project_id = p.id AND po.status NOT IN ('draft','cancelled','rejected')
+            ) as total_po_value,
+            -- Claim Nota Expenses
+            (SELECT COALESCE(SUM(nci.amount), 0)
+             FROM nota_claim_items nci
+             JOIN nota_claims nc ON nci.claim_id = nc.id
+             WHERE nci.project_id = p.id AND nc.status = 'paid'
+            ) as total_claim_value
+        FROM projects p
+        WHERE p.status = 'active'
+        ORDER BY p.name ASC
+    ";
+    $projectsData = $pdo->query($projectSql)->fetchAll();
+
+    foreach ($projectsData as $row) {
+        $projectNames[] = $row['name'];
+        $projectBudgets[] = (float)$row['budget'];
+        $projectActuals[] = (float)$row['total_po_value'] + (float)$row['total_claim_value'];
+    }
+
+    // 3. Query for Top 5 Categories Spent
+    $categorySql = "
+        SELECT 
+            c.name AS category_name, 
+            COALESCE(SUM(poi.total), 0) AS total_spent
+        FROM purchase_order_items poi
+        JOIN items i ON poi.item_id = i.id
+        JOIN categories c ON i.category_id = c.id
+        JOIN purchase_orders po ON poi.po_id = po.id
+        WHERE po.status NOT IN ('draft','cancelled','rejected')
+        GROUP BY c.id
+        ORDER BY total_spent DESC
+        LIMIT 5
+    ";
+    $categoriesData = $pdo->query($categorySql)->fetchAll();
+
+    foreach ($categoriesData as $row) {
+        $categoryNames[] = $row['category_name'];
+        $categorySpent[] = (float)$row['total_spent'];
+    }
+}
+
 // === Karyawan Dashboard Data ===
 $karyawanDash = null;
 if (hasRole(['karyawan'])) {
@@ -423,6 +528,125 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 <?php endif; ?>
 
+<?php if (hasRole(['super_admin', 'finance', 'project_manager'])): ?>
+<!-- Executive Charts Section -->
+<div class="row">
+    <!-- Chart 1: Cash Flow Trend -->
+    <div class="col-lg-7 col-md-12 mb-4 animate__animated animate__fadeIn">
+        <div class="card card-outline card-primary h-100 shadow-sm border-0" style="border-radius: 8px;">
+            <div class="card-header bg-white py-3 border-0">
+                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-chart-line mr-2 text-primary"></i>Tren Arus Kas (6 Bulan Terakhir)</h3>
+            </div>
+            <div class="card-body p-2">
+                <div id="chart-cash-flow" style="min-height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart 2: Top 5 Category Spending -->
+    <div class="col-lg-5 col-md-12 mb-4 animate__animated animate__fadeIn">
+        <div class="card card-outline card-info h-100 shadow-sm border-0" style="border-radius: 8px;">
+            <div class="card-header bg-white py-3 border-0">
+                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-chart-pie mr-2 text-info"></i>5 Kategori Terboros (PO)</h3>
+            </div>
+            <div class="card-body p-2 d-flex flex-column justify-content-center">
+                <div id="chart-categories" style="min-height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Chart 3: Project Budget vs Actual -->
+    <div class="col-lg-8 col-md-12 mb-4 animate__animated animate__fadeIn">
+        <div class="card card-outline card-success h-100 shadow-sm border-0" style="border-radius: 8px;">
+            <div class="card-header bg-white py-3 border-0">
+                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-chart-bar mr-2 text-success"></i>Budget vs Aktual Per Proyek</h3>
+            </div>
+            <div class="card-body p-2">
+                <div id="chart-projects" style="min-height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Widget 4: Financial Overview AP vs AR & Budget Efficiency -->
+    <div class="col-lg-4 col-md-12 mb-4 animate__animated animate__fadeIn">
+        <div class="card card-outline card-warning h-100 shadow-sm border-0" style="border-radius: 8px;">
+            <div class="card-header bg-white py-3 border-0">
+                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-wallet mr-2 text-warning"></i>Analitis & Efisiensi Anggaran</h3>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-between p-3">
+                <!-- AR vs AP Card -->
+                <div class="mb-3">
+                    <h6 class="text-muted font-weight-bold mb-2 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Outstanding Cash Flow</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-sm">Piutang Customer (AR)</span>
+                        <span class="font-weight-bold text-success text-sm"><?= formatRupiah($stats['customer_outstanding']) ?></span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-sm">Hutang Vendor (AP)</span>
+                        <span class="font-weight-bold text-danger text-sm"><?= formatRupiah($stats['vendor_outstanding']) ?></span>
+                    </div>
+                    <?php 
+                        $netOutstanding = $stats['customer_outstanding'] - $stats['vendor_outstanding'];
+                        $netColor = $netOutstanding >= 0 ? 'text-success' : 'text-danger';
+                    ?>
+                    <hr class="my-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="font-weight-bold text-sm">Proyeksi Bersih (Net)</span>
+                        <span class="font-weight-bold <?= $netColor ?> text-sm"><?= ($netOutstanding < 0 ? '-' : '') . formatRupiah(abs($netOutstanding)) ?></span>
+                    </div>
+                </div>
+
+                <!-- Budget Efficiency Analysis -->
+                <div>
+                    <h6 class="text-muted font-weight-bold mb-2 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Proyek Terboros & Anggaran</h6>
+                    <?php 
+                        // Find active project with highest % spent
+                        $highestPct = 0;
+                        $highestProjectName = 'Tidak ada';
+                        $totalActiveBudget = 0;
+                        $totalActiveSpent = 0;
+                        foreach ($projectsData as $row) {
+                            $spent = (float)$row['total_po_value'] + (float)$row['total_claim_value'];
+                            $totalActiveBudget += (float)$row['budget'];
+                            $totalActiveSpent += $spent;
+                            if ($row['budget'] > 0) {
+                                $pct = ($spent / (float)$row['budget']) * 100;
+                                if ($pct > $highestPct) {
+                                    $highestPct = $pct;
+                                    $highestProjectName = $row['name'];
+                                }
+                            }
+                        }
+                        $overallEfficiency = $totalActiveBudget > 0 ? ($totalActiveSpent / $totalActiveBudget) * 100 : 0;
+                        $efficiencyColor = $overallEfficiency > 90 ? 'danger' : ($overallEfficiency > 70 ? 'warning' : 'success');
+                    ?>
+                    <div class="mb-2">
+                        <span class="text-sm d-block text-muted">Total Anggaran Proyek Aktif:</span>
+                        <span class="font-weight-bold text-dark"><?= formatRupiah($totalActiveBudget) ?></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-sm d-block text-muted">Efisiensi Keseluruhan:</span>
+                        <div class="progress progress-sm" style="border-radius:4px; height:8px;">
+                            <div class="progress-bar bg-<?= $efficiencyColor ?>" style="width: <?= min(100, $overallEfficiency) ?>%"></div>
+                        </div>
+                        <span class="text-xs text-muted font-weight-bold"><?= round($overallEfficiency, 1) ?>% Terpakai dari total anggaran</span>
+                    </div>
+                    <?php if ($highestPct > 0): ?>
+                    <div class="p-2 bg-light" style="border-radius: 6px; border-left: 3px solid #dc3545;">
+                        <span class="text-xs text-uppercase font-weight-bold text-danger d-block">Anggaran Tertinggi Terpakai:</span>
+                        <span class="text-sm font-weight-bold text-dark"><?= sanitize($highestProjectName) ?></span>
+                        <span class="text-xs text-muted d-block"><?= round($highestPct, 1) ?>% Anggaran Terpakai</span>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- Quick Stats Footer -->
 <div class="row">
     <div class="col-md-3 col-sm-6">
@@ -627,7 +851,9 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <?php
-$extraJS = <<<'JS'
+ob_start();
+?>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
 $(document).ready(function() {
     $('.view-item-history').on('click', function(e) {
@@ -656,9 +882,146 @@ $(document).ready(function() {
             }
         });
     });
+
+    <?php if (hasRole(['super_admin', 'finance', 'project_manager'])): ?>
+    // 1. Chart: Cash Flow Trend
+    if ($('#chart-cash-flow').length) {
+        var optionsCashFlow = {
+            chart: {
+                type: 'area',
+                height: 350,
+                fontFamily: 'inherit',
+                toolbar: { show: false },
+                zoom: { enabled: false }
+            },
+            colors: ['#28a745', '#dc3545'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.35,
+                    opacityTo: 0.05,
+                    stops: [0, 90, 100]
+                }
+            },
+            dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 3 },
+            series: [{
+                name: 'Uang Masuk (Debit)',
+                data: <?php echo json_encode($cashFlowIn); ?>
+            }, {
+                name: 'Uang Keluar (Kredit)',
+                data: <?php echo json_encode($cashFlowOut); ?>
+            }],
+            xaxis: {
+                categories: <?php echo json_encode($cashFlowMonths); ?>,
+                labels: { style: { colors: '#64748b' } }
+            },
+            yaxis: {
+                labels: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    },
+                    style: { colors: '#64748b' }
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    }
+                }
+            },
+            grid: { borderColor: '#f1f5f9' }
+        };
+        var chartCashFlow = new ApexCharts(document.querySelector("#chart-cash-flow"), optionsCashFlow);
+        chartCashFlow.render();
+    }
+
+    // 2. Chart: Budget vs Actual
+    if ($('#chart-projects').length) {
+        var optionsProjects = {
+            chart: {
+                type: 'bar',
+                height: 350,
+                fontFamily: 'inherit',
+                toolbar: { show: false }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    borderRadius: 4
+                },
+            },
+            colors: ['#007bff', '#28a745'],
+            dataLabels: { enabled: false },
+            stroke: { show: true, width: 2, colors: ['transparent'] },
+            series: [{
+                name: 'Anggaran (Budget)',
+                data: <?php echo json_encode($projectBudgets); ?>
+            }, {
+                name: 'Biaya Aktual (PO + Claim)',
+                data: <?php echo json_encode($projectActuals); ?>
+            }],
+            xaxis: {
+                categories: <?php echo json_encode($projectNames); ?>,
+                labels: { style: { colors: '#64748b' } }
+            },
+            yaxis: {
+                labels: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    },
+                    style: { colors: '#64748b' }
+                }
+            },
+            fill: { opacity: 0.95 },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    }
+                }
+            },
+            grid: { borderColor: '#f1f5f9' }
+        };
+        var chartProjects = new ApexCharts(document.querySelector("#chart-projects"), optionsProjects);
+        chartProjects.render();
+    }
+
+    // 3. Chart: Top Categories
+    if ($('#chart-categories').length) {
+        var optionsCategories = {
+            chart: {
+                type: 'donut',
+                height: 350,
+                fontFamily: 'inherit'
+            },
+            series: <?php echo json_encode($categorySpent); ?>,
+            labels: <?php echo json_encode($categoryNames); ?>,
+            colors: ['#17a2b8', '#ffc107', '#007bff', '#dc3545', '#6c757d'],
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center'
+            },
+            dataLabels: { enabled: false },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    }
+                }
+            }
+        };
+        var chartCategories = new ApexCharts(document.querySelector("#chart-categories"), optionsCategories);
+        chartCategories.render();
+    }
+    <?php endif; ?>
 });
 </script>
-JS;
+<?php
+$extraJS = ob_get_clean();
 ?>
 
 <?php endif; // end !karyawan ?>

@@ -227,12 +227,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-box">
         <div class="login-logo mb-3">
             <a href="index.php" class="d-flex align-items-center justify-content-center text-decoration-none" style="gap: 10px;">
-                <span class="d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#091426;border-radius:4px;">
+                <strong>E-Procurement System</strong>
+                 <!-- <span class="d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#091426;border-radius:4px;">
                     <i class="fas fa-hard-hat text-white" style="font-size:18px;"></i>
                 </span>
                 <span class="font-weight-bold" style="font-size: 24px; font-family: 'Montserrat', sans-serif;">
                     <span style="color:#091426;">MKM</span> <span style="color:#f28c28;">Procurement</span>
-                </span>
+                </span> -->
             </a>
         </div>
 
@@ -280,13 +281,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" class="btn btn-block btn-login mt-4">
                         <i class="fas fa-sign-in-alt mr-1"></i> MASUK
                     </button>
+                    <button type="submit" class="btn btn-block btn-login mt-4">
+                        <a href="index.php" class="d-flex align-items-center justify-content-center text-decoration-none" style="gap: 10px;">
+                Ke Halaman Utama
+            </a>
+                    </button>
                 </form>
             </div>
         </div>
 
-        <p class="text-center mt-4" style="color:#64748b;font-size:12px;">
+        <!-- <p class="text-center mt-4" style="color:#64748b;font-size:12px;">
             &copy; <?= date('Y') ?> PT. Mega Karya Modern. All rights reserved.
-        </p>
+        </p> -->
     </div>
 
     <!-- jQuery -->
