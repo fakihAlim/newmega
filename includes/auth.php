@@ -11,7 +11,7 @@ require_once __DIR__ . '/permissions.php';
 // Check if user is logged in
 function requireLogin() {
     if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
-        header('Location: ' . APP_URL . '/index.php');
+        header('Location: ' . APP_URL . '/login.php');
         exit;
     }
     // Session timeout (60 minutes)
@@ -19,7 +19,7 @@ function requireLogin() {
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
         session_unset();
         session_destroy();
-        header('Location: ' . APP_URL . '/index.php?error=timeout');
+        header('Location: ' . APP_URL . '/login.php?error=timeout');
         exit;
     }
     $_SESSION['last_activity'] = time(); // update last activity time
@@ -28,7 +28,7 @@ function requireLogin() {
     if (isset($_SESSION['ip_address']) && $_SESSION['ip_address'] !== $_SERVER['REMOTE_ADDR']) {
         session_unset();
         session_destroy();
-        header('Location: ' . APP_URL . '/index.php?error=invalid_session');
+        header('Location: ' . APP_URL . '/login.php?error=invalid_session');
         exit;
     }
 
@@ -40,7 +40,7 @@ function requireLogin() {
     
     if (!$user || !$user['is_active']) {
         session_destroy();
-        header('Location: ' . APP_URL . '/index.php?error=deactivated');
+        header('Location: ' . APP_URL . '/login.php?error=deactivated');
         exit;
     }
 }

@@ -52,6 +52,9 @@ $AVAILABLE_MODULES = [
         'report_profit_loss' => 'Profit & Loss',
         'report_stock' => 'Laporan Stok',
     ],
+    'CMS Landing Page' => [
+        'cms_landing' => 'Kelola Landing Page (CMS)',
+    ],
     'Administrasi' => [
         'users' => 'Manajemen User',
         'roles' => 'Role & Akses',

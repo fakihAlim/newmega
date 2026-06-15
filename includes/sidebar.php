@@ -388,6 +388,45 @@ function isActiveClass($dirs, $pages = []) {
                 </li>
                 <?php endif; ?>
 
+                <?php if (canAccess('cms_landing')): ?>
+                <!-- CMS Landing Page -->
+                <li class="nav-item has-treeview <?= isMenuOpen(['cms']) ?>">
+                    <a href="#" class="nav-link <?= isActiveClass(['cms']) ?>">
+                        <i class="nav-icon fas fa-laptop-code"></i>
+                        <p>
+                            CMS Landing Page
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/cms/banner.php" class="nav-link <?= isActiveClass(['cms'], ['banner.php']) ?>">
+                                <i class="nav-icon fas fa-image"></i>
+                                <p>Kelola Banner</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/cms/services.php" class="nav-link <?= isActiveClass(['cms'], ['services.php']) ?>">
+                                <i class="nav-icon fas fa-concierge-bell"></i>
+                                <p>Kelola Layanan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/cms/portfolio.php" class="nav-link <?= isActiveClass(['cms'], ['portfolio.php']) ?>">
+                                <i class="nav-icon fas fa-briefcase"></i>
+                                <p>Kelola Portofolio</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/cms/tips.php" class="nav-link <?= isActiveClass(['cms'], ['tips.php']) ?>">
+                                <i class="nav-icon fas fa-lightbulb"></i>
+                                <p>Kelola Tips & Trick</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <?php endif; ?>
+
                 <?php if (canAccess('users')): ?>
                 <!-- Administrasi -->
                 <li class="nav-item has-treeview <?= isMenuOpen(['users', 'roles']) ?>">
