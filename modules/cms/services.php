@@ -116,7 +116,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                     title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button type="button" class="btn btn-danger btn-sm btn-delete" 
+                            <button type="button" class="btn btn-danger btn-sm btn-cms-delete" 
                                     data-id="<?= $s['id'] ?>" 
                                     data-title="<?= sanitize($s['title']) ?>"
                                     title="Hapus">
@@ -238,7 +238,7 @@ $(document).ready(function() {
     });
 
     // Handle delete action
-    $('.btn-delete').click(function() {
+    $('.btn-cms-delete').click(function() {
         const id = $(this).data('id');
         const title = $(this).data('title');
         
