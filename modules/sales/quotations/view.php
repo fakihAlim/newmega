@@ -154,20 +154,20 @@ require_once __DIR__ . '/../../../includes/header.php';
             <table class="table quotation-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" width="3%">NO</th>
-                        <th rowspan="2" width="25%">DESCRIPTION</th>
-                        <th rowspan="2" width="18%">TYPE</th>
-                        <th rowspan="2" width="5%">QTY</th>
-                        <th rowspan="2" width="5%">UOM</th>
-                        <th colspan="2" width="18%">MATERIAL</th>
-                        <th colspan="2" width="18%">MANPOWER</th>
-                        <th rowspan="2" width="10%">AMOUNT</th>
+                        <th rowspan="2" style="width: 1%; min-width: 30px;">NO</th>
+                        <th rowspan="2" style="width: 25%;">DESCRIPTION</th>
+                        <th rowspan="2" style="width: 20%;">TYPE</th>
+                        <th rowspan="2" style="width: 1%; min-width: 40px;">QTY</th>
+                        <th rowspan="2" style="width: 1%; min-width: 40px;">UOM</th>
+                        <th colspan="2" style="width: 18%;">MATERIAL</th>
+                        <th colspan="2" style="width: 18%;">MANPOWER</th>
+                        <th rowspan="2" style="width: 10%;">AMOUNT</th>
                     </tr>
                     <tr>
-                        <th style="font-size: 11px;">UNIT PRICE</th>
-                        <th style="font-size: 11px;">TOTAL MATERIAL</th>
-                        <th style="font-size: 11px;">UNIT PRICE</th>
-                        <th style="font-size: 11px;">TOTAL MANPOWER</th>
+                        <th style="font-size: 10px; width: 9%;">UNIT PRICE</th>
+                        <th style="font-size: 10px; width: 9%;">TOTAL MATERIAL</th>
+                        <th style="font-size: 10px; width: 9%;">UNIT PRICE</th>
+                        <th style="font-size: 10px; width: 9%;">TOTAL MANPOWER</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -299,14 +299,15 @@ require_once __DIR__ . '/../../../includes/header.php';
     width: 100% !important;
     border: 1px solid #000 !important;
     font-family: Arial, sans-serif !important;
-    font-size: 13px !important;
+    font-size: 11px !important;
     margin-bottom: 0 !important;
 }
 .quotation-table th, .quotation-table td {
     border: 1px solid #000 !important;
-    padding: 6px 8px !important;
+    padding: 3px 5px !important;
     color: #000 !important;
     vertical-align: middle !important;
+    line-height: 1.2 !important;
 }
 .quotation-table thead th {
     background-color: #ffffff !important;
