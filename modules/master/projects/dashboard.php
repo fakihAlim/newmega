@@ -205,30 +205,376 @@ $breadcrumbs = [
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* Reset Font Family for the whole page */
+.content-wrapper, .content-wrapper * {
+    font-family: 'Work Sans', sans-serif;
+}
+h1, h2, h3, h4, h5, h6, 
+.card-title, .metric-value, .btn-custom {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Colors & Variables */
+:root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f28c28;
+    --accent-hover: #d67417;
+    --border-color: #cbd5e1;
+    --border-light: #e2e8f0;
+    --bg-light: #f8fafc;
+    --text-slate: #64748b;
+    --text-dark: #0f172a;
+}
+
+/* Page Background Overwrite */
+.content-wrapper {
+    background-color: var(--bg-light) !important;
+}
+
+/* Badges / Chips Override */
+.badge {
+    font-family: 'Work Sans', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 6px 12px !important;
+    border-radius: 4px !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.badge-secondary { background-color: #e2e8f0 !important; color: #475569 !important; }
+.badge-warning { background-color: #fef3c7 !important; color: #b45309 !important; }
+.badge-success { background-color: #dcfce7 !important; color: #15803d !important; }
+.badge-danger { background-color: #fee2e2 !important; color: #b91c1c !important; }
+.badge-info { background-color: #e0f2fe !important; color: #0369a1 !important; }
+.badge-dark { background-color: #f1f5f9 !important; color: #1e293b !important; }
+.badge-primary { background-color: #dbeafe !important; color: #1d4ed8 !important; }
+
+/* Custom Cards/Panels */
+.card {
+    background: #ffffff !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    margin-bottom: 24px !important;
+}
+.card:hover {
+    transform: translate(-4px, -4px) !important;
+    box-shadow: 4px 4px 0px var(--primary) !important;
+}
+.card-header {
+    border-bottom: 1px solid var(--border-light) !important;
+    background: #ffffff !important;
+    border-radius: 4px 4px 0 0 !important;
+    padding: 16px 20px !important;
+}
+.card-title {
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--primary) !important;
+    margin: 0 !important;
+}
+.card-body {
+    padding: 20px !important;
+}
+
+/* Custom Buttons */
+.btn-custom {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    border: none !important;
+}
+.btn-custom-primary {
+    background-color: var(--accent) !important;
+    color: #ffffff !important;
+}
+.btn-custom-primary:hover {
+    background-color: var(--accent-hover) !important;
+    color: #ffffff !important;
+}
+.btn-custom-slate {
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+.btn-custom-slate:hover {
+    background-color: var(--primary-dark) !important;
+    color: #ffffff !important;
+}
+.btn-custom-outline {
+    background-color: transparent !important;
+    border: 2px solid var(--primary) !important;
+    color: var(--primary) !important;
+    padding: 6px 14px !important;
+}
+.btn-custom-outline:hover {
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+/* Project Header Area */
+.project-meta-item {
+    display: inline-flex;
+    flex-direction: column;
+    margin-right: 32px;
+}
+.project-meta-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-slate);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+.project-meta-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* Financial Metric Cards */
+.metric-card {
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+.metric-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 4px 4px 0px var(--primary);
+}
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+}
+.border-left-slate::before { background-color: var(--primary); }
+.border-left-red::before { background-color: #ba1a1a; }
+.border-left-green::before { background-color: #15803d; }
+.border-left-orange::before { background-color: var(--accent); }
+
+.metric-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-slate);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.metric-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+}
+.metric-meta {
+    font-size: 11px;
+    color: var(--text-slate);
+    border-top: 1px solid #f1f5f9;
+    padding-top: 8px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Progress Bars */
+.progress {
+    height: 8px !important;
+    background-color: #f1f5f9 !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    margin-bottom: 12px !important;
+}
+.progress-bar {
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    background-color: var(--primary) !important;
+}
+.progress-bar.bg-info { background-color: var(--primary) !important; }
+.progress-bar.bg-warning { background-color: var(--accent) !important; }
+.progress-bar.bg-danger { background-color: #ba1a1a !important; }
+.progress-bar.bg-success { background-color: #15803d !important; }
+
+/* Dot Indicators */
+.indicator-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+.indicator-dot.bg-danger { background-color: #ba1a1a !important; }
+.indicator-dot.bg-info { background-color: var(--primary) !important; }
+.indicator-dot.bg-success { background-color: #15803d !important; }
+.indicator-dot.bg-warning { background-color: var(--accent) !important; }
+
+/* Table Overrides */
+.table {
+    border-collapse: collapse !important;
+}
+.table thead th {
+    background: #f8fafc !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    border-top: none !important;
+    color: var(--text-slate) !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 10px 16px !important;
+}
+.table td {
+    border-top: 1px solid var(--border-light) !important;
+    padding: 12px 16px !important;
+    font-size: 13px !important;
+    color: #334155 !important;
+}
+.table-bordered th, .table-bordered td {
+    border: 1px solid var(--border-light) !important;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f8fafc !important;
+}
+.table-success, .table-success td {
+    background-color: #f0fdf4 !important;
+    color: #166534 !important;
+}
+.table-danger, .table-danger td {
+    background-color: #fef2f2 !important;
+    color: #991b1b !important;
+}
+.table-warning, .table-warning td {
+    background-color: #fffbeb !important;
+    color: #92400e !important;
+}
+
+/* Custom Timeline Component */
+.custom-timeline {
+    position: relative;
+    padding: 10px 0;
+}
+.custom-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 110px;
+    width: 1px;
+    background-color: var(--border-light);
+}
+.timeline-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+}
+.timeline-date {
+    width: 90px;
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-slate);
+    padding-right: 10px;
+}
+.timeline-dot {
+    width: 9px;
+    height: 9px;
+    background-color: #cbd5e1;
+    border-radius: 50%;
+    margin: 0 11px;
+    z-index: 1;
+    transition: background-color 0.2s ease;
+}
+.timeline-row:hover .timeline-dot {
+    background-color: var(--accent);
+}
+.timeline-content {
+    flex: 1;
+    font-size: 13px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-left: 10px;
+}
+.timeline-type {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 9px;
+    color: var(--text-slate);
+    background-color: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.timeline-doc {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700;
+    color: var(--primary);
+}
+.timeline-actor {
+    color: var(--text-slate);
+    font-size: 12px;
+}
+</style>
+
 <!-- Project Header -->
-<div class="card card-outline card-warning mb-3">
-    <div class="card-body py-3">
+<div class="card mb-4">
+    <div class="card-body py-4">
         <div class="row align-items-center">
-            <div class="col-md-6">
-                <h4 class="mb-1 font-weight-bold"><?= sanitize($project['name']) ?></h4>
-                <div style="font-size:14px;">
-                    <i class="fas fa-map-marker-alt text-danger mr-1"></i> <?= sanitize($project['location']) ?: '-' ?>
-                    <span class="mx-2">|</span>
-                    <i class="fas fa-building text-primary mr-1"></i> <?= sanitize($project['customer_name']) ?>
-                    <span class="mx-2">|</span>
-                    <i class="fas fa-hard-hat text-warning mr-1"></i> PM: <?= sanitize($project['pm_name']) ?: '-' ?>
+            <div class="col-md-7">
+                <h3 class="mb-3 font-weight-bold text-dark" style="font-size: 20px; font-weight:800; letter-spacing:-0.01em;"><?= sanitize($project['name']) ?></h3>
+                <div class="d-flex flex-wrap">
+                    <div class="project-meta-item">
+                        <span class="project-meta-label">Lokasi</span>
+                        <span class="project-meta-value"><?= sanitize($project['location']) ?: '-' ?></span>
+                    </div>
+                    <div class="project-meta-item">
+                        <span class="project-meta-label">Pelanggan</span>
+                        <span class="project-meta-value"><?= sanitize($project['customer_name']) ?></span>
+                    </div>
+                    <div class="project-meta-item">
+                        <span class="project-meta-label">Project Manager</span>
+                        <span class="project-meta-value"><?= sanitize($project['pm_name']) ?: '-' ?></span>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6 text-right">
+            <div class="col-md-5 text-right mt-3 mt-md-0">
                 <?= getStatusBadge($project['status']) ?>
-                <span class="ml-3" style="font-size:13px;">
-                    <?php if ($project['start_date']): ?>
-                        <i class="far fa-calendar mr-1"></i>
+                <?php if ($project['start_date']): ?>
+                    <span class="ml-3 font-weight-bold" style="font-size:12px; color: var(--text-slate); letter-spacing:0.05em; text-transform:uppercase;">
                         <?= date('d M Y', strtotime($project['start_date'])) ?> — <?= $project['end_date'] ? date('d M Y', strtotime($project['end_date'])) : 'TBD' ?>
-                    <?php endif; ?>
-                </span>
-                <a href="item_usage.php?id=<?= $id ?>" class="btn btn-sm btn-info ml-3"><i class="fas fa-box-open mr-1"></i> Rincian Barang</a>
-                <a href="index.php" class="btn btn-sm btn-secondary ml-2"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
+                    </span>
+                <?php endif; ?>
+                <a href="item_usage.php?id=<?= $id ?>" class="btn-custom btn-custom-slate ml-3">Rincian Barang</a>
+                <a href="index.php" class="btn-custom btn-custom-outline ml-2">Kembali</a>
             </div>
         </div>
     </div>
@@ -237,50 +583,62 @@ require_once __DIR__ . '/../../../includes/header.php';
 <!-- Summary Cards Row 1: Budget & Financials -->
 <div class="row">
     <div class="col-md-3">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h4><?= formatRupiah($project['budget']) ?></h4>
-                <p>Budget Proyek</p>
-            </div>
-            <div class="icon"><i class="fas fa-wallet"></i></div>
-            <div class="small-box-footer" style="font-size:12px;">
+        <div class="metric-card border-left-slate">
+            <div class="metric-label">Budget Proyek</div>
+            <div class="metric-value"><?= formatRupiah($project['budget']) ?></div>
+            <div class="metric-meta">
                 Terpakai: <strong><?= $budgetUsedPct ?>%</strong>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h4><?= formatRupiah($totalPengeluaran) ?></h4>
-                <p>Total Pengeluaran (PO+Gudang)</p>
-            </div>
-            <div class="icon"><i class="fas fa-shopping-cart"></i></div>
-            <div class="small-box-footer" style="font-size:12px;">
+        <div class="metric-card border-left-red">
+            <div class="metric-label">Total Pengeluaran</div>
+            <div class="metric-value"><?= formatRupiah($totalPengeluaran) ?></div>
+            <div class="metric-meta">
                 PO: <?= formatRupiah($totalPOValue) ?> | Gudang: <?= formatRupiah($transfers['total_value']) ?>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h4><?= formatRupiah($invoice['total_invoice']) ?></h4>
-                <p>Total Pendapatan (Invoice)</p>
-            </div>
-            <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
-            <div class="small-box-footer" style="font-size:12px;">
+        <div class="metric-card border-left-green">
+            <div class="metric-label">Total Pendapatan (Invoice)</div>
+            <div class="metric-value"><?= formatRupiah($invoice['total_invoice']) ?></div>
+            <div class="metric-meta">
                 <?= $invoice['cnt'] ?> Invoice | Diterima: <?= formatRupiah($totalCustReceived) ?>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="small-box <?= $grossProfit >= 0 ? 'bg-primary' : 'bg-warning' ?>">
-            <div class="inner">
-                <h4><?= formatRupiah($grossProfit) ?></h4>
-                <p>Laba Kotor (Gross Profit)</p>
-            </div>
-            <div class="icon"><i class="fas fa-balance-scale"></i></div>
-            <div class="small-box-footer" style="font-size:12px;">
+        <div class="metric-card border-left-orange">
+            <div class="metric-label">Laba Kotor (Gross Profit)</div>
+            <div class="metric-value"><?= formatRupiah($grossProfit) ?></div>
+            <div class="metric-meta">
                 Cash Flow: <?= formatRupiah($netCashFlow) ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Alokasi Anggaran Proyek</h3>
+            </div>
+            <div class="card-body">
+                <div id="chart-budget-allocation" style="min-height: 280px; display: flex; align-items: center; justify-content: center;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Arus Kas & Pembayaran (AR vs AP)</h3>
+            </div>
+            <div class="card-body">
+                <div id="chart-cashflow-comparison" style="min-height: 280px;"></div>
             </div>
         </div>
     </div>
@@ -290,23 +648,32 @@ require_once __DIR__ . '/../../../includes/header.php';
 <div class="row">
     <!-- Budget Usage -->
     <div class="col-md-4">
-        <div class="card card-outline card-info">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i> Pemakaian Budget</h3></div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Pemakaian Budget</h3></div>
             <div class="card-body">
-                <div class="progress-group mb-3">
+                <div class="progress-group mb-3" style="font-size:13px;">
                     <span class="progress-text">PO & Gudang vs Budget</span>
                     <span class="float-right"><b><?= $budgetUsedPct ?>%</b></span>
-                    <div class="progress">
+                    <div class="progress mt-1">
                         <div class="progress-bar <?= $budgetUsedPct > 90 ? 'bg-danger' : ($budgetUsedPct > 70 ? 'bg-warning' : 'bg-info') ?>" style="width: <?= min($budgetUsedPct, 100) ?>%"></div>
                     </div>
                 </div>
-                <table class="table table-sm table-borderless" style="font-size:13px;">
-                    <tr><td>Budget</td><td class="text-right font-weight-bold"><?= formatRupiah($project['budget']) ?></td></tr>
-                    <tr><td><i class="fas fa-shopping-cart text-danger mr-1"></i> Nilai PO</td><td class="text-right font-weight-bold text-danger"><?= formatRupiah($totalPOValue) ?></td></tr>
-                    <tr><td><i class="fas fa-exchange-alt text-info mr-1"></i> Nilai Gudang</td><td class="text-right font-weight-bold text-info"><?= formatRupiah($transfers['total_value']) ?></td></tr>
-                    <tr style="border-top:1px solid #eee;">
-                        <td>Sisa Budget</td>
-                        <td class="text-right font-weight-bold <?= ($project['budget'] - $totalPengeluaran) >= 0 ? 'text-success' : 'text-danger' ?>">
+                <table class="table table-sm table-borderless m-0" style="font-size:13px;">
+                    <tr>
+                        <td><span class="indicator-dot bg-info"></span> Budget Total</td>
+                        <td class="text-right font-weight-bold text-dark"><?= formatRupiah($project['budget']) ?></td>
+                    </tr>
+                    <tr>
+                        <td><span class="indicator-dot bg-danger"></span> Nilai PO</td>
+                        <td class="text-right font-weight-bold text-danger"><?= formatRupiah($totalPOValue) ?></td>
+                    </tr>
+                    <tr>
+                        <td><span class="indicator-dot bg-warning"></span> Nilai Gudang</td>
+                        <td class="text-right font-weight-bold text-warning"><?= formatRupiah($transfers['total_value']) ?></td>
+                    </tr>
+                    <tr style="border-top:1px solid #e2e8f0;">
+                        <td class="pt-2 font-weight-bold">Sisa Budget</td>
+                        <td class="pt-2 text-right font-weight-bold <?= ($project['budget'] - $totalPengeluaran) >= 0 ? 'text-success' : 'text-danger' ?>">
                             <?= formatRupiah($project['budget'] - $totalPengeluaran) ?>
                         </td>
                     </tr>
@@ -317,49 +684,65 @@ require_once __DIR__ . '/../../../includes/header.php';
 
     <!-- MR & PO Status -->
     <div class="col-md-4">
-        <div class="card card-outline card-primary">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-clipboard-list mr-2"></i> Status MR & PO</h3></div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Status MR & PO</h3></div>
             <div class="card-body">
-                <h6 class="font-weight-bold mb-2">Material Request (<?= $totalMR ?>)</h6>
+                <h6 class="font-weight-bold mb-2 text-uppercase text-xs tracking-wider text-muted">Material Request (<?= $totalMR ?>)</h6>
+                <div class="d-flex flex-wrap gap-2 mb-3">
                 <?php
                 $mrColors = ['draft'=>'secondary','pending'=>'warning','approved'=>'success','rejected'=>'danger','completed'=>'info'];
                 foreach ($mrStats as $st => $cnt): ?>
-                    <span class="badge badge-<?= $mrColors[$st] ?? 'secondary' ?> mr-1" style="font-size:12px;">
-                        <?= ucfirst($st) ?>: <?= $cnt ?>
+                    <span class="badge badge-<?= $mrColors[$st] ?? 'secondary' ?>">
+                        <?= $st ?>: <?= $cnt ?>
                     </span>
                 <?php endforeach; ?>
-                <?php if ($totalMR === 0): ?><span class="text-muted">Belum ada MR</span><?php endif; ?>
+                <?php if ($totalMR === 0): ?><span class="text-muted text-sm">Belum ada MR</span><?php endif; ?>
+                </div>
                 
                 <hr class="my-3">
                 
-                <h6 class="font-weight-bold mb-2">Purchase Order (<?= $totalPOCount ?>)</h6>
+                <h6 class="font-weight-bold mb-2 text-uppercase text-xs tracking-wider text-muted">Purchase Order (<?= $totalPOCount ?>)</h6>
+                <div class="d-flex flex-wrap gap-2">
                 <?php foreach ($poRows as $r): ?>
-                    <span class="badge badge-<?= $mrColors[$r['status']] ?? 'secondary' ?> mr-1" style="font-size:12px;">
-                        <?= ucfirst($r['status']) ?>: <?= $r['total'] ?>
+                    <span class="badge badge-<?= $mrColors[$r['status']] ?? 'secondary' ?>">
+                        <?= $r['status'] ?>: <?= $r['total'] ?>
                     </span>
                 <?php endforeach; ?>
-                <?php if ($totalPOCount === 0): ?><span class="text-muted">Belum ada PO</span><?php endif; ?>
+                <?php if ($totalPOCount === 0): ?><span class="text-muted text-sm">Belum ada PO</span><?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Receiving Progress -->
     <div class="col-md-4">
-        <div class="card card-outline card-success">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-dolly mr-2"></i> Progress Penerimaan</h3></div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Progress Penerimaan</h3></div>
             <div class="card-body">
-                <div class="progress-group mb-3">
+                <div class="progress-group mb-3" style="font-size:13px;">
                     <span class="progress-text">Barang Diterima</span>
                     <span class="float-right"><b><?= $rcvPct ?>%</b></span>
-                    <div class="progress">
+                    <div class="progress mt-1">
                         <div class="progress-bar bg-success" style="width: <?= $rcvPct ?>%"></div>
                     </div>
                 </div>
-                <table class="table table-sm table-borderless" style="font-size:13px;">
-                    <tr><td>Total Kebutuhan (PO + Gudang)</td><td class="text-right font-weight-bold"><?= number_format($combinedTarget, 0) ?></td></tr>
-                    <tr><td><i class="fas fa-truck text-success mr-1"></i> Diterima dari PO</td><td class="text-right font-weight-bold text-success"><?= number_format($receiving['total_received'], 0) ?></td></tr>
-                    <tr><td><i class="fas fa-exchange-alt text-info mr-1"></i> Diterima dari Gudang</td><td class="text-right font-weight-bold text-info"><?= number_format($transfers['total_items'], 0) ?></td></tr>
-                    <tr><td><i class="fas fa-times-circle text-danger mr-1"></i> Ditolak/Rusak (PO)</td><td class="text-right font-weight-bold text-danger"><?= number_format($receiving['total_rejected'], 0) ?></td></tr>
+                <table class="table table-sm table-borderless m-0" style="font-size:13px;">
+                    <tr>
+                        <td>Kebutuhan Total (PO + Gudang)</td>
+                        <td class="text-right font-weight-bold"><?= number_format($combinedTarget, 0) ?></td>
+                    </tr>
+                    <tr>
+                        <td><span class="indicator-dot bg-success"></span> Diterima dari PO</td>
+                        <td class="text-right font-weight-bold text-success"><?= number_format($receiving['total_received'], 0) ?></td>
+                    </tr>
+                    <tr>
+                        <td><span class="indicator-dot bg-info"></span> Diterima dari Gudang</td>
+                        <td class="text-right font-weight-bold text-info"><?= number_format($transfers['total_items'], 0) ?></td>
+                    </tr>
+                    <tr>
+                        <td><span class="indicator-dot bg-danger"></span> Ditolak/Rusak (PO)</td>
+                        <td class="text-right font-weight-bold text-danger"><?= number_format($receiving['total_rejected'], 0) ?></td>
+                    </tr>
                 </table>
             </div>
         </div>
@@ -369,16 +752,25 @@ require_once __DIR__ . '/../../../includes/header.php';
 <!-- Row 3: Outstanding & Cash Flow -->
 <div class="row">
     <div class="col-md-6">
-        <div class="card card-outline card-danger">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-money-check-alt mr-2"></i> Outstanding Hutang (Vendor)</h3></div>
-            <div class="card-body">
-                <table class="table table-sm table-bordered" style="font-size:13px;">
-                    <tr><td>Total Nilai PO</td><td class="text-right font-weight-bold"><?= formatRupiah($totalPOValue) ?></td></tr>
-                    <tr class="table-success"><td>Sudah Dibayar</td><td class="text-right font-weight-bold text-success"><?= formatRupiah($totalVendorPaid) ?></td></tr>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Outstanding Hutang (Vendor)</h3></div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-bordered m-0" style="font-size:13px; border:none;">
+                    <tr>
+                        <td class="bg-light font-weight-bold" style="width:40%;">Total Nilai PO</td>
+                        <td class="text-right font-weight-bold"><?= formatRupiah($totalPOValue) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="table-success font-weight-bold">Sudah Dibayar</td>
+                        <td class="text-right font-weight-bold text-success"><?= formatRupiah($totalVendorPaid) ?></td>
+                    </tr>
                     <tr class="<?= $vendorOutstanding > 0 ? 'table-danger' : 'table-success' ?>">
-                        <td class="font-weight-bold" style="font-size:14px;">Sisa Hutang</td>
-                        <td class="text-right font-weight-bold" style="font-size:16px;"><?= formatRupiah($vendorOutstanding) ?>
-                            <?= $vendorOutstanding <= 0 ? ' <i class="fas fa-check-circle text-success"></i>' : '' ?>
+                        <td class="font-weight-bold" style="font-size:13px;">Sisa Hutang</td>
+                        <td class="text-right font-weight-bold" style="font-size:14px;">
+                            <?= formatRupiah($vendorOutstanding) ?>
+                            <?php if ($vendorOutstanding <= 0): ?>
+                                <span class="badge badge-success ml-2">LUNAS</span>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 </table>
@@ -386,16 +778,25 @@ require_once __DIR__ . '/../../../includes/header.php';
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card card-outline card-success">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-hand-holding-usd mr-2"></i> Outstanding Piutang (Customer)</h3></div>
-            <div class="card-body">
-                <table class="table table-sm table-bordered" style="font-size:13px;">
-                    <tr><td>Total Invoice</td><td class="text-right font-weight-bold"><?= formatRupiah($invoice['total_invoice']) ?></td></tr>
-                    <tr class="table-success"><td>Sudah Diterima</td><td class="text-right font-weight-bold text-success"><?= formatRupiah($totalCustReceived) ?></td></tr>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Outstanding Piutang (Customer)</h3></div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-bordered m-0" style="font-size:13px; border:none;">
+                    <tr>
+                        <td class="bg-light font-weight-bold" style="width:40%;">Total Invoice</td>
+                        <td class="text-right font-weight-bold"><?= formatRupiah($invoice['total_invoice']) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="table-success font-weight-bold">Sudah Diterima</td>
+                        <td class="text-right font-weight-bold text-success"><?= formatRupiah($totalCustReceived) ?></td>
+                    </tr>
                     <tr class="<?= $custOutstanding > 0 ? 'table-warning' : 'table-success' ?>">
-                        <td class="font-weight-bold" style="font-size:14px;">Sisa Piutang</td>
-                        <td class="text-right font-weight-bold" style="font-size:16px;"><?= formatRupiah($custOutstanding) ?>
-                            <?= $custOutstanding <= 0 ? ' <i class="fas fa-check-circle text-success"></i>' : '' ?>
+                        <td class="font-weight-bold" style="font-size:13px;">Sisa Piutang</td>
+                        <td class="text-right font-weight-bold" style="font-size:14px;">
+                            <?= formatRupiah($custOutstanding) ?>
+                            <?php if ($custOutstanding <= 0): ?>
+                                <span class="badge badge-success ml-2">LUNAS</span>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 </table>
@@ -407,11 +808,11 @@ require_once __DIR__ . '/../../../includes/header.php';
 <!-- Row 4: Recent MRs & Timeline -->
 <div class="row">
     <div class="col-md-5">
-        <div class="card card-outline card-secondary">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-clipboard-list mr-2"></i> MR Terbaru</h3></div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">MR Terbaru</h3></div>
             <div class="card-body p-0">
-                <table class="table table-sm table-striped m-0" style="font-size:13px;">
-                    <thead class="bg-light">
+                <table class="table table-striped table-hover m-0" style="font-size:13px;">
+                    <thead>
                         <tr>
                             <th>No. MR</th>
                             <th>Tanggal</th>
@@ -422,14 +823,14 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <tbody>
                         <?php foreach ($recentMRs as $mr): ?>
                         <tr>
-                            <td><strong><?= sanitize($mr['mr_number']) ?></strong></td>
+                            <td><strong class="text-dark"><?= sanitize($mr['mr_number']) ?></strong></td>
                             <td><?= date('d-m-Y', strtotime($mr['request_date'])) ?></td>
                             <td><?= sanitize($mr['requester']) ?></td>
                             <td><?= getStatusBadge($mr['status']) ?></td>
                         </tr>
                         <?php endforeach; ?>
                         <?php if (empty($recentMRs)): ?>
-                        <tr><td colspan="4" class="text-center text-muted">Belum ada MR</td></tr>
+                        <tr><td colspan="4" class="text-center text-muted py-3">Belum ada MR</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -438,28 +839,19 @@ require_once __DIR__ . '/../../../includes/header.php';
     </div>
     
     <div class="col-md-7">
-        <div class="card card-outline card-secondary">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-stream mr-2"></i> Timeline Aktivitas</h3></div>
-            <div class="card-body p-0" style="max-height:350px; overflow-y:auto;">
-                <div class="timeline timeline-inverse px-3 pt-3">
-                    <?php foreach ($timeline as $t): 
-                        $typeIcons = [
-                            'MR' => 'fas fa-clipboard-list bg-primary',
-                            'PO' => 'fas fa-file-invoice bg-danger',
-                            'Quotation' => 'fas fa-file-alt bg-info',
-                            'Invoice' => 'fas fa-file-invoice-dollar bg-success',
-                        ];
-                    ?>
-                    <div>
-                        <i class="<?= $typeIcons[$t['type']] ?? 'fas fa-circle bg-secondary' ?> timeline-item-icon" style="width:28px;height:28px;line-height:28px;font-size:12px;border-radius:50%;text-align:center;color:#fff;position:absolute;left:-14px;"></i>
-                        <div class="timeline-item" style="margin-left:20px;padding:8px 12px;margin-bottom:8px;border:1px solid #e9ecef;border-radius:5px;font-size:13px;">
-                            <span class="time" style="font-size:11px;color:#999;"><i class="far fa-clock mr-1"></i><?= date('d M Y H:i', strtotime($t['event_date'])) ?></span>
-                            <div>
-                                <span class="badge badge-light mr-1"><?= $t['type'] ?></span>
-                                <strong><?= sanitize($t['doc_no']) ?></strong>
-                                <?= getStatusBadge($t['status']) ?>
-                                <span class="text-muted ml-1">oleh <?= sanitize($t['actor']) ?></span>
-                            </div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Timeline Aktivitas</h3></div>
+            <div class="card-body" style="max-height:350px; overflow-y:auto; padding: 20px;">
+                <div class="custom-timeline">
+                    <?php foreach ($timeline as $t): ?>
+                    <div class="timeline-row">
+                        <div class="timeline-date"><?= date('d M Y H:i', strtotime($t['event_date'])) ?></div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-type"><?= $t['type'] ?></span>
+                            <strong class="timeline-doc"><?= sanitize($t['doc_no']) ?></strong>
+                            <span><?= getStatusBadge($t['status']) ?></span>
+                            <span class="timeline-actor">oleh <?= sanitize($t['actor']) ?></span>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -472,12 +864,120 @@ require_once __DIR__ . '/../../../includes/header.php';
     </div>
 </div>
 
-<style>
-.timeline { position: relative; padding-left: 20px; }
-.timeline::before { content: ''; position: absolute; left: 5px; top: 0; bottom: 0; width: 2px; background: #dee2e6; }
-.timeline > div { position: relative; margin-bottom: 5px; }
-.timeline-item-icon { position: absolute; left: -14px; z-index: 1; }
-.small-box .small-box-footer { padding: 3px 10px; background: rgba(0,0,0,.1); color: rgba(255,255,255,.8); display: block; text-decoration: none; }
-</style>
+<?php
+ob_start();
+?>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+$(document).ready(function() {
+    // 1. Chart: Budget Allocation
+    if ($('#chart-budget-allocation').length) {
+        var optionsBudgetAllocation = {
+            chart: {
+                type: 'donut',
+                height: 280,
+                fontFamily: "'Work Sans', sans-serif"
+            },
+            series: [
+                <?php echo (float)$totalPOValue; ?>,
+                <?php echo (float)$transfers['total_value']; ?>,
+                <?php echo (float)max(0, $project['budget'] - $totalPengeluaran); ?>
+            ],
+            labels: ['Nilai PO', 'Transfer Gudang', 'Sisa Budget'],
+            colors: ['#ba1a1a', '#64748b', '#15803d'],
+            dataLabels: { enabled: false },
+            legend: {
+                position: 'bottom',
+                fontSize: '11px',
+                fontFamily: "'Work Sans', sans-serif",
+                labels: { colors: '#64748b' }
+            },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    }
+                }
+            }
+        };
+        var chartBudgetAllocation = new ApexCharts(document.querySelector("#chart-budget-allocation"), optionsBudgetAllocation);
+        chartBudgetAllocation.render();
+    }
 
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
+    // 2. Chart: Cash Flow & Outstanding Comparison
+    if ($('#chart-cashflow-comparison').length) {
+        var optionsCashflow = {
+            chart: {
+                type: 'bar',
+                height: 280,
+                fontFamily: "'Work Sans', sans-serif",
+                toolbar: { show: false }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '50%',
+                    borderRadius: 4
+                },
+            },
+            colors: ['#1e293b', '#f28c28'],
+            dataLabels: { enabled: false },
+            stroke: { show: true, width: 2, colors: ['transparent'] },
+            series: [{
+                name: 'Total Tagihan / Nilai Kontrak',
+                data: [
+                    <?php echo (float)$invoice['total_invoice']; ?>,
+                    <?php echo (float)$totalPOValue; ?>
+                ]
+            }, {
+                name: 'Jumlah Terbayar',
+                data: [
+                    <?php echo (float)$totalCustReceived; ?>,
+                    <?php echo (float)$totalVendorPaid; ?>
+                ]
+            }],
+            xaxis: {
+                categories: ['Piutang Customer', 'Hutang Vendor'],
+                labels: {
+                    style: {
+                        colors: '#64748b',
+                        fontSize: '11px'
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    },
+                    style: {
+                        colors: '#64748b',
+                        fontSize: '11px'
+                    }
+                }
+            },
+            legend: {
+                position: 'bottom',
+                fontSize: '11px',
+                fontFamily: "'Work Sans', sans-serif",
+                labels: { colors: '#64748b' }
+            },
+            fill: { opacity: 0.95 },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                    }
+                }
+            },
+            grid: { borderColor: '#f1f5f9' }
+        };
+        var chartCashflow = new ApexCharts(document.querySelector("#chart-cashflow-comparison"), optionsCashflow);
+        chartCashflow.render();
+    }
+});
+</script>
+<?php
+$extraJS = ob_get_clean();
+require_once __DIR__ . '/../../../includes/footer.php';
+?>

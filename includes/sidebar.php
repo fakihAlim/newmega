@@ -429,8 +429,8 @@ function isActiveClass($dirs, $pages = []) {
 
                 <?php if (canAccess('users')): ?>
                 <!-- Administrasi -->
-                <li class="nav-item has-treeview <?= isMenuOpen(['users', 'roles']) ?>">
-                    <a href="#" class="nav-link <?= isActiveClass(['users', 'roles']) ?>">
+                <li class="nav-item has-treeview <?= isMenuOpen(['users', 'roles', 'settings']) ?>">
+                    <a href="#" class="nav-link <?= isActiveClass(['users', 'roles', 'settings']) ?>">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>
                             Administrasi
@@ -448,6 +448,12 @@ function isActiveClass($dirs, $pages = []) {
                             <a href="<?= APP_URL ?>/modules/master/roles/index.php" class="nav-link <?= isActiveClass(['roles']) ?>">
                                 <i class="nav-icon fas fa-user-tag"></i>
                                 <p>Role & Akses</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/settings/index.php" class="nav-link <?= isActiveClass(['settings']) ?>">
+                                <i class="nav-icon fas fa-tools"></i>
+                                <p>Pengaturan Sistem</p>
                             </a>
                         </li>
                     </ul>

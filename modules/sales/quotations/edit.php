@@ -37,7 +37,7 @@ if ($user['role'] !== 'super_admin' && $q['created_by'] != $user['id']) {
 // Fetch Dependencies
 $companies  = $pdo->query("SELECT id, name, is_default FROM companies ORDER BY name")->fetchAll();
 $customers  = $pdo->query("SELECT id, company_name as name, abbreviation FROM customers WHERE is_active = 1 ORDER BY company_name")->fetchAll();
-$projects   = $pdo->query("SELECT id, name FROM projects WHERE status IN ('planning','active') OR id = ".($q['project_id'] ?: 0)." ORDER BY name")->fetchAll();
+$projects   = $pdo->query("SELECT id, name, customer_id FROM projects WHERE status IN ('planning','active') OR id = ".($q['project_id'] ?: 0)." ORDER BY name")->fetchAll();
 
 // Fetch Items
 $stmtItems = $pdo->prepare("SELECT * FROM quotation_items WHERE quotation_id = ? ORDER BY id ASC");
@@ -159,7 +159,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Customer <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
-                            <select name="customer_id" class="form-control select2" required>
+                            <select name="customer_id" id="customer_id" class="form-control select2" required>
                                 <option value="">-- Pilih Customer --</option>
                                 <?php foreach ($customers as $c): ?>
                                     <option value="<?= $c['id'] ?>" <?= $q['customer_id'] == $c['id'] ? 'selected' : '' ?>><?= sanitize($c['name']) ?></option>
@@ -171,10 +171,10 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Proyek <small class="text-muted">(opsi)</small></label>
                         <div class="col-sm-8">
-                            <select name="project_id" class="form-control select2">
+                            <select name="project_id" id="project_id" class="form-control select2">
                                 <option value="">-- Tanpa Proyek --</option>
                                 <?php foreach ($projects as $p): ?>
-                                    <option value="<?= $p['id'] ?>" <?= $q['project_id'] == $p['id'] ? 'selected' : '' ?>><?= sanitize($p['name']) ?></option>
+                                    <option value="<?= $p['id'] ?>" data-customer-id="<?= $p['customer_id'] ?>" <?= $q['project_id'] == $p['id'] ? 'selected' : '' ?>><?= sanitize($p['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -364,6 +364,14 @@ function calculateGrandTotal() {
 $(document).ready(function() {
     initSelect2('.select2');
     calculateGrandTotal(); // Initial calc
+
+    // Auto-select customer based on selected project
+    $('#project_id').on('change', function() {
+        var customerId = $(this).find('option:selected').data('customer-id');
+        if (customerId) {
+            $('#customer_id').val(customerId).trigger('change');
+        }
+    });
 
     $('#calc_discount_pct, #calc_tax_pct').on('input', calculateGrandTotal);
     $('#calc_discount_nom, #calc_tax_nom, #calc_shipping').on('input', function() {

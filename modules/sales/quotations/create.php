@@ -9,7 +9,8 @@ $user = getCurrentUser();
 
 $companies  = $pdo->query("SELECT id, name, is_default FROM companies ORDER BY name")->fetchAll();
 $customers  = $pdo->query("SELECT id, company_name as name, abbreviation FROM customers WHERE is_active = 1 ORDER BY company_name")->fetchAll();
-$projects   = $pdo->query("SELECT id, name FROM projects WHERE status IN ('planning','active') ORDER BY name")->fetchAll();
+$projects   = $pdo->query("SELECT id, name, customer_id FROM projects WHERE status IN ('planning','active') ORDER BY name")->fetchAll();
+$pastQuotations = $pdo->query("SELECT q.id, q.quotation_no, q.total, c.company_name as customer_name FROM quotations q JOIN customers c ON q.customer_id = c.id ORDER BY q.id DESC LIMIT 50")->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $companyId     = $_POST['company_id'] ?? null;
@@ -135,7 +136,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Customer <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
-                            <select name="customer_id" class="form-control select2" required>
+                            <select name="customer_id" id="customer_id" class="form-control select2" required>
                                 <option value="">-- Pilih Customer --</option>
                                 <?php foreach ($customers as $c): ?>
                                     <option value="<?= $c['id'] ?>"><?= sanitize($c['name']) ?></option>
@@ -147,10 +148,10 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Proyek <small class="text-muted">(opsi)</small></label>
                         <div class="col-sm-8">
-                            <select name="project_id" class="form-control select2">
+                            <select name="project_id" id="project_id" class="form-control select2">
                                 <option value="">-- Tanpa Proyek --</option>
                                 <?php foreach ($projects as $p): ?>
-                                    <option value="<?= $p['id'] ?>"><?= sanitize($p['name']) ?></option>
+                                    <option value="<?= $p['id'] ?>" data-customer-id="<?= $p['customer_id'] ?>"><?= sanitize($p['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -213,7 +214,11 @@ require_once __DIR__ . '/../../../includes/header.php';
             <!-- Item List Section -->
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="text-secondary text-uppercase font-weight-bold m-0" style="font-size:12px;letter-spacing:1px;">3. Daftar Pekerjaan / Barang</h5>
-                <button type="button" class="btn btn-sm btn-primary" id="btnAddRow"><i class="fas fa-plus mr-1"></i> Tambah Baris</button>
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-info mr-1" data-toggle="modal" data-target="#modalDuplicateQuotation"><i class="fas fa-copy mr-1"></i> Duplikat</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary mr-1" data-toggle="modal" data-target="#modalAiQuotation"><i class="fas fa-magic mr-1"></i> Buat dgn AI</button>
+                    <button type="button" class="btn btn-sm btn-primary" id="btnAddRow"><i class="fas fa-plus mr-1"></i> Tambah Baris</button>
+                </div>
             </div>
             
             <div class="table-responsive mb-3">
@@ -287,6 +292,62 @@ require_once __DIR__ . '/../../../includes/header.php';
     </form>
 </div>
 
+<!-- Modal AI -->
+<div class="modal fade" id="modalAiQuotation" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-magic mr-2"></i> Buat Quotation dengan AI</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Ceritakan Spesifikasi / Kebutuhan Proyek Anda:</label>
+                    <textarea id="aiProjectSpecs" class="form-control" rows="5" placeholder="Contoh: Perbaikan atap gudang seluas 50m2, butuh asbes, paku payung, dan jasa pemasangan 2 hari kerja."></textarea>
+                    <small class="text-muted">AI akan membaca narasi ini dan mengubahnya menjadi daftar item material dan jasa lengkap dengan estimasi harganya.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="btnGenerateAi"><i class="fas fa-bolt mr-1"></i> Generate Items</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Duplicate -->
+<div class="modal fade" id="modalDuplicateQuotation" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-copy mr-2"></i> Duplikat dari Quotation Lama</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Pilih Quotation Sebelumnya:</label>
+                    <select id="duplicateQuotationId" class="form-control select2" style="width: 100%;">
+                        <option value="">-- Pilih Quotation --</option>
+                        <?php foreach ($pastQuotations as $pq): ?>
+                            <option value="<?= $pq['id'] ?>">
+                                <?= sanitize($pq['quotation_no']) ?> - <?= sanitize($pq['customer_name']) ?> (Rp <?= number_format($pq['total'],0,',','.') ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-info" id="btnProcessDuplicate"><i class="fas fa-copy mr-1"></i> Salin Items</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 $extraJS = <<<'JS'
 <script>
@@ -341,6 +402,14 @@ function calculateGrandTotal() {
 $(document).ready(function() {
     initSelect2('.select2');
     
+    // Auto-select customer based on selected project
+    $('#project_id').on('change', function() {
+        var customerId = $(this).find('option:selected').data('customer-id');
+        if (customerId) {
+            $('#customer_id').val(customerId).trigger('change');
+        }
+    });
+    
     $('#calc_discount_pct, #calc_tax_pct').on('input', calculateGrandTotal);
     $('#calc_discount_nom, #calc_tax_nom, #calc_shipping').on('input', function() {
         $(this).val(formatIdr(parseIdr($(this).val())));
@@ -379,6 +448,89 @@ $(document).ready(function() {
             tbody.html('<tr class="empty-row"><td colspan="8" class="text-center text-muted py-4">Belum ada item.</td></tr>');
         }
         calculateGrandTotal();
+    });
+
+    // Helper function to append items
+    function appendItemsToTable(items) {
+        tbody.empty(); // User requested to replace existing rows
+        items.forEach(function(d) {
+            var html = `
+            <tr class="q-row">
+                <td><input type="text" name="description[]" class="form-control form-control-sm" required value="${d.description || ''}"></td>
+                <td><input type="text" name="type_specification[]" class="form-control form-control-sm" value="${d.type_specification || ''}"></td>
+                <td><input type="text" name="qty[]" class="form-control form-control-sm text-center input-number col-qty" value="${d.qty || 1}" required></td>
+                <td><input type="text" name="uom[]" class="form-control form-control-sm text-center" value="${d.uom || ''}"></td>
+                <td><input type="text" name="material_unit_price[]" class="form-control form-control-sm text-right input-number col-mat-price" value="${formatIdr(d.material_price || 0)}"></td>
+                <td><input type="text" name="manpower_unit_price[]" class="form-control form-control-sm text-right input-number col-man-price" value="${formatIdr(d.manpower_price || 0)}"></td>
+                <td><input type="text" name="amount[]" class="form-control form-control-sm text-right font-weight-bold col-amount" value="0" readonly></td>
+                <td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class="fas fa-times"></i></button></td>
+            </tr>`;
+            tbody.append(html);
+        });
+        // Recalculate everything
+        $('.col-qty').trigger('input');
+    }
+
+    // AI Generate Logic
+    $('#btnGenerateAi').on('click', function() {
+        var specs = $('#aiProjectSpecs').val().trim();
+        if (!specs) { toastr.error('Spesifikasi tidak boleh kosong'); return; }
+        
+        var btn = $(this);
+        var originalText = btn.html();
+        btn.html('<i class="fas fa-spinner fa-spin"></i> Memproses...').prop('disabled', true);
+        
+        $.ajax({
+            url: APP_URL + '/api/ai_suggest_quotation.php',
+            type: 'POST',
+            data: { project_specs: specs },
+            dataType: 'json',
+            success: function(res) {
+                btn.html(originalText).prop('disabled', false);
+                if (res.success && res.data) {
+                    appendItemsToTable(res.data);
+                    $('#modalAiQuotation').modal('hide');
+                    toastr.success('Item berhasil dibuat oleh AI ✨');
+                } else {
+                    toastr.error(res.error || 'Gagal generate AI');
+                }
+            },
+            error: function() {
+                btn.html(originalText).prop('disabled', false);
+                toastr.error('Kesalahan koneksi ke server AI');
+            }
+        });
+    });
+
+    // Duplicate Logic
+    $('#btnProcessDuplicate').on('click', function() {
+        var qId = $('#duplicateQuotationId').val();
+        if (!qId) { toastr.error('Pilih quotation terlebih dahulu'); return; }
+        
+        var btn = $(this);
+        var originalText = btn.html();
+        btn.html('<i class="fas fa-spinner fa-spin"></i> Mengambil...').prop('disabled', true);
+        
+        $.ajax({
+            url: APP_URL + '/api/get_quotation_items.php',
+            type: 'GET',
+            data: { quotation_id: qId },
+            dataType: 'json',
+            success: function(res) {
+                btn.html(originalText).prop('disabled', false);
+                if (res.success && res.data) {
+                    appendItemsToTable(res.data);
+                    $('#modalDuplicateQuotation').modal('hide');
+                    toastr.success('Item berhasil diduplikat');
+                } else {
+                    toastr.error(res.error || 'Gagal menduplikat item');
+                }
+            },
+            error: function() {
+                btn.html(originalText).prop('disabled', false);
+                toastr.error('Kesalahan koneksi saat mengambil data');
+            }
+        });
     });
 });
 

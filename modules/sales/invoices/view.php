@@ -180,19 +180,6 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <td class="text-right p-1" style="border: 1px solid #000; color: #000;"><?= number_format($item['amount'], 0, ',', '.') ?></td>
                     </tr>
                     <?php endforeach; ?>
-                    <!-- Empty row to match exactly the design layout -->
-                    <tr>
-                        <td class="text-right p-1" style="border: 1px solid #000; color: #000;"><?= $no ?></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                        <td class="p-1" style="border: 1px solid #000;"></td>
-                    </tr>
                 </tbody>
             </table>
         </div>

@@ -166,14 +166,25 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <td width="33%" class="font-weight-bold">Approver</td>
                     </tr>
                     <tr>
-                        <td style="height: 80px;"></td>
-                        <td></td>
-                        <td></td>
+                        <td style="height: 80px;">
+                            <?php if ($mr['created_at']): ?>
+                                <small class="text-muted d-block" style="margin-top: 40px;">Requested on <?= date('d-M-Y', strtotime($mr['created_at'])) ?></small>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <small class="text-muted d-block" style="margin-top: 40px;">Purchasing Staff</small>
+                        </td>
+                        <td>
+                            <?php if ($mr['status'] === 'approved' || $mr['status'] === 'completed'): ?>
+                                <span class="text-success font-weight-bold"><i class="fas fa-check-circle"></i> Approved</span><br>
+                                <small class="text-muted"><?= date('d-M-Y H:i', strtotime($mr['approved_at'])) ?></small>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <tr>
-                        <td>(_________________________)</td>
-                        <td>(_________________________)</td>
-                        <td>(_________________________)</td>
+                        <td>( <?= sanitize($mr['requester_name']) ?> )</td>
+                        <td>( <?= sanitize($user['full_name']) ?> )</td>
+                        <td>( <?= sanitize($mr['approver_name']) ?: '_________________________' ?> )</td>
                     </tr>
                 </table>
             </div>

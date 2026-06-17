@@ -28,10 +28,11 @@ $customers = $pdo->query("SELECT id, company_name, abbreviation FROM customers W
 $pms = $pdo->query("SELECT DISTINCT u.id, u.full_name, u.username FROM users u JOIN user_roles ur ON u.id = ur.user_id JOIN roles r ON ur.role_id = r.id WHERE r.role_key = 'project_manager' AND u.is_active = 1 ORDER BY u.full_name ASC")->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name       = trim($_POST['name'] ?? '');
-    $customerId = $_POST['customer_id'] ?? null;
-    $managerId  = $_POST['manager_id'] ?? null;
-    $location   = trim($_POST['location'] ?? '');
+    $name         = trim($_POST['name'] ?? '');
+    $abbreviation = trim($_POST['abbreviation'] ?? '');
+    $customerId   = $_POST['customer_id'] ?? null;
+    $managerId    = $_POST['manager_id'] ?? null;
+    $location     = trim($_POST['location'] ?? '');
     $startDate  = trim($_POST['start_date'] ?? '');
     $endDate    = trim($_POST['end_date'] ?? '');
     $budget     = parseRupiah($_POST['budget'] ?? '0');
@@ -44,17 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validation
     $errors = [];
     if (empty($name)) $errors[] = "Nama proyek wajib diisi.";
+    if (empty($abbreviation)) $errors[] = "Singkatan proyek wajib diisi.";
     if (empty($customerId)) $errors[] = "Customer wajib dipilih.";
     if (empty($location)) $errors[] = "Lokasi proyek wajib diisi.";
     
     if (empty($errors)) {
         $stmt = $pdo->prepare("
             UPDATE projects 
-            SET name=?, customer_id=?, project_manager_id=?, location=?, start_date=?, end_date=?, budget=?, status=? 
+            SET name=?, abbreviation=?, customer_id=?, project_manager_id=?, location=?, start_date=?, end_date=?, budget=?, status=? 
             WHERE id=?
         ");
         
-        if ($stmt->execute([$name, $customerId, $managerId, $location, $startDate, $endDate, $budget, $status, $id])) {
+        if ($stmt->execute([$name, $abbreviation, $customerId, $managerId, $location, $startDate, $endDate, $budget, $status, $id])) {
             setFlash('success', "Data proyek berhasil diperbarui.");
             header('Location: ' . APP_URL . '/modules/master/projects/index.php');
             exit;
@@ -67,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setFlash('danger', implode('<br>', $errors));
         // Reset state for form display
         $project['name'] = $name;
+        $project['abbreviation'] = $abbreviation;
         $project['customer_id'] = $customerId;
         $project['project_manager_id'] = $managerId;
         $project['location'] = $location;
@@ -90,10 +93,20 @@ require_once __DIR__ . '/../../../includes/header.php';
             <form method="POST">
                 <div class="card-body">
                     
-                    <div class="form-group">
-                        <label>Nama Proyek <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control check-duplicate" data-type="project" data-id="<?= $id ?>" value="<?= sanitize($project['name']) ?>" required>
-                        <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <label>Nama Proyek <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control check-duplicate" data-type="project" data-id="<?= $id ?>" value="<?= sanitize($project['name']) ?>" required>
+                                <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Singkatan <span class="text-danger">*</span></label>
+                                <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($project['abbreviation'] ?? '') ?>" placeholder="Cth: PKST1" required maxlength="10">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="row">

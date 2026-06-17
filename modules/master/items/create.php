@@ -115,8 +115,13 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="row">
                         <div class="col-md-7">
                             <div class="form-group">
-                                <label>Nama / Deskripsi Barang <span class="text-danger">*</span></label>
-                                <input type="text" name="description" class="form-control check-duplicate" data-type="item" value="<?= sanitize($_POST['description'] ?? '') ?>" required>
+                                <label class="d-flex justify-content-between align-items-center w-100">
+                                    <span>Nama / Deskripsi Barang <span class="text-danger">*</span></span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary border-0" id="btnAiSuggest" title="Lengkapi Otomatis dengan AI">
+                                        <i class="fas fa-magic"></i> AI Auto-Fill
+                                    </button>
+                                </label>
+                                <input type="text" id="itemName" name="description" class="form-control check-duplicate" data-type="item" value="<?= sanitize($_POST['description'] ?? '') ?>" required>
                                 <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
                             </div>
                         </div>
@@ -200,6 +205,48 @@ $(document).ready(function() {
     
     // Trigger on load
     $('input[name="stock_type"]').trigger('change');
+    
+    // AI Auto-Fill feature
+    $('#btnAiSuggest').on('click', function() {
+        let itemName = $('#itemName').val().trim();
+        if (!itemName) {
+            toastr.error('Silakan ketik nama barang terlebih dahulu!');
+            return;
+        }
+        
+        let btn = $(this);
+        let originalHtml = btn.html();
+        btn.html('<i class="fas fa-spinner fa-spin"></i> Memproses...').prop('disabled', true);
+        
+        $.ajax({
+            url: APP_URL + '/api/ai_suggest_item.php',
+            type: 'POST',
+            data: { item_name: itemName },
+            dataType: 'json',
+            success: function(res) {
+                btn.html(originalHtml).prop('disabled', false);
+                if (res.success && res.data) {
+                    let d = res.data;
+                    if (d.category_id) {
+                        $('select[name="category_id"]').val(d.category_id).trigger('change');
+                    }
+                    if (d.type_specification) {
+                        $('input[name="type_specification"]').val(d.type_specification);
+                    }
+                    if (d.uom) {
+                        $('input[name="uom"]').val(d.uom);
+                    }
+                    toastr.success('Data berhasil dilengkapi oleh AI ✨');
+                } else {
+                    toastr.error(res.error || 'Gagal memproses AI.');
+                }
+            },
+            error: function(err) {
+                btn.html(originalHtml).prop('disabled', false);
+                toastr.error('Terjadi kesalahan saat menghubungi API.');
+            }
+        });
+    });
 });
 </script>
 JS;

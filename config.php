@@ -10,6 +10,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Load environment variables if exists
+if (file_exists(__DIR__ . '/env.php')) {
+    require_once __DIR__ . '/env.php';
+}
+
 // Production-safe error handling:
 // Hide errors from output, but still log them server-side.
 ini_set('display_errors', 0);
@@ -17,12 +22,7 @@ ini_set('display_startup_errors', 0);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
-// Database Configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'procurementDB');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb4');
+// Database Configuration has been moved to env.php
 
 // Application Configuration
 define('APP_NAME', 'MKM Procurement');
@@ -56,20 +56,29 @@ define('PROFILES_PATH', UPLOADS_PATH . '/profiles');
 define('LOGOS_PATH', UPLOADS_PATH . '/company_logos');
 
 // PDO Connection
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+    PDO::ATTR_TIMEOUT            => 3 // 3 seconds timeout for fast fallback
+];
+
 try {
-    $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
-    $options = [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ];
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
-} catch (PDOException $e) {
-    die('<div style="text-align:center;padding:50px;font-family:Arial;">
-        <h2>⚠️ Database Connection Error</h2>
-        <p>Pastikan MySQL sudah berjalan di XAMPP.</p>
-        <p style="color:#999;font-size:12px;">' . $e->getMessage() . '</p>
-    </div>');
+    // 1. Try Online Database
+    $dsnOnline = "mysql:host=" . (defined('DB_HOST_ONLINE') ? DB_HOST_ONLINE : 'localhost') . ";dbname=" . (defined('DB_NAME_ONLINE') ? DB_NAME_ONLINE : '') . ";charset=" . (defined('DB_CHARSET') ? DB_CHARSET : 'utf8mb4');
+    $pdo = new PDO($dsnOnline, defined('DB_USER_ONLINE') ? DB_USER_ONLINE : '', defined('DB_PASS_ONLINE') ? DB_PASS_ONLINE : '', $options);
+} catch (PDOException $eOnline) {
+    // 2. Fallback to Local Database
+    try {
+        $dsnLocal = "mysql:host=" . (defined('DB_HOST_LOCAL') ? DB_HOST_LOCAL : 'localhost') . ";dbname=" . (defined('DB_NAME_LOCAL') ? DB_NAME_LOCAL : 'procurementDB') . ";charset=" . (defined('DB_CHARSET') ? DB_CHARSET : 'utf8mb4');
+        $pdo = new PDO($dsnLocal, defined('DB_USER_LOCAL') ? DB_USER_LOCAL : 'root', defined('DB_PASS_LOCAL') ? DB_PASS_LOCAL : '', $options);
+    } catch (PDOException $eLocal) {
+        die('<div style="text-align:center;padding:50px;font-family:Arial;">
+            <h2>⚠️ Database Connection Error</h2>
+            <p>Gagal terhubung ke server database utama maupun lokal.</p>
+            <p style="color:#999;font-size:12px;"><strong>Online Error:</strong> ' . $eOnline->getMessage() . '<br><strong>Local Error:</strong> ' . $eLocal->getMessage() . '</p>
+        </div>');
+    }
 }
 
 // Timezone

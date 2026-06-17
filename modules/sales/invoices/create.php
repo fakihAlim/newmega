@@ -18,6 +18,12 @@ $stmtQ = $pdo->query("
     JOIN customers cust ON q.customer_id = cust.id
     JOIN companies c ON q.company_id = c.id
     WHERE q.status IN ('approved', 'invoiced')
+      AND q.total > (
+          SELECT COALESCE(SUM(total), 0) 
+          FROM invoices 
+          WHERE quotation_id = q.id 
+            AND status != 'rejected'
+      )
     ORDER BY q.id DESC
 ");
 $quotations = $stmtQ->fetchAll();
