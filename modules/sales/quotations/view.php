@@ -11,7 +11,7 @@ $sql = "
     SELECT q.*, 
            c.name as company_name, c.address as company_address, c.city as company_city, c.province as company_province, 
            c.phone as company_phone, c.email as company_email, c.logo as company_logo,
-           cust.company_name as customer_name, cust.address as customer_address, cust.phone as customer_phone, cust.pic_name as customer_pic,
+           cust.company_name as customer_name, cust.address as customer_address, cust.phone as customer_phone, cust.pic_name as customer_pic, cust.email as customer_email,
            p.name as project_name,
            u.full_name as creator_name, u2.full_name as approver_name
     FROM quotations q
@@ -88,63 +88,66 @@ require_once __DIR__ . '/../../../includes/header.php';
         </div>
     </div>
     
-    <div class="card-body printable-area p-5">
-        <div class="row mb-5 pb-3">
-            <div class="col-sm-7">
-                <div class="d-flex align-items-center mb-3">
+    <div class="card-body printable-area p-4 bg-white" style="color: #000; font-family: Arial, sans-serif;">
+        <!-- Title and Quotation No/Date -->
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div style="flex: 1;"></div>
+            <div style="flex: 1; text-align: center;">
+                <h1 class="font-weight-bold m-0" style="font-size: 48px; color: #000; letter-spacing: 1px;">QUOTATION</h1>
+            </div>
+            <div style="flex: 1; text-align: right;">
+                <table class="table-sm table-borderless font-weight-bold" style="font-size: 15px; margin-left: auto;">
+                    <tr>
+                        <td class="text-left pr-2 pb-0">Quotation No</td>
+                        <td class="text-left pb-0"><?= sanitize($q['quotation_no']) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="text-left pr-2 py-0">Date</td>
+                        <td class="text-left py-0"><?= date('j-M-Y', strtotime($q['quotation_date'])) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="text-left pr-2 pt-0">Valid Until</td>
+                        <td class="text-left pt-0"><?= $q['valid_until'] ? date('j-M-Y', strtotime($q['valid_until'])) : '-' ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- From and To -->
+        <div class="row no-gutters mb-3" style="border: 1px solid #000;">
+            <div class="col-sm-7 p-2" style="border-right: 1px solid #000 !important;">
+                <div style="font-size: 14px;">From</div>
+                <div class="d-flex align-items-start">
                     <?php if ($q['company_logo']): ?>
-                        <img src="<?= getCompanyLogo($q['company_logo']) ?>" alt="Logo" style="height:65px; margin-right:20px;">
+                        <img src="<?= getCompanyLogo($q['company_logo']) ?>" alt="Logo" style="height:55px; margin-right:15px;">
                     <?php endif; ?>
                     <div>
-                        <h3 class="mb-0 font-weight-bold" style="color:#000;"><?= sanitize($q['company_name']) ?></h3>
-                        <div style="font-size:13px; line-height:1.4;">
-                            <?= sanitize($q['company_address']) ?><br>
+                        <h4 class="font-weight-bold mb-1" style="color: #000; font-size: 18px;"><?= sanitize($q['company_name']) ?></h4>
+                        <div style="font-size: 13px; line-height: 1.5; color: #000;">
+                            <?= nl2br(sanitize($q['company_address'])) ?><br>
                             <?= sanitize($q['company_city']) ?>, <?= sanitize($q['company_province']) ?><br>
                             Email: <?= sanitize($q['company_email']) ?> | Phone: <?= sanitize($q['company_phone']) ?>
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-4">
-                    <h6 class="text-uppercase font-weight-bold mb-2" style="font-size:13px;">Quotation for:</h6>
-                    <div style="font-size:14px; line-height:1.5;">
-                        <strong style="color:#000;"><?= sanitize($q['customer_name']) ?></strong><br>
-                        <?= nl2br(sanitize($q['customer_address'])) ?><br>
-                        Email: <?= sanitize($q['customer_email'] ?? '-') ?><br>
-                        Phone: <?= sanitize($q['customer_phone'] ?? '-') ?>
-                    </div>
-                </div>
             </div>
-            <div class="col-sm-5 pl-4">
-                <h1 class="font-weight-bold text-uppercase mb-4" style="letter-spacing:1px; font-size:32px;">QUOTATION</h1>
-                
-                <table class="table table-sm table-borderless" style="font-size:14px;">
-                    <tr>
-                        <td width="40%" class="font-weight-bold p-0">Quotation No</td>
-                        <td class="p-0">: <span class="font-weight-bold"><?= sanitize($q['quotation_no']) ?></span></td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold p-0">Date</td>
-                        <td class="p-0">: <?= date('j-M-Y', strtotime($q['quotation_date'])) ?></td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold p-0">Customer ID</td>
-                        <td class="p-0">: <span><?= substr(strtoupper($q['customer_name']), 0, 3) . str_pad($q['customer_id'], 4, '0', STR_PAD_LEFT) ?></span></td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold p-0">Quotation valid until</td>
-                        <td class="p-0">: <?= $q['valid_until'] ? date('j-M-Y', strtotime($q['valid_until'])) : '-' ?></td>
-                    </tr>
-                </table>
-
-                <?php if ($q['comments']): ?>
-                <div class="mt-3 p-2 bg-light" style="border:1px solid #ddd; font-size:13px;">
-                    <strong style="color:#000;">Comments:</strong><br>
-                    <span style="color:#000;"><?= nl2br(sanitize($q['comments'])) ?></span>
+            <div class="col-sm-5 p-2">
+                <div style="font-size: 14px; font-weight: bold;">Quotation for:</div>
+                <h4 class="font-weight-bold mb-1" style="color: #000; font-size: 18px;"><?= sanitize($q['customer_name']) ?></h4>
+                <div style="font-size: 13px; color: #000; line-height: 1.5;">
+                    <?= nl2br(sanitize($q['customer_address'])) ?><br>
+                    Email: <?= sanitize($q['customer_email'] ?? '-') ?><br>
+                    Phone: <?= sanitize($q['customer_phone'] ?? '-') ?>
                 </div>
-                <?php endif; ?>
             </div>
         </div>
+
+        <?php if ($q['comments']): ?>
+        <div class="mb-3 p-2 bg-light" style="border:1px solid #000; font-size:13px; color:#000;">
+            <strong>Comments:</strong><br>
+            <?= nl2br(sanitize($q['comments'])) ?>
+        </div>
+        <?php endif; ?>
         
         <!-- Items Table -->
         <div class="table-responsive mb-4">
