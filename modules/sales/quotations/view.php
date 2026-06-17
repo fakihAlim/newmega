@@ -151,38 +151,38 @@ require_once __DIR__ . '/../../../includes/header.php';
         
         <!-- Items Table -->
         <div class="table-responsive mb-4">
-            <table class="table table-bordered table-sm print-table" style="font-size:12px; border:1px solid #000;">
-                <thead class="text-center" style="background-color: #f2f2f2;">
+            <table class="table quotation-table">
+                <thead>
                     <tr>
-                        <th rowspan="2" width="3%" class="align-middle">NO</th>
-                        <th rowspan="2" width="25%" class="align-middle">Description</th>
-                        <th rowspan="2" width="10%" class="align-middle">Type</th>
-                        <th rowspan="2" width="5%" class="align-middle">Qty</th>
-                        <th rowspan="2" width="5%" class="align-middle">UOM</th>
+                        <th rowspan="2" width="3%">NO</th>
+                        <th rowspan="2" width="25%">DESCRIPTION</th>
+                        <th rowspan="2" width="18%">TYPE</th>
+                        <th rowspan="2" width="5%">QTY</th>
+                        <th rowspan="2" width="5%">UOM</th>
                         <th colspan="2" width="18%">MATERIAL</th>
                         <th colspan="2" width="18%">MANPOWER</th>
-                        <th rowspan="2" width="16%" class="align-middle">Amount</th>
+                        <th rowspan="2" width="10%">AMOUNT</th>
                     </tr>
                     <tr>
-                        <th>Unit Price</th>
-                        <th>Total Material</th>
-                        <th>Unit Price</th>
-                        <th>Total Manpower</th>
+                        <th style="font-size: 11px;">UNIT PRICE</th>
+                        <th style="font-size: 11px;">TOTAL MATERIAL</th>
+                        <th style="font-size: 11px;">UNIT PRICE</th>
+                        <th style="font-size: 11px;">TOTAL MANPOWER</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $no = 1; foreach ($items as $item): ?>
                     <tr>
-                        <td class="text-center align-middle"><?= $no++ ?></td>
-                        <td class="align-middle"><strong><?= sanitize($item['description']) ?></strong></td>
-                        <td class="text-center align-middle"><?= sanitize($item['type_specification']) ?: '-' ?></td>
-                        <td class="text-center align-middle"><?= number_format($item['qty'], 0) ?></td>
-                        <td class="text-center align-middle"><?= sanitize($item['uom']) ?></td>
-                        <td class="text-right align-middle px-2"><?= number_format($item['material_unit_price'], 0, ',', '.') ?></td>
-                        <td class="text-right align-middle px-2"><?= number_format($item['material_total'], 0, ',', '.') ?></td>
-                        <td class="text-right align-middle px-2"><?= number_format($item['manpower_unit_price'], 0, ',', '.') ?></td>
-                        <td class="text-right align-middle px-2"><?= number_format($item['manpower_total'], 0, ',', '.') ?></td>
-                        <td class="text-right align-middle font-weight-bold px-2" style="background-color: #f9f9f9;"><?= number_format($item['amount'], 0, ',', '.') ?></td>
+                        <td class="text-right"><?= $no++ ?></td>
+                        <td><?= sanitize($item['description']) ?></td>
+                        <td><?= sanitize($item['type_specification']) ?: '-' ?></td>
+                        <td class="text-right"><?= number_format($item['qty'], 0) ?></td>
+                        <td><?= sanitize($item['uom']) ?></td>
+                        <td class="text-right"><?= number_format($item['material_unit_price'], 0, ',', '.') ?></td>
+                        <td class="text-right"><?= number_format($item['material_total'], 0, ',', '.') ?></td>
+                        <td class="text-right"><?= number_format($item['manpower_unit_price'], 0, ',', '.') ?></td>
+                        <td class="text-right"><?= number_format($item['manpower_total'], 0, ',', '.') ?></td>
+                        <td class="text-right"><?= number_format($item['amount'], 0, ',', '.') ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -294,6 +294,37 @@ require_once __DIR__ . '/../../../includes/header.php';
 </div>
 
 <style>
+.quotation-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    border: 1px solid #000 !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 13px !important;
+    margin-bottom: 0 !important;
+}
+.quotation-table th, .quotation-table td {
+    border: 1px solid #000 !important;
+    padding: 6px 8px !important;
+    color: #000 !important;
+    vertical-align: middle !important;
+}
+.quotation-table thead th {
+    background-color: #ffffff !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+.quotation-table td.text-right {
+    text-align: right !important;
+}
+.quotation-table td.text-center {
+    text-align: center !important;
+}
+.quotation-table td.text-left {
+    text-align: left !important;
+}
+
 @media print {
     @page {
         size: A4 portrait;
@@ -311,7 +342,9 @@ require_once __DIR__ . '/../../../includes/header.php';
     .card-header { display: none !important; }
     .printable-area { width: 100% !important; padding: 0 !important; border: none !important; color: #000 !important; }
     .printable-area * { color: #000 !important; }
-    .print-table th { background-color: #f2f2f2 !important; color: #000 !important; }
+    .quotation-table th { background-color: #ffffff !important; color: #000 !important; }
+    /* Ensure borders print properly */
+    .quotation-table, .quotation-table th, .quotation-table td { border: 1px solid #000 !important; }
 }
 .printable-area { color: #000 !important; }
 .printable-area * { color: #000 !important; }
