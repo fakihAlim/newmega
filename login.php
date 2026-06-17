@@ -72,10 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = 'Username atau password salah.';
                 }
             } catch (PDOException $e) {
+                error_log('[NEWMEGA] ' . $e->getMessage());
                 if ((isset($e->errorInfo[1]) && $e->errorInfo[1] == 2006) || strpos($e->getMessage(), 'gone away') !== false) {
                     $error = 'Koneksi ke server database terputus. Silakan coba klik tombol MASUK sekali lagi.';
                 } else {
-                    $error = 'Terjadi kesalahan sistem: ' . $e->getMessage();
+                    $error = 'Terjadi kesalahan sistem saat mencoba login.';
                 }
             }
         }

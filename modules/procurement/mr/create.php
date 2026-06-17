@@ -100,7 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
         } catch (Exception $e) {
             $pdo->rollBack();
-            setFlash('danger', "Terjadi kesalahan sistem: " . $e->getMessage());
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            setFlash('danger', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
     
@@ -112,229 +113,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<!-- Load Montserrat and Work Sans fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-/* Style overrides for Iron & Oak Foundation style */
-body {
-    font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #f7f9fb !important;
-}
-
-/* Card Redesign */
-.mr-card {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 4px !important;
-    box-shadow: none !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    margin-bottom: 2rem;
-}
-.mr-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 4px 4px 0px #1e293b !important;
-}
-
-/* Header Redesign */
-.mr-card-header {
-    background-color: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    padding: 1.25rem 1.5rem !important;
-    border-top-left-radius: 4px !important;
-    border-top-right-radius: 4px !important;
-}
-.mr-card-title {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1.25rem !important;
-    color: #091426 !important;
-    margin: 0 !important;
-    letter-spacing: -0.01em;
-}
-
-/* Section Headers */
-.section-title {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 13px !important;
-    letter-spacing: 0.1em !important;
-    text-transform: uppercase !important;
-    color: #1e293b !important;
-    margin-bottom: 1.25rem !important;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 6px;
-}
-
-/* Form Styling */
-.form-group label {
-    font-family: 'Work Sans', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 11px !important;
-    letter-spacing: 0.08em !important;
-    text-transform: uppercase !important;
-    color: #475569 !important;
-    margin-bottom: 0.5rem !important;
-}
-.form-control {
-    font-family: 'Work Sans', sans-serif !important;
-    font-size: 14px !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 4px !important;
-    padding: 0.5rem 0.75rem !important;
-    height: auto !important;
-    background-color: #ffffff !important;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
-}
-.form-control:focus {
-    border-color: #cbd5e1 !important;
-    border-bottom: 2px solid #f28c28 !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* Buttons styling based on design.md */
-.btn-primary-cta {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    background-color: #f28c28 !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 4px !important;
-    padding: 0.6rem 1.25rem !important;
-    transition: background-color 0.2s ease;
-}
-.btn-primary-cta:hover {
-    background-color: #d97706 !important;
-    color: #ffffff !important;
-}
-
-.btn-secondary-cta {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    background-color: #1e293b !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 4px !important;
-    padding: 0.6rem 1.25rem !important;
-    transition: background-color 0.2s ease;
-}
-.btn-secondary-cta:hover {
-    background-color: #0f172a !important;
-    color: #ffffff !important;
-}
-
-.btn-outline-cta {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 13px !important;
-    background-color: transparent !important;
-    color: #1e293b !important;
-    border: 2px solid #1e293b !important;
-    border-radius: 4px !important;
-    padding: 0.4rem 1rem !important;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-.btn-outline-cta:hover {
-    background-color: #1e293b !important;
-    color: #ffffff !important;
-}
-
-.btn-outline-danger-cta {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    background-color: transparent !important;
-    color: #ba1a1a !important;
-    border: 2px solid #ba1a1a !important;
-    border-radius: 4px !important;
-    padding: 0.5rem 1.25rem !important;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-.btn-outline-danger-cta:hover {
-    background-color: #ba1a1a !important;
-    color: #ffffff !important;
-}
-
-/* Custom Table Styling */
-.table-minimalist {
-    border-collapse: collapse !important;
-    width: 100% !important;
-    font-size: 13px !important;
-}
-.table-minimalist th {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    font-size: 11px !important;
-    letter-spacing: 0.05em !important;
-    background-color: #1e293b !important;
-    color: #ffffff !important;
-    border: 1px solid #334155 !important;
-    padding: 10px 12px !important;
-}
-.table-minimalist td {
-    font-family: 'Work Sans', sans-serif !important;
-    border: 1px solid #e2e8f0 !important;
-    padding: 10px 12px !important;
-    vertical-align: middle !important;
-    background-color: #ffffff;
-}
-
-/* Select2 overrides to match custom styles */
-.select2-container--bootstrap4 .select2-selection--single {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 4px !important;
-    height: calc(2.25rem + 2px) !important;
-    font-family: 'Work Sans', sans-serif !important;
-    font-size: 14px !important;
-}
-.select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
-    line-height: calc(2.25rem) !important;
-    padding-left: 0.75rem !important;
-    color: #1f2937 !important;
-}
-.select2-container--bootstrap4 .select2-selection--single:focus,
-.select2-container--bootstrap4.select2-container--focus .select2-selection--single {
-    border-color: #cbd5e1 !important;
-    border-bottom: 2px solid #f28c28 !important;
-    box-shadow: none !important;
-}
-
-.item-info {
-    font-family: 'Work Sans', sans-serif !important;
-    font-size: 12px !important;
-    line-height: 1.4 !important;
-}
-.qty-input {
-    text-align: center !important;
-    font-weight: 600 !important;
-}
-.btn-remove-row {
-    color: #ba1a1a !important;
-    background-color: transparent !important;
-    border: 1px solid #ba1a1a !important;
-    transition: all 0.2s ease;
-    border-radius: 4px !important;
-    padding: 0.25rem 0.5rem !important;
-}
-.btn-remove-row:hover {
-    color: #ffffff !important;
-    background-color: #ba1a1a !important;
-}
-</style>
-
-<div class="card mr-card">
-    <div class="card-header mr-card-header">
-        <h3 class="card-title mr-card-title"><i class="fas fa-file-alt mr-2" style="color: #f28c28;"></i> FORM PERMINTAAN MATERIAL (MR)</h3>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title text-primary"><i class="fas fa-file-alt mr-2"></i> Form Permintaan Material (MR)</h3>
     </div>
     
     <form method="POST" id="mrForm">
-        <div class="card-body bg-white p-4">
+        <div class="card-body bg-light">
             <!-- Header Section -->
-            <h5 class="section-title">1. Informasi Proyek</h5>
+            <h5 class="mb-3 text-secondary text-uppercase" style="font-size:14px;letter-spacing:1px;font-weight:600;">1. Informasi Proyek</h5>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -367,17 +154,17 @@ body {
                 </div>
             </div>
             
-            <hr class="my-4" style="border-top: 1px solid #e2e8f0;">
+            <hr class="my-4">
             
             <!-- Items Section -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="section-title m-0" style="border-bottom: none; padding-bottom: 0;">2. Detail Material</h5>
-                <button type="button" class="btn btn-outline-cta" id="btnAddRow"><i class="fas fa-plus mr-1"></i> Tambah Baris</button>
-            </div>
+            <h5 class="mb-3 text-secondary text-uppercase d-flex justify-content-between align-items-center" style="font-size:14px;letter-spacing:1px;font-weight:600;">
+                2. Detail Material
+                <button type="button" class="btn btn-sm btn-info" id="btnAddRow"><i class="fas fa-plus"></i> Tambah Baris</button>
+            </h5>
             
             <div class="table-responsive">
-                <table class="table table-minimalist table-bordered table-sm" id="itemsTable">
-                    <thead>
+                <table class="table table-bordered table-sm" id="itemsTable">
+                    <thead class="thead-dark">
                         <tr>
                             <th width="35%">Item Code & Description</th>
                             <th width="15%">Type</th>
@@ -395,11 +182,11 @@ body {
             
         </div>
         
-        <div class="card-footer bg-white border-top-0 px-4 pb-4 pt-2 text-right">
+        <div class="card-footer bg-white text-right">
             <input type="hidden" name="action" id="formAction" value="draft">
-            <a href="<?= APP_URL ?>/modules/procurement/mr/index.php" class="btn btn-outline-danger-cta mr-2"><i class="fas fa-times mr-1"></i> Batal</a>
-            <button type="button" class="btn btn-secondary-cta mr-2" onclick="submitForm('draft')"><i class="fas fa-save mr-1"></i> Simpan Draft</button>
-            <button type="button" class="btn btn-primary-cta" onclick="submitForm('submit')"><i class="fas fa-paper-plane mr-1"></i> Submit untuk Approval</button>
+            <a href="<?= APP_URL ?>/modules/procurement/mr/index.php" class="btn btn-default mr-2"><i class="fas fa-times mr-1"></i> Batal</a>
+            <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')"><i class="fas fa-save mr-1"></i> Simpan Draft</button>
+            <button type="button" class="btn btn-success" onclick="submitForm('submit')"><i class="fas fa-paper-plane mr-1"></i> Kirim untuk Persetujuan</button>
         </div>
     </form>
 </div>
@@ -416,10 +203,10 @@ body {
             </select>
         </td>
         <td>
-            <div class="item-info text-muted">Pilih barang...</div>
+            <div class="item-info text-muted" style="font-size:12px;">Pilih barang...</div>
         </td>
         <td>
-            <input type="text" name="qty[]" class="form-control qty-input" value="1" required>
+            <input type="text" name="qty[]" class="form-control input-number qty-input" value="1" required>
         </td>
         <td class="item-uom text-center" style="vertical-align:middle;font-weight:bold;">
             -
@@ -428,7 +215,7 @@ body {
             <input type="text" name="item_remark[]" class="form-control" placeholder="Cth: Untuk cor lantai 1">
         </td>
         <td class="text-center" style="vertical-align:middle;">
-            <button type="button" class="btn btn-remove-row"><i class="fas fa-times"></i></button>
+            <button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class="fas fa-times"></i></button>
         </td>
     </tr>
 </template>

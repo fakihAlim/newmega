@@ -127,14 +127,14 @@ require_once __DIR__ . '/../../../includes/header.php';
                                 </a>
                                 <?php endif; ?>
                                 <a class="dropdown-item" href="<?= APP_URL ?>/modules/master/projects/edit.php?id=<?= $p['id'] ?>">
-                                    <i class="fas fa-edit text-info mr-2"></i> Edit Proyek
+                                    <i class="fas fa-edit text-info mr-2"></i> Ubah Proyek
                                 </a>
                                 
                                 <div class="dropdown-divider"></div>
                                 <h6 class="dropdown-header">Ubah Status</h6>
-                                <a class="dropdown-item status-btn" href="#" data-id="<?= $p['id'] ?>" data-status="active"><i class="fas fa-play text-primary mr-2"></i> Set Active</a>
-                                <a class="dropdown-item status-btn" href="#" data-id="<?= $p['id'] ?>" data-status="completed"><i class="fas fa-check text-success mr-2"></i> Set Completed</a>
-                                <a class="dropdown-item status-btn" href="#" data-id="<?= $p['id'] ?>" data-status="cancelled"><i class="fas fa-times text-danger mr-2"></i> Set Cancelled</a>
+                                <a class="dropdown-item status-btn" href="#" data-id="<?= $p['id'] ?>" data-status="active"><i class="fas fa-play text-primary mr-2"></i> Set Aktif</a>
+                                <a class="dropdown-item status-btn" href="#" data-id="<?= $p['id'] ?>" data-status="completed"><i class="fas fa-check text-success mr-2"></i> Set Selesai</a>
+                                <a class="dropdown-item status-btn" href="#" data-id="<?= $p['id'] ?>" data-status="cancelled"><i class="fas fa-times text-danger mr-2"></i> Set Dibatalkan</a>
                                 <?php if (canAccess('master_projects', 'delete')): ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item delete-btn text-danger" href="#" data-id="<?= $p['id'] ?>" data-name="<?= sanitize($p['name']) ?>"><i class="fas fa-trash mr-2"></i> Hapus Permanen</a>

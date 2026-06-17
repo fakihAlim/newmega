@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('success', "Klaim Nota {$claim['claim_number']} berhasil dihapus.");
         } catch (Exception $e) {
             $pdo->rollBack();
-            setFlash('danger', "Gagal menghapus klaim: " . $e->getMessage());
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            setFlash('danger', 'Gagal menghapus klaim. Terjadi kesalahan sistem.');
         }
     }
 } else {

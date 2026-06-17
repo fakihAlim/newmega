@@ -94,7 +94,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <td><small><?= formatDateTime($u['last_login']) ?></small></td>
                     <td><?= getStatusBadge($u['is_active'] ? 'active' : 'cancelled') ?></td>
                     <td class="text-center">
-                        <a href="<?= APP_URL ?>/modules/users/edit.php?id=<?= $u['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Edit">
+                        <a href="<?= APP_URL ?>/modules/users/edit.php?id=<?= $u['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Ubah">
                             <i class="fas fa-edit"></i>
                         </a>
                         

@@ -78,7 +78,7 @@ $(document).ready(function () {
     window.showError = function(message) {
         Swal.fire({
             icon: 'error',
-            title: 'Error!',
+            title: 'Gagal!',
             text: message
         });
     };

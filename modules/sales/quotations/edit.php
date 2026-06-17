@@ -129,7 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
         } catch (Exception $e) {
             $pdo->rollBack();
-            setFlash('danger', 'Gagal: ' . $e->getMessage());
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            setFlash('danger', 'Gagal memperbarui Quotation. Terjadi kesalahan sistem.');
         }
     }
 }

@@ -70,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
         
     } catch (Exception $e) {
-        setFlash('danger', 'Gagal menyimpan pembayaran: ' . $e->getMessage());
+        error_log('[NEWMEGA] ' . $e->getMessage());
+        setFlash('danger', 'Gagal menyimpan pembayaran. Terjadi kesalahan sistem.');
     }
 }
 

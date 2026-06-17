@@ -219,7 +219,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } catch (Exception $e) {
             $pdo->rollBack();
-            $errors[] = "Terjadi kesalahan: " . $e->getMessage();
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            $errors[] = 'Terjadi kesalahan sistem saat menyimpan klaim.';
         }
     }
 

@@ -146,7 +146,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                     data-image="<?= sanitize($p['image_url']) ?>"
                                     data-order="<?= $p['order_num'] ?>"
                                     data-active="<?= $p['is_active'] ?>"
-                                    title="Edit">
+                                    title="Ubah">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button type="button" class="btn btn-danger btn-sm btn-cms-delete" 

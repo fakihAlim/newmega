@@ -100,7 +100,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/master/vendors/index.php" class="nav-link <?= isActiveClass(['vendors']) ?>">
                                 <i class="nav-icon fas fa-truck"></i>
-                                <p>Vendor</p>
+                                <p>Supplier</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -108,7 +108,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/master/customers/index.php" class="nav-link <?= isActiveClass(['customers']) ?>">
                                 <i class="nav-icon fas fa-building"></i>
-                                <p>Customer</p>
+                                <p>Pelanggan</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -159,7 +159,7 @@ function isActiveClass($dirs, $pages = []) {
                     <a href="#" class="nav-link <?= isActiveClass(['mr','po','receiving']) ?>">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
-                            Procurement
+                            Pengadaan
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -237,7 +237,7 @@ function isActiveClass($dirs, $pages = []) {
                     <a href="#" class="nav-link <?= isActiveClass(['vendor_payments','customer_payments','quotations','invoices','claim_nota','ledger']) ?>">
                         <i class="nav-icon fas fa-coins"></i>
                         <p>
-                            Finance
+                            Keuangan
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -270,7 +270,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/finance/vendor_payments/index.php" class="nav-link <?= isActiveClass(['vendor_payments']) ?>">
                                 <i class="nav-icon fas fa-money-check-alt"></i>
-                                <p>Pembayaran Vendor</p>
+                                <p>Pembayaran Supplier</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -278,7 +278,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/finance/customer_payments/index.php" class="nav-link <?= isActiveClass(['customer_payments']) ?>">
                                 <i class="nav-icon fas fa-hand-holding-usd"></i>
-                                <p>Penerimaan Customer</p>
+                                <p>Penerimaan Pelanggan</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -286,7 +286,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/finance/ledger/index.php" class="nav-link <?= isActiveClass(['ledger']) ?>">
                                 <i class="nav-icon fas fa-book"></i>
-                                <p>Buku Kas (Ledger)</p>
+                                <p>Buku Kas</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -317,7 +317,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/timesheet/approval.php" class="nav-link <?= isActiveClass(['timesheet'], ['approval.php']) ?>">
                                 <i class="nav-icon fas fa-check-double"></i>
-                                <p>Approval Timesheet</p>
+                                <p>Persetujuan Timesheet</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -356,7 +356,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/reports/vendor_outstanding.php" class="nav-link <?= isActiveClass([], 'vendor_outstanding.php') ?>">
                                 <i class="nav-icon fas fa-file-invoice"></i>
-                                <p>Outstanding Vendor</p>
+                                <p>Tagihan Supplier</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -364,7 +364,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/reports/customer_outstanding.php" class="nav-link <?= isActiveClass([], 'customer_outstanding.php') ?>">
                                 <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                                <p>Outstanding Customer</p>
+                                <p>Piutang Pelanggan</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -372,7 +372,7 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/reports/profit_loss.php" class="nav-link <?= isActiveClass([], 'profit_loss.php') ?>">
                                 <i class="nav-icon fas fa-balance-scale"></i>
-                                <p>Profit & Loss</p>
+                                <p>Laba & Rugi</p>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -394,7 +394,7 @@ function isActiveClass($dirs, $pages = []) {
                     <a href="#" class="nav-link <?= isActiveClass(['cms']) ?>">
                         <i class="nav-icon fas fa-laptop-code"></i>
                         <p>
-                            CMS Landing Page
+                            CMS Halaman Utama
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -441,13 +441,13 @@ function isActiveClass($dirs, $pages = []) {
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/users/index.php" class="nav-link <?= isActiveClass(['users']) ?>">
                                 <i class="nav-icon fas fa-users-cog"></i>
-                                <p>Manajemen User</p>
+                                <p>Manajemen Pengguna</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="<?= APP_URL ?>/modules/master/roles/index.php" class="nav-link <?= isActiveClass(['roles']) ?>">
                                 <i class="nav-icon fas fa-user-tag"></i>
-                                <p>Role & Akses</p>
+                                <p>Peran & Hak Akses</p>
                             </a>
                         </li>
                         <li class="nav-item">

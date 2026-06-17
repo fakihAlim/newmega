@@ -19,17 +19,17 @@ $claim = $stmt->fetch();
 if (!$claim) {
     setFlash('danger', 'Claim Nota tidak ditemukan.');
 } elseif ($claim['status'] !== 'draft') {
-    setFlash('warning', 'Hanya claim Draft yang bisa disubmit.');
+    setFlash('warning', 'Hanya Claim Nota berstatus Draf yang dapat dikirim.');
 } else {
     // Check at least 1 item exists
     $itemCount = $pdo->prepare("SELECT COUNT(*) FROM claim_nota_items WHERE claim_id = ?");
     $itemCount->execute([$id]);
     
     if ($itemCount->fetchColumn() == 0) {
-        setFlash('danger', 'Claim harus memiliki minimal 1 item sebelum disubmit.');
+        setFlash('danger', 'Claim Nota harus memiliki minimal 1 item sebelum dikirim.');
     } else {
         $pdo->prepare("UPDATE claim_notas SET status = 'pending' WHERE id = ?")->execute([$id]);
-        setFlash('success', 'Claim Nota ' . $claim['claim_number'] . ' berhasil disubmit untuk approval.');
+        setFlash('success', 'Claim Nota ' . $claim['claim_number'] . ' berhasil dikirim untuk persetujuan.');
     }
 }
 

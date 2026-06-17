@@ -54,7 +54,8 @@ try {
     setFlash('success', "PO {$po['po_number']} berhasil dihapus.");
 } catch (Exception $e) {
     $pdo->rollBack();
-    setFlash('danger', 'Terjadi kesalahan saat menghapus PO: ' . $e->getMessage());
+    error_log('[NEWMEGA] ' . $e->getMessage());
+    setFlash('danger', 'Terjadi kesalahan sistem saat menghapus PO.');
 }
 
 header('Location: ' . APP_URL . '/modules/procurement/po/index.php');

@@ -92,7 +92,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                                 <i class="fas fa-eye"></i>
                             </a>
                             <?php if ($inv['status'] === 'draft'): ?>
-                            <a href="<?= APP_URL ?>/modules/sales/invoices/edit.php?id=<?= $inv['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Edit">
+                            <a href="<?= APP_URL ?>/modules/sales/invoices/edit.php?id=<?= $inv['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Ubah">
                                 <i class="fas fa-edit text-white"></i>
                             </a>
                             <button type="button" class="btn btn-danger btn-sm action-btn" data-id="<?= $inv['id'] ?>" data-name="<?= sanitize($inv['invoice_no']) ?>" data-toggle="tooltip" title="Hapus">

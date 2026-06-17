@@ -144,7 +144,8 @@ try {
     
 } catch (Exception $e) {
     $pdo->rollBack();
-    setFlash('danger', 'Gagal import: ' . $e->getMessage());
+    error_log('[NEWMEGA] ' . $e->getMessage());
+    setFlash('danger', 'Gagal mengimpor data karyawan. Terjadi kesalahan sistem.');
 }
 
 fclose($handle);

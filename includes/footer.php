@@ -7,9 +7,9 @@
     <!-- Footer -->
     <footer class="main-footer text-sm">
         <div class="float-right d-none d-sm-block">
-            <b>Version</b> <?= APP_VERSION ?>
+            <b>Versi</b> <?= APP_VERSION ?>
         </div>
-        <strong>&copy; <?= date('Y') ?> <a href="#"><?= APP_NAME ?></a>.</strong> All rights reserved.
+        <strong>&copy; <?= date('Y') ?> <a href="#"><?= APP_NAME ?></a>.</strong> Hak cipta dilindungi.
     </footer>
 </div>
 <!-- ./wrapper -->

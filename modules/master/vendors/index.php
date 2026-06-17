@@ -124,7 +124,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <td><?= getStatusBadge($v['is_active'] ? 'active' : 'cancelled') ?></td>
                     <td class="text-center">
                         <div class="btn-group">
-                            <a href="<?= APP_URL ?>/modules/master/vendors/edit.php?id=<?= $v['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Edit">
+                            <a href="<?= APP_URL ?>/modules/master/vendors/edit.php?id=<?= $v['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Ubah">
                                 <i class="fas fa-edit"></i>
                             </a>
                             

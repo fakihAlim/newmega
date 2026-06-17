@@ -127,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
         } catch (Exception $e) {
             $pdo->rollBack();
-            setFlash('danger', "Terjadi kesalahan sistem: " . $e->getMessage());
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            setFlash('danger', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
     
@@ -247,7 +248,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             <input type="hidden" name="action" id="formAction" value="draft">
             <a href="<?= APP_URL ?>/modules/procurement/mr/index.php" class="btn btn-default mr-2"><i class="fas fa-times mr-1"></i> Batal</a>
             <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')"><i class="fas fa-save mr-1"></i> Update Draft</button>
-            <button type="button" class="btn btn-success" onclick="submitForm('submit')"><i class="fas fa-paper-plane mr-1"></i> Submit untuk Approval</button>
+            <button type="button" class="btn btn-success" onclick="submitForm('submit')"><i class="fas fa-paper-plane mr-1"></i> Kirim untuk Persetujuan</button>
         </div>
     </form>
 </div>

@@ -137,7 +137,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     </td>
                     <td class="text-center">
                         <div class="btn-group">
-                            <a href="<?= APP_URL ?>/modules/master/companies/edit.php?id=<?= $c['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Edit">
+                            <a href="<?= APP_URL ?>/modules/master/companies/edit.php?id=<?= $c['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Ubah">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <?php if ($c['used_count'] == 0 && !$c['is_default']): ?>

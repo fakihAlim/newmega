@@ -173,19 +173,19 @@ function getFlash() {
  */
 function getStatusBadge($status) {
     $badges = [
-        'draft'               => '<span class="badge badge-secondary">Draft</span>',
-        'pending'             => '<span class="badge badge-warning">Pending Approval</span>',
-        'approved'            => '<span class="badge badge-success">Approved</span>',
-        'rejected'            => '<span class="badge badge-danger">Rejected</span>',
-        'completed'           => '<span class="badge badge-info">Completed</span>',
-        'cancelled'           => '<span class="badge badge-dark">Cancelled</span>',
-        'partially_received'  => '<span class="badge badge-primary">Partially Received</span>',
-        'invoiced'            => '<span class="badge badge-info">Invoiced</span>',
-        'sent'                => '<span class="badge badge-primary">Sent</span>',
-        'paid'                => '<span class="badge badge-success">Paid</span>',
-        'partial_paid'        => '<span class="badge badge-warning">Partial Paid</span>',
-        'planning'            => '<span class="badge badge-secondary">Planning</span>',
-        'active'              => '<span class="badge badge-success">Active</span>',
+        'draft'               => '<span class="badge badge-secondary">Draf</span>',
+        'pending'             => '<span class="badge badge-warning">Menunggu Persetujuan</span>',
+        'approved'            => '<span class="badge badge-success">Disetujui</span>',
+        'rejected'            => '<span class="badge badge-danger">Ditolak</span>',
+        'completed'           => '<span class="badge badge-info">Selesai</span>',
+        'cancelled'           => '<span class="badge badge-dark">Dibatalkan</span>',
+        'partially_received'  => '<span class="badge badge-primary">Diterima Sebagian</span>',
+        'invoiced'            => '<span class="badge badge-info">Sudah Ditagih</span>',
+        'sent'                => '<span class="badge badge-primary">Terkirim</span>',
+        'paid'                => '<span class="badge badge-success">Lunas</span>',
+        'partial_paid'        => '<span class="badge badge-warning">Bayar Sebagian</span>',
+        'planning'            => '<span class="badge badge-secondary">Perencanaan</span>',
+        'active'              => '<span class="badge badge-success">Aktif</span>',
     ];
     
     return $badges[$status] ?? '<span class="badge badge-secondary">' . ucfirst(str_replace('_', ' ', $status)) . '</span>';
@@ -249,12 +249,12 @@ function hasRole($roles) {
  */
 function uploadFile($file, $destination, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'csv', 'pdf', 'xls', 'xlsx', 'doc', 'docx'], $maxSize = 5242880) {
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        return ['success' => false, 'message' => 'Upload error'];
+        return ['success' => false, 'message' => 'Gagal mengunggah file.'];
     }
     
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedTypes)) {
-        return ['success' => false, 'message' => 'Tipe file tidak diizinkan. Allowed: ' . implode(', ', $allowedTypes)];
+        return ['success' => false, 'message' => 'Tipe file tidak diizinkan. Format yang diperbolehkan: ' . implode(', ', $allowedTypes)];
     }
     
     if ($file['size'] > $maxSize) {

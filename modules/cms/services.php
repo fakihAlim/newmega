@@ -113,7 +113,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                     data-icon="<?= sanitize($s['icon']) ?>"
                                     data-order="<?= $s['order_num'] ?>"
                                     data-active="<?= $s['is_active'] ?>"
-                                    title="Edit">
+                                    title="Ubah">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button type="button" class="btn btn-danger btn-sm btn-cms-delete" 

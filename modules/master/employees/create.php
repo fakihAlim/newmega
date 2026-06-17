@@ -75,7 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } catch (PDOException $e) {
             $pdo->rollBack();
-            setFlash('danger', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            setFlash('danger', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     } else {
         setFlash('danger', implode('<br>', $errors));

@@ -132,7 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
     } catch (Exception $e) {
         $pdo->rollBack();
-        setFlash('danger', 'Gagal menyimpan penerimaan: ' . $e->getMessage());
+        error_log('[NEWMEGA] ' . $e->getMessage());
+        setFlash('danger', 'Gagal menyimpan penerimaan. Terjadi kesalahan sistem.');
     }
 }
 

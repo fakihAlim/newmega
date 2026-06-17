@@ -67,7 +67,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                         </a>
                         
                         <?php if (in_array($o['status'], ['draft', 'pending']) && ($user['role'] === 'super_admin' || $user['id'] == $o['created_by'])): ?>
-                        <a href="<?= APP_URL ?>/modules/procurement/po/edit.php?id=<?= $o['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Edit">
+                        <a href="<?= APP_URL ?>/modules/procurement/po/edit.php?id=<?= $o['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Ubah">
                             <i class="fas fa-edit text-white"></i>
                         </a>
                         <button type="button" class="btn btn-danger btn-sm btn-delete-po" data-id="<?= $o['id'] ?>" data-number="<?= sanitize($o['po_number']) ?>" data-toggle="tooltip" title="Hapus">

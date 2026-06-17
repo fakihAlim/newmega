@@ -15,7 +15,7 @@ require_once __DIR__ . '/permissions.php';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="<?= APP_NAME ?> - E-Procurement System">
+    <meta name="description" content="<?= APP_NAME ?> - Sistem E-Procurement">
     <title><?= sanitize($pageTitle) ?> | <?= APP_NAME ?></title>
 
     <!-- Google Font: Inter -->
@@ -88,7 +88,7 @@ require_once __DIR__ . '/permissions.php';
             ?>
             <?php if ($totalPending > 0): ?>
             <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#" title="Pending Approvals">
+                <a class="nav-link" data-toggle="dropdown" href="#" title="Persetujuan Tertunda">
                     <i class="fas fa-tasks text-info"></i>
                     <span class="badge badge-info navbar-badge"><?= $totalPending ?></span>
                 </a>
@@ -131,7 +131,7 @@ require_once __DIR__ . '/permissions.php';
                     </a>
                     <div class="dropdown-divider"></div>
                     <a href="<?= APP_URL ?>/modules/auth/logout.php" class="dropdown-item text-danger">
-                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        <i class="fas fa-sign-out-alt mr-2"></i> Keluar
                     </a>
                 </div>
             </li>
@@ -151,7 +151,7 @@ require_once __DIR__ . '/permissions.php';
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right" style="font-size:13px;">
-                            <li class="breadcrumb-item"><a href="<?= APP_URL ?>/modules/dashboard/index.php">Home</a></li>
+                            <li class="breadcrumb-item"><a href="<?= APP_URL ?>/modules/dashboard/index.php">Beranda</a></li>
                             <?php if (isset($breadcrumbs) && is_array($breadcrumbs)): ?>
                                 <?php foreach ($breadcrumbs as $bc): ?>
                                     <?php if (isset($bc['url'])): ?>

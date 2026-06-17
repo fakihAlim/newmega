@@ -96,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
     } catch (Exception $e) {
         $pdo->rollBack();
-        setFlash('danger', 'Gagal membuat transfer: ' . $e->getMessage());
+        error_log('[NEWMEGA] ' . $e->getMessage());
+        setFlash('danger', 'Gagal membuat transfer. Terjadi kesalahan sistem.');
     }
 }
 

@@ -88,7 +88,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                                 <i class="fas fa-eye"></i>
                             </a>
                             <?php if ($q['status'] === 'draft'): ?>
-                            <a href="<?= APP_URL ?>/modules/sales/quotations/edit.php?id=<?= $q['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Edit">
+                            <a href="<?= APP_URL ?>/modules/sales/quotations/edit.php?id=<?= $q['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Ubah">
                                 <i class="fas fa-edit text-white"></i>
                             </a>
                             <button type="button" class="btn btn-danger btn-sm action-btn" data-id="<?= $q['id'] ?>" data-name="<?= sanitize($q['quotation_no']) ?>" data-toggle="tooltip" title="Hapus">

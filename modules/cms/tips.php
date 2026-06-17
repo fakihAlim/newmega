@@ -142,7 +142,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                     data-date="<?= $t['published_date'] ?>"
                                     data-image="<?= sanitize($t['image_url']) ?>"
                                     data-active="<?= $t['is_active'] ?>"
-                                    title="Edit">
+                                    title="Ubah">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button type="button" class="btn btn-danger btn-sm btn-cms-delete" 

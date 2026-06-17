@@ -131,7 +131,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                     data-btnurl="<?= sanitize($b['button_url']) ?>"
                                     data-order="<?= $b['order_num'] ?>"
                                     data-active="<?= $b['is_active'] ?>"
-                                    title="Edit">
+                                    title="Ubah">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button type="button" class="btn btn-danger btn-sm btn-cms-delete" 

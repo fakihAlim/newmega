@@ -68,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } catch (Exception $e) {
             $pdo->rollBack();
-            $errors[] = "Terjadi kesalahan sistem: " . $e->getMessage();
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            $errors[] = 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.';
         }
     }
     
@@ -117,10 +118,10 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <thead class="bg-light">
                         <tr>
                             <th>Modul</th>
-                            <th width="100" class="text-center">View</th>
-                            <th width="100" class="text-center">Create</th>
-                            <th width="100" class="text-center">Edit</th>
-                            <th width="100" class="text-center">Delete</th>
+                            <th width="100" class="text-center">Lihat</th>
+                            <th width="100" class="text-center">Tambah</th>
+                            <th width="100" class="text-center">Ubah</th>
+                            <th width="100" class="text-center">Hapus</th>
                         </tr>
                     </thead>
                     <tbody>

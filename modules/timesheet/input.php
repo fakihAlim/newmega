@@ -50,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$emp['id'], $company_id, $project_id, $work_date, $work_type, $overtime_hours, $emp['daily_wage'], $notes, $user['id']]);
                 setFlash('success', 'Timesheet berhasil disimpan!');
             } catch (PDOException $e) {
-                setFlash('danger', 'Terjadi kesalahan: ' . $e->getMessage());
+                error_log('[NEWMEGA] ' . $e->getMessage());
+                setFlash('danger', 'Terjadi kesalahan sistem saat menyimpan timesheet.');
             }
         } else {
             setFlash('danger', implode('<br>', $errors));
@@ -137,7 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('success', $msg);
         } catch (Exception $e) {
             $pdo->rollBack();
-            setFlash('danger', 'Gagal: ' . $e->getMessage());
+            error_log('[NEWMEGA] ' . $e->getMessage());
+            setFlash('danger', 'Gagal memproses timesheet. Terjadi kesalahan sistem.');
         }
         header('Location: ' . APP_URL . '/modules/timesheet/input.php');
         exit;

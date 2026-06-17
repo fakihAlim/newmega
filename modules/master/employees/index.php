@@ -91,7 +91,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <td class="text-center">
                             <div class="btn-group">
                                 <a href="<?= APP_URL ?>/modules/master/employees/edit.php?id=<?= $e['id'] ?>"
-                                    class="btn btn-info btn-sm" data-toggle="tooltip" title="Edit">
+                                    class="btn btn-info btn-sm" data-toggle="tooltip" title="Ubah">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button type="button"

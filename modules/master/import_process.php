@@ -307,7 +307,8 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    setFlash('danger', 'Terjadi kesalahan sistem saat membaca file Excel: ' . $e->getMessage());
+    error_log('[NEWMEGA] ' . $e->getMessage());
+    setFlash('danger', 'Terjadi kesalahan sistem saat membaca file Excel.');
 }
 
 header("Location: " . $_SERVER['HTTP_REFERER']);
