@@ -11,7 +11,7 @@ $stmt->execute([$id]);
 $role = $stmt->fetch();
 
 if (!$role) {
-    setFlash('danger', 'Role tidak ditemukan.');
+    setFlash('danger', 'Peran tidak ditemukan.');
     header('Location: index.php');
     exit;
 }
@@ -24,10 +24,10 @@ while ($row = $stmtPerm->fetch()) {
     $existingPerms[$row['module_key']] = $row;
 }
 
-$pageTitle = 'Edit Role: ' . sanitize($role['role_name']);
+$pageTitle = 'Edit Peran: ' . sanitize($role['role_name']);
 $breadcrumbs = [
     ['label' => 'Administrasi', 'url' => '#'],
-    ['label' => 'Role & Akses', 'url' => 'index.php'],
+    ['label' => 'Peran & Hak Akses', 'url' => 'index.php'],
     ['label' => 'Edit']
 ];
 
@@ -42,14 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     $errors = [];
-    if (empty($roleName)) $errors[] = "Nama Role wajib diisi.";
-    if (empty($roleKey)) $errors[] = "Key Role gagal digenerate.";
+    if (empty($roleName)) $errors[] = "Nama Peran wajib diisi.";
+    if (empty($roleKey)) $errors[] = "Key Peran gagal digenerate.";
     
     // Check if key exists for other roles
     $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM roles WHERE role_key = ? AND id != ?");
     $stmtCheck->execute([$roleKey, $id]);
     if ($stmtCheck->fetchColumn() > 0) {
-        $errors[] = "Key Role '$roleKey' sudah digunakan.";
+        $errors[] = "Key Peran '$roleKey' sudah digunakan.";
     }
     
     if (empty($errors)) {
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // So it's fine! It will query DB on every request for permissions!
             
             $pdo->commit();
-            setFlash('success', 'Data role berhasil diperbarui.');
+            setFlash('success', 'Data peran berhasil diperbarui.');
             header('Location: index.php');
             exit;
         } catch (Exception $e) {
@@ -110,7 +110,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Form Edit Role</h3>
+        <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Form Edit Peran</h3>
         <a href="index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
     </div>
     <form method="POST">
@@ -119,13 +119,13 @@ require_once __DIR__ . '/../../../includes/header.php';
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Nama Role <span class="text-danger">*</span></label>
+                        <label>Nama Peran <span class="text-danger">*</span></label>
                         <input type="text" name="role_name" class="form-control" value="<?= sanitize($role['role_name']) ?>" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Key Role</label>
+                        <label>Key Peran</label>
                         <input type="text" name="role_key" class="form-control" value="<?= sanitize($role['role_key']) ?>">
                     </div>
                 </div>

@@ -11,6 +11,38 @@ $breadcrumbs = [
     ['label' => 'Outstanding Vendor']
 ];
 
+// Get filters
+$filterStart = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$filterEnd = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$filterVendor = $_GET['vendor_id'] ?? '';
+$filterStatus = $_GET['status'] ?? '';
+
+// Build conditions
+$conditions = ["po.status NOT IN ('draft', 'cancelled', 'rejected')"];
+$params = [];
+
+if ($filterStart) {
+    $conditions[] = "po.po_date >= ?";
+    $params[] = $filterStart;
+}
+if ($filterEnd) {
+    $conditions[] = "po.po_date <= ?";
+    $params[] = $filterEnd;
+}
+if ($filterVendor) {
+    $conditions[] = "po.vendor_id = ?";
+    $params[] = $filterVendor;
+}
+if ($filterStatus) {
+    $conditions[] = "po.status = ?";
+    $params[] = $filterStatus;
+}
+
+$whereClause = "";
+if (!empty($conditions)) {
+    $whereClause = "WHERE " . implode(" AND ", $conditions);
+}
+
 // Fetch all POs with outstanding balance
 $sql = "
     SELECT 
@@ -20,25 +52,94 @@ $sql = "
     FROM purchase_orders po
     JOIN vendors v ON po.vendor_id = v.id
     LEFT JOIN vendor_payments vp ON vp.po_id = po.id
-    WHERE po.status NOT IN ('draft', 'cancelled', 'rejected')
+    $whereClause
     GROUP BY po.id
     ORDER BY (po.total - COALESCE(SUM(vp.amount), 0)) DESC
 ";
-$stmt = $pdo->query($sql);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $pos = $stmt->fetchAll();
+
+// Fetch all vendors for filter dropdown
+$vendors = $pdo->query("SELECT id, company_name FROM vendors ORDER BY company_name ASC")->fetchAll();
 
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../includes/report_print.php';
 ?>
 
-<?php renderReportPrintHeader('Rekap Hutang ke Vendor (Outstanding)'); ?>
+<?php 
+$periodText = '';
+if ($filterStart || $filterEnd) {
+    $periodText = 'Periode: ' . ($filterStart ? date('d-m-Y', strtotime($filterStart)) : 'Awal') . ' s/d ' . ($filterEnd ? date('d-m-Y', strtotime($filterEnd)) : 'Akhir');
+}
+renderReportPrintHeader('Rekap Hutang ke Vendor (Outstanding)', $periodText); 
+?>
+
+<!-- Filter Card -->
+<div class="card card-default d-print-none mb-3">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-filter mr-2"></i>Filter Data</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <form method="GET" action="">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Tanggal Mulai</label>
+                        <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterStart) ?>">
+                    </div>
+                </div>
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Tanggal Selesai</label>
+                        <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterEnd) ?>">
+                    </div>
+                </div>
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Supplier / Vendor</label>
+                        <select name="vendor_id" class="form-control form-control-sm select2">
+                            <option value="">-- Semua Supplier --</option>
+                            <?php foreach ($vendors as $v): ?>
+                                <option value="<?= $v['id'] ?>" <?= $filterVendor == $v['id'] ? 'selected' : '' ?>>
+                                    <?= sanitize($v['company_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Status PO</label>
+                        <select name="status" class="form-control form-control-sm">
+                            <option value="">-- Semua Status --</option>
+                            <option value="pending" <?= $filterStatus === 'pending' ? 'selected' : '' ?>>Pending Approval</option>
+                            <option value="approved" <?= $filterStatus === 'approved' ? 'selected' : '' ?>>Approved</option>
+                            <option value="partially_received" <?= $filterStatus === 'partially_received' ? 'selected' : '' ?>>Partially Received</option>
+                            <option value="completed" <?= $filterStatus === 'completed' ? 'selected' : '' ?>>Completed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <a href="vendor_outstanding.php" class="btn btn-secondary mr-2"><i class="fas fa-undo mr-1"></i> Reset</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i> Filter</button>
+        </div>
+    </form>
+</div>
 
 <div class="card card-outline card-warning">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title"><i class="fas fa-file-invoice mr-2"></i> Rekap Hutang ke Vendor (Outstanding)</h3>
         <div class="ml-auto d-flex gap-2">
-            <a href="export_excel.php?type=vendor_outstanding" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i> Export Excel</a>
-            <a href="export_csv.php?type=vendor_outstanding" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> Export CSV</a>
+            <a href="export_excel.php?<?= http_build_query(array_merge($_GET, ['type' => 'vendor_outstanding'])) ?>" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i> Export Excel</a>
+            <a href="export_csv.php?<?= http_build_query(array_merge($_GET, ['type' => 'vendor_outstanding'])) ?>" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> Export CSV</a>
             <button class="btn btn-default btn-sm ml-1" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak</button>
         </div>
     </div>
@@ -101,7 +202,15 @@ require_once __DIR__ . '/../../includes/report_print.php';
 
 <?php
 $extraJS = <<<'JS'
-<script>$(document).ready(function() { initDataTable('#reportTable'); });</script>
+<script>
+$(document).ready(function() {
+    initDataTable('#reportTable');
+    $('.select2').select2({
+        theme: 'bootstrap4',
+        width: '100%'
+    });
+});
+</script>
 JS;
 require_once __DIR__ . '/../../includes/footer.php';
 ?>

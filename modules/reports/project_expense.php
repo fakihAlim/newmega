@@ -11,67 +11,150 @@ $breadcrumbs = [
     ['label' => 'Pengeluaran Proyek']
 ];
 
-// Fetch all projects with their PO expenditure
-$sql = "
-    SELECT 
-        p.id, p.name, p.abbreviation, p.status, p.budget,
-        COALESCE(SUM(DISTINCT po_totals.po_total), 0) as total_po,
-        COALESCE(SUM(DISTINCT vp_totals.paid_total), 0) as total_paid
-    FROM projects p
-    LEFT JOIN (
-        SELECT pml.mr_id, po.id as po_id, po.total as po_total
-        FROM purchase_orders po
-        JOIN po_mr_links pml ON pml.po_id = po.id
-        WHERE po.status NOT IN ('draft', 'cancelled', 'rejected')
-    ) po_sub ON po_sub.mr_id IN (
-        SELECT mr.id FROM material_requests mr WHERE mr.project_id = p.id
-    )
-    LEFT JOIN (
-        SELECT po_id, total as po_total FROM purchase_orders WHERE status NOT IN ('draft','cancelled','rejected')
-    ) po_totals ON po_totals.po_id = po_sub.po_id
-    LEFT JOIN (
-        SELECT po_id, SUM(amount) as paid_total FROM vendor_payments GROUP BY po_id
-    ) vp_totals ON vp_totals.po_id = po_sub.po_id
-    GROUP BY p.id
-    ORDER BY p.name
-";
+// Get filters
+$filterStart = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$filterEnd = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$filterProject = $_GET['project_id'] ?? '';
+$filterStatus = $_GET['status'] ?? '';
 
-// Simpler approach: get project-level PO spending via MR links
+// Build conditions
+$conditions = [];
+$params = [];
+
+if ($filterProject) {
+    $conditions[] = "p.id = ?";
+    $params[] = $filterProject;
+}
+if ($filterStatus) {
+    $conditions[] = "p.status = ?";
+    $params[] = $filterStatus;
+}
+
+$whereClause = "";
+if (!empty($conditions)) {
+    $whereClause = "WHERE " . implode(" AND ", $conditions);
+}
+
+// Modify subqueries to support date filters
+$dateCondPO = "";
+$dateCondVP = "";
+$dateCondMR = "";
+if ($filterStart) {
+    $dateCondPO .= " AND po.po_date >= " . $pdo->quote($filterStart);
+    $dateCondVP .= " AND vp.payment_date >= " . $pdo->quote($filterStart);
+    $dateCondMR .= " AND mr.request_date >= " . $pdo->quote($filterStart);
+}
+if ($filterEnd) {
+    $dateCondPO .= " AND po.po_date <= " . $pdo->quote($filterEnd);
+    $dateCondVP .= " AND vp.payment_date <= " . $pdo->quote($filterEnd);
+    $dateCondMR .= " AND mr.request_date <= " . $pdo->quote($filterEnd);
+}
+
 $sql = "
     SELECT 
         p.id, p.name, p.abbreviation, p.status, p.budget,
-        (SELECT COUNT(*) FROM material_requests mr WHERE mr.project_id = p.id AND mr.status != 'draft') as total_mr,
+        (SELECT COUNT(*) FROM material_requests mr WHERE mr.project_id = p.id AND mr.status != 'draft' $dateCondMR) as total_mr,
         (SELECT COALESCE(SUM(po.total), 0) 
          FROM purchase_orders po 
          JOIN po_mr_links pml ON pml.po_id = po.id 
          JOIN material_requests mr ON pml.mr_id = mr.id 
-         WHERE mr.project_id = p.id AND po.status NOT IN ('draft','cancelled','rejected')
+         WHERE mr.project_id = p.id AND po.status NOT IN ('draft','cancelled','rejected') $dateCondPO
         ) as total_po_value,
         (SELECT COALESCE(SUM(vp.amount), 0) 
          FROM vendor_payments vp 
          JOIN purchase_orders po ON vp.po_id = po.id
          JOIN po_mr_links pml ON pml.po_id = po.id
          JOIN material_requests mr ON pml.mr_id = mr.id
-         WHERE mr.project_id = p.id
+         WHERE mr.project_id = p.id $dateCondVP
         ) as total_paid
     FROM projects p
+    $whereClause
     ORDER BY p.name
 ";
-$stmt = $pdo->query($sql);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $projects = $stmt->fetchAll();
+
+// Fetch all projects for filter dropdown
+$allProjects = $pdo->query("SELECT id, name FROM projects ORDER BY name ASC")->fetchAll();
 
 require_once __DIR__ . '/../../includes/header.php';
 require_once __DIR__ . '/../../includes/report_print.php';
 ?>
 
-<?php renderReportPrintHeader('Laporan Pengeluaran Proyek'); ?>
+<?php 
+$periodText = '';
+if ($filterStart || $filterEnd) {
+    $periodText = 'Periode: ' . ($filterStart ? date('d-m-Y', strtotime($filterStart)) : 'Awal') . ' s/d ' . ($filterEnd ? date('d-m-Y', strtotime($filterEnd)) : 'Akhir');
+}
+renderReportPrintHeader('Laporan Pengeluaran Proyek', $periodText); 
+?>
+
+<!-- Filter Card -->
+<div class="card card-default d-print-none mb-3">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-filter mr-2"></i>Filter Data</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <form method="GET" action="">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Tanggal Mulai</label>
+                        <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterStart) ?>">
+                    </div>
+                </div>
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Tanggal Selesai</label>
+                        <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterEnd) ?>">
+                    </div>
+                </div>
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Proyek</label>
+                        <select name="project_id" class="form-control form-control-sm select2">
+                            <option value="">-- Semua Proyek --</option>
+                            <?php foreach ($allProjects as $proj): ?>
+                                <option value="<?= $proj['id'] ?>" <?= $filterProject == $proj['id'] ? 'selected' : '' ?>>
+                                    <?= sanitize($proj['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md col-sm-6">
+                    <div class="form-group mb-2 mb-md-0">
+                        <label>Status Proyek</label>
+                        <select name="status" class="form-control form-control-sm">
+                            <option value="">-- Semua Status --</option>
+                            <option value="planning" <?= $filterStatus === 'planning' ? 'selected' : '' ?>>Planning</option>
+                            <option value="active" <?= $filterStatus === 'active' ? 'selected' : '' ?>>Active</option>
+                            <option value="completed" <?= $filterStatus === 'completed' ? 'selected' : '' ?>>Completed</option>
+                            <option value="cancelled" <?= $filterStatus === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <a href="project_expense.php" class="btn btn-secondary mr-2"><i class="fas fa-undo mr-1"></i> Reset</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i> Filter</button>
+        </div>
+    </form>
+</div>
 
 <div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i> Pengeluaran Per Proyek</h3>
         <div class="ml-auto d-flex gap-2">
-            <a href="export_excel.php?type=project_expense" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i> Export Excel</a>
-            <a href="export_csv.php?type=project_expense" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> Export CSV</a>
+            <a href="export_excel.php?<?= http_build_query(array_merge($_GET, ['type' => 'project_expense'])) ?>" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i> Export Excel</a>
+            <a href="export_csv.php?<?= http_build_query(array_merge($_GET, ['type' => 'project_expense'])) ?>" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> Export CSV</a>
             <button class="btn btn-default btn-sm ml-1" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak</button>
         </div>
     </div>
@@ -131,7 +214,15 @@ require_once __DIR__ . '/../../includes/report_print.php';
 
 <?php
 $extraJS = <<<'JS'
-<script>$(document).ready(function() { initDataTable('#reportTable'); });</script>
+<script>
+$(document).ready(function() {
+    initDataTable('#reportTable');
+    $('.select2').select2({
+        theme: 'bootstrap4',
+        width: '100%'
+    });
+});
+</script>
 JS;
 require_once __DIR__ . '/../../includes/footer.php';
 ?>

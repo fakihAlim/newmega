@@ -8,14 +8,14 @@
  */
 $AVAILABLE_MODULES = [
     'Dashboard' => [
-        'dashboard' => 'Dashboard Utama',
+        'dashboard' => 'Dashboard',
         'project_dashboard' => 'Dashboard Proyek',
     ],
     'Master Data' => [
         'master_categories' => 'Kategori',
         'master_items' => 'Barang',
-        'master_vendors' => 'Vendor',
-        'master_customers' => 'Customer',
+        'master_vendors' => 'Supplier',
+        'master_customers' => 'Pelanggan',
         'master_companies' => 'Perusahaan',
         'master_wages' => 'Master Upah',
         'master_employees' => 'Master Karyawan',
@@ -23,7 +23,7 @@ $AVAILABLE_MODULES = [
     'Proyek' => [
         'master_projects' => 'Proyek',
     ],
-    'Procurement' => [
+    'Pengadaan' => [
         'material_request' => 'Material Request',
         'purchase_order' => 'Purchase Order',
         'receiving' => 'Penerimaan Barang',
@@ -33,31 +33,31 @@ $AVAILABLE_MODULES = [
         'stock_transfer' => 'Transfer Barang',
         'stock_alerts' => 'Stok Minimum',
     ],
-    'Finance' => [
+    'Keuangan' => [
         'quotation' => 'Quotation',
         'invoice' => 'Invoice',
         'claim_nota' => 'Claim Nota',
-        'vendor_payments' => 'Pembayaran Vendor',
-        'customer_payments' => 'Penerimaan Customer',
-        'ledger' => 'General Ledger',
+        'vendor_payments' => 'Pembayaran Supplier',
+        'customer_payments' => 'Penerimaan Pelanggan',
+        'ledger' => 'Buku Kas',
     ],
     'Timesheet' => [
-        'timesheet' => 'Timesheet (Input & Approval)',
+        'timesheet' => 'Input & Persetujuan Timesheet',
         'report_timesheet' => 'Laporan Timesheet',
     ],
     'Laporan' => [
         'report_project_expense' => 'Pengeluaran Proyek',
-        'report_vendor_outstanding' => 'Outstanding Vendor',
-        'report_customer_outstanding' => 'Outstanding Customer',
-        'report_profit_loss' => 'Profit & Loss',
+        'report_vendor_outstanding' => 'Tagihan Supplier',
+        'report_customer_outstanding' => 'Piutang Pelanggan',
+        'report_profit_loss' => 'Laba & Rugi',
         'report_stock' => 'Laporan Stok',
     ],
-    'CMS Landing Page' => [
-        'cms_landing' => 'Kelola Landing Page (CMS)',
+    'CMS Halaman Utama' => [
+        'cms_landing' => 'CMS Halaman Utama',
     ],
     'Administrasi' => [
-        'users' => 'Manajemen User',
-        'roles' => 'Role & Akses',
+        'users' => 'Manajemen Pengguna',
+        'roles' => 'Peran & Hak Akses',
     ]
 ];
 

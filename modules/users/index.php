@@ -5,10 +5,10 @@
 require_once __DIR__ . '/../../includes/auth.php';
 requirePermission('users');
 
-$pageTitle = 'Manajemen User';
+$pageTitle = 'Manajemen Pengguna';
 $breadcrumbs = [
     ['label' => 'Administrasi', 'url' => '#'],
-    ['label' => 'User']
+    ['label' => 'Pengguna']
 ];
 
 // Handle Delete
@@ -20,9 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         // We will just deactivate instead of hard delete to maintain data integrity
         $stmt = $pdo->prepare("UPDATE users SET is_active = 0 WHERE id = ?");
         if ($stmt->execute([$id])) {
-            setFlash('success', 'User berhasil dinonaktifkan.');
+            setFlash('success', 'Pengguna berhasil dinonaktifkan.');
         } else {
-            setFlash('danger', 'Gagal menonaktifkan user.');
+            setFlash('danger', 'Gagal menonaktifkan pengguna.');
         }
     }
     header('Location: ' . APP_URL . '/modules/users/index.php');
@@ -34,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $id = $_POST['id'] ?? 0;
     $stmt = $pdo->prepare("UPDATE users SET is_active = 1 WHERE id = ?");
     if ($stmt->execute([$id])) {
-        setFlash('success', 'User berhasil diaktifkan.');
+        setFlash('success', 'Pengguna berhasil diaktifkan.');
     } else {
-        setFlash('danger', 'Gagal mengaktifkan user.');
+        setFlash('danger', 'Gagal mengaktifkan pengguna.');
     }
     header('Location: ' . APP_URL . '/modules/users/index.php');
     exit;
@@ -51,18 +51,18 @@ require_once __DIR__ . '/../../includes/header.php';
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title">Daftar User</h3>
+        <h3 class="card-title">Daftar Pengguna</h3>
         <a href="<?= APP_URL ?>/modules/users/create.php" class="btn btn-primary btn-sm ml-auto">
-            <i class="fas fa-plus mr-1"></i> Tambah User Baru
+            <i class="fas fa-plus mr-1"></i> Tambah Pengguna Baru
         </a>
     </div>
     <div class="card-body">
-        <table id="usersTable" class="table table-bordered table-striped table-hover w-100 style="font-size: 13.5px;"">
+        <table id="usersTable" class="table table-bordered table-striped table-hover w-100" style="font-size: 13.5px;">
             <thead>
                 <tr>
                     <th width="5%">No</th>
                     <th width="20%">Nama / Username</th>
-                    <th width="15%">Role</th>
+                    <th width="15%">Peran</th>
                     <th width="20%">Kontak</th>
                     <th width="15%">Login Terakhir</th>
                     <th width="10%">Status</th>
@@ -144,7 +144,7 @@ $(document).ready(function() {
         const name = $(this).data('name');
         const action = $(this).data('action');
         
-        let title = action === 'delete' ? 'Nonaktifkan User?' : 'Aktifkan User?';
+        let title = action === 'delete' ? 'Nonaktifkan Pengguna?' : 'Aktifkan Pengguna?';
         let text = action === 'delete' ? 
             `Anda yakin ingin menonaktifkan pengguna "${name}"? Pengguna tidak akan bisa login.` : 
             `Anda yakin ingin mengaktifkan pengguna "${name}"?`;

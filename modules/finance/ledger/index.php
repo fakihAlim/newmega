@@ -254,7 +254,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         </div>
 
         <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover mb-0" style="font-size:13px;">
+            <table id="ledgerTable" class="table table-bordered table-striped table-hover mb-0 w-100" style="font-size:13px;">
                 <thead class="bg-light">
                     <tr>
                         <th width="10%">Tanggal</th>
@@ -266,25 +266,18 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <th width="12%" class="text-right text-danger">Kredit (-)</th>
                         <th width="15%" class="text-right font-weight-bold">Saldo</th>
                     </tr>
-                </thead>
-                <tbody>
                     <!-- Row Saldo Awal -->
                     <tr class="bg-light font-weight-bold" style="background-color: #f8f9fa;">
-                        <td colspan="5" class="text-right text-secondary">SALDO AWAL (OPENING BALANCE):</td>
-                        <td></td>
-                        <td></td>
-                        <td class="text-right text-dark"><?= number_format($openingBalance, 0, ',', '.') ?></td>
+                        <th colspan="5" class="text-right text-secondary" style="font-weight: bold; border: 1px solid #dee2e6;">SALDO AWAL (OPENING BALANCE):</th>
+                        <th style="border: 1px solid #dee2e6;"></th>
+                        <th style="border: 1px solid #dee2e6;"></th>
+                        <th class="text-right text-dark" style="font-weight: bold; border: 1px solid #dee2e6;"><?= number_format($openingBalance, 0, ',', '.') ?></th>
                     </tr>
-
+                </thead>
+                <tbody>
                     <?php 
                     $currentRunningBalance = $openingBalance;
-                    if (empty($transactions)): 
-                    ?>
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">Tidak ditemukan transaksi kas untuk filter ini.</td>
-                        </tr>
-                    <?php 
-                    else: 
+                    if (!empty($transactions)): 
                         foreach ($transactions as $t): 
                             $debit = (float)$t['debit'];
                             $kredit = (float)$t['kredit'];
@@ -357,6 +350,11 @@ $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
     initSelect2('.select2');
+    initDataTable('#ledgerTable', {
+        ordering: false,
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Semua"]]
+    });
 });
 </script>
 JS;

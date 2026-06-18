@@ -140,7 +140,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <select name="customer_id" id="customer_id" class="form-control select2" required>
                                 <option value="">-- Pilih Customer --</option>
                                 <?php foreach ($customers as $c): ?>
-                                    <option value="<?= $c['id'] ?>"><?= sanitize($c['name']) ?></option>
+                                    <option value="<?= $c['id'] ?>" <?= (isset($_POST['customer_id']) && $_POST['customer_id'] == $c['id']) ? 'selected' : '' ?>><?= sanitize($c['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -152,7 +152,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <select name="project_id" id="project_id" class="form-control select2">
                                 <option value="">-- Tanpa Proyek --</option>
                                 <?php foreach ($projects as $p): ?>
-                                    <option value="<?= $p['id'] ?>" data-customer-id="<?= $p['customer_id'] ?>"><?= sanitize($p['name']) ?></option>
+                                    <option value="<?= $p['id'] ?>" data-customer-id="<?= $p['customer_id'] ?>" <?= (isset($_POST['project_id']) && $_POST['project_id'] == $p['id']) ? 'selected' : '' ?>><?= sanitize($p['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -161,14 +161,14 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Catatan (Pesan)</label>
                         <div class="col-sm-8">
-                            <textarea name="comments" class="form-control" rows="2" placeholder="Catatan yang muncul di header..."></textarea>
+                            <textarea name="comments" class="form-control" rows="2" placeholder="Catatan yang muncul di header..."><?= sanitize($_POST['comments'] ?? '') ?></textarea>
                         </div>
                     </div>
                     
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Syarat & Ketentuan</label>
                         <div class="col-sm-8">
-                            <textarea name="terms_and_conditions" class="form-control" rows="3" placeholder="Note 1: ...&#10;Note 2: ..."></textarea>
+                            <textarea name="terms_and_conditions" class="form-control" rows="3" placeholder="Note 1: ...&#10;Note 2: ..."><?= sanitize($_POST['terms_and_conditions'] ?? '') ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -181,7 +181,17 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <div class="col-sm-8">
                             <select name="company_id" class="form-control" required>
                                 <?php foreach ($companies as $co): ?>
-                                    <option value="<?= $co['id'] ?>" <?= $co['is_default'] ? 'selected' : '' ?>><?= sanitize($co['name']) ?></option>
+                                    <?php 
+                                    $coSelected = false;
+                                    if (isset($_POST['company_id'])) {
+                                        if ($_POST['company_id'] == $co['id']) {
+                                            $coSelected = true;
+                                        }
+                                    } elseif ($co['is_default']) {
+                                        $coSelected = true;
+                                    }
+                                    ?>
+                                    <option value="<?= $co['id'] ?>" <?= $coSelected ? 'selected' : '' ?>><?= sanitize($co['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -190,21 +200,21 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Tanggal Quotation <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
-                            <input type="date" name="quotation_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                            <input type="date" name="quotation_date" class="form-control" value="<?= sanitize($_POST['quotation_date'] ?? date('Y-m-d')) ?>" required>
                         </div>
                     </div>
                     
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Berlaku Dari</label>
                         <div class="col-sm-8">
-                            <input type="date" name="valid_from" class="form-control" value="<?= date('Y-m-d') ?>">
+                            <input type="date" name="valid_from" class="form-control" value="<?= sanitize($_POST['valid_from'] ?? date('Y-m-d')) ?>">
                         </div>
                     </div>
                     
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Berlaku Sampai</label>
                         <div class="col-sm-8">
-                            <input type="date" name="valid_until" class="form-control" value="<?= date('Y-m-d', strtotime('+30 days')) ?>">
+                            <input type="date" name="valid_until" class="form-control" value="<?= sanitize($_POST['valid_until'] ?? date('Y-m-d', strtotime('+30 days'))) ?>">
                         </div>
                     </div>
                 </div>
@@ -237,9 +247,24 @@ require_once __DIR__ . '/../../../includes/header.php';
                         </tr>
                     </thead>
                     <tbody id="qItemsBody">
-                        <tr class="empty-row">
-                            <td colspan="8" class="text-center text-muted py-4">Belum ada item. Klik "Tambah Baris".</td>
-                        </tr>
+                        <?php if (isset($_POST['description']) && is_array($_POST['description']) && count($_POST['description']) > 0): ?>
+                            <?php foreach ($_POST['description'] as $i => $desc): ?>
+                                <tr class="q-row">
+                                    <td><input type="text" name="description[]" class="form-control form-control-sm" required placeholder="Nama pekerjaan/material" value="<?= sanitize($desc) ?>"></td>
+                                    <td><input type="text" name="type_specification[]" class="form-control form-control-sm" placeholder="Spek" value="<?= sanitize($_POST['type_specification'][$i] ?? '') ?>"></td>
+                                    <td><input type="text" name="qty[]" class="form-control form-control-sm text-center input-number col-qty" value="<?= sanitize($_POST['qty'][$i] ?? '1') ?>" required></td>
+                                    <td><input type="text" name="uom[]" class="form-control form-control-sm text-center" value="<?= sanitize($_POST['uom'][$i] ?? '') ?>"></td>
+                                    <td><input type="text" name="material_unit_price[]" class="form-control form-control-sm text-right input-number col-mat-price" value="<?= sanitize($_POST['material_unit_price'][$i] ?? '0') ?>"></td>
+                                    <td><input type="text" name="manpower_unit_price[]" class="form-control form-control-sm text-right input-number col-man-price" value="<?= sanitize($_POST['manpower_unit_price'][$i] ?? '0') ?>"></td>
+                                    <td><input type="text" name="amount[]" class="form-control form-control-sm text-right font-weight-bold col-amount" value="<?= sanitize($_POST['amount'][$i] ?? '0') ?>" readonly></td>
+                                    <td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class="fas fa-times"></i></button></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr class="empty-row">
+                                <td colspan="8" class="text-center text-muted py-4">Belum ada item. Klik "Tambah Baris".</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -250,15 +275,15 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <table class="table table-sm table-borderless font-weight-bold text-right" style="font-size:14px;">
                         <tr>
                             <td width="40%">Subtotal</td>
-                            <td><input type="text" name="subtotal" id="calc_subtotal" class="form-control text-right form-control-sm font-weight-bold" readonly value="0"></td>
+                            <td><input type="text" name="subtotal" id="calc_subtotal" class="form-control text-right form-control-sm font-weight-bold" readonly value="<?= sanitize($_POST['subtotal'] ?? '0') ?>"></td>
                         </tr>
                         <tr>
                             <td>Diskon</td>
                             <td>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" id="calc_discount_pct" class="form-control text-center" placeholder="%" min="0" max="100" step="0.01">
+                                    <input type="number" name="discount_pct" id="calc_discount_pct" class="form-control text-center" placeholder="%" min="0" max="100" step="0.01" value="<?= sanitize($_POST['discount_pct'] ?? '') ?>">
                                     <div class="input-group-prepend input-group-append"><span class="input-group-text">% | Rp</span></div>
-                                    <input type="text" name="discount_nominal" id="calc_discount_nom" class="form-control text-right mask-rupiah" value="0">
+                                    <input type="text" name="discount_nominal" id="calc_discount_nom" class="form-control text-right mask-rupiah" value="<?= sanitize($_POST['discount_nominal'] ?? '0') ?>">
                                 </div>
                             </td>
                         </tr>
@@ -266,19 +291,19 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <td>Pajak (PPN)</td>
                             <td>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" id="calc_tax_pct" class="form-control text-center" placeholder="%" min="0" max="100" step="0.01" value="11">
+                                    <input type="number" name="tax_pct" id="calc_tax_pct" class="form-control text-center" placeholder="%" min="0" max="100" step="0.01" value="<?= sanitize($_POST['tax_pct'] ?? '11') ?>">
                                     <div class="input-group-prepend input-group-append"><span class="input-group-text">% | Rp</span></div>
-                                    <input type="text" name="tax_nominal" id="calc_tax_nom" class="form-control text-right mask-rupiah" value="0">
+                                    <input type="text" name="tax_nominal" id="calc_tax_nom" class="form-control text-right mask-rupiah" value="<?= sanitize($_POST['tax_nominal'] ?? '0') ?>">
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>Ongkos Kirim</td>
-                            <td><input type="text" name="shipping_cost" id="calc_shipping" class="form-control text-right form-control-sm mask-rupiah" value="0"></td>
+                            <td><input type="text" name="shipping_cost" id="calc_shipping" class="form-control text-right form-control-sm mask-rupiah" value="<?= sanitize($_POST['shipping_cost'] ?? '0') ?>"></td>
                         </tr>
                         <tr style="border-top: 2px solid #ccc;">
                             <td class="text-danger" style="font-size:16px;">GRAND TOTAL</td>
-                            <td><input type="text" name="grand_total" id="calc_grandtotal" class="form-control text-right text-danger font-weight-bold form-control-lg" readonly style="font-size:20px;background-color:#fff8f8;" value="0"></td>
+                            <td><input type="text" name="grand_total" id="calc_grandtotal" class="form-control text-right text-danger font-weight-bold form-control-lg" readonly style="font-size:20px;background-color:#fff8f8;" value="<?= sanitize($_POST['grand_total'] ?? '0') ?>"></td>
                         </tr>
                     </table>
                 </div>
@@ -533,6 +558,11 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Recalculate totals on page load to sync JS states if there are elements already rendered by PHP
+    if ($('.q-row').length > 0) {
+        calculateGrandTotal();
+    }
 });
 
 function submitForm(actionType) {

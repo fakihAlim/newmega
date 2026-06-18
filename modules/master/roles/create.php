@@ -5,10 +5,10 @@
 require_once __DIR__ . '/../../../includes/auth.php';
 requirePermission('users');
 
-$pageTitle = 'Tambah Role';
+$pageTitle = 'Tambah Peran';
 $breadcrumbs = [
     ['label' => 'Administrasi', 'url' => '#'],
-    ['label' => 'Role & Akses', 'url' => 'index.php'],
+    ['label' => 'Peran & Hak Akses', 'url' => 'index.php'],
     ['label' => 'Tambah']
 ];
 
@@ -24,14 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     $errors = [];
-    if (empty($roleName)) $errors[] = "Nama Role wajib diisi.";
-    if (empty($roleKey)) $errors[] = "Key Role gagal digenerate.";
+    if (empty($roleName)) $errors[] = "Nama Peran wajib diisi.";
+    if (empty($roleKey)) $errors[] = "Key Peran gagal digenerate.";
     
     // Check if key exists
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM roles WHERE role_key = ?");
     $stmt->execute([$roleKey]);
     if ($stmt->fetchColumn() > 0) {
-        $errors[] = "Key Role '$roleKey' sudah digunakan.";
+        $errors[] = "Key Peran '$roleKey' sudah digunakan.";
     }
     
     if (empty($errors)) {
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $pdo->commit();
-            setFlash('success', 'Role berhasil ditambahkan.');
+            setFlash('success', 'Peran berhasil ditambahkan.');
             header('Location: index.php');
             exit;
         } catch (Exception $e) {
@@ -83,7 +83,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-plus mr-2"></i>Form Tambah Role</h3>
+        <h3 class="card-title"><i class="fas fa-plus mr-2"></i>Form Tambah Peran</h3>
         <a href="index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
     </div>
     <form method="POST">
@@ -92,15 +92,15 @@ require_once __DIR__ . '/../../../includes/header.php';
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Nama Role <span class="text-danger">*</span></label>
+                        <label>Nama Peran <span class="text-danger">*</span></label>
                         <input type="text" name="role_name" class="form-control" value="<?= sanitize($_POST['role_name'] ?? '') ?>" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Key Role</label>
+                        <label>Key Peran</label>
                         <input type="text" name="role_key" class="form-control" value="<?= sanitize($_POST['role_key'] ?? '') ?>" placeholder="Cth: finance_manager">
-                        <small class="text-muted">Kosongkan agar digenerate otomatis dari Nama Role.</small>
+                        <small class="text-muted">Kosongkan agar digenerate otomatis dari Nama Peran.</small>
                     </div>
                 </div>
             </div>
@@ -165,7 +165,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             
         </div>
         <div class="card-footer text-right">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan Role</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan Peran</button>
         </div>
     </form>
 </div>

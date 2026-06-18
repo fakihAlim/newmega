@@ -5,10 +5,10 @@
 require_once __DIR__ . '/../../includes/auth.php';
 requirePermission('users');
 
-$pageTitle = 'Tambah User Baru';
+$pageTitle = 'Tambah Pengguna Baru';
 $breadcrumbs = [
     ['label' => 'Administrasi', 'url' => '#'],
-    ['label' => 'User', 'url' => APP_URL . '/modules/users/index.php'],
+    ['label' => 'Pengguna', 'url' => APP_URL . '/modules/users/index.php'],
     ['label' => 'Tambah']
 ];
 
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = [];
     if (empty($username)) $errors[] = "Username wajib diisi.";
     if (empty($password)) $errors[] = "Password wajib diisi.";
-    if (empty($selectedRoles)) $errors[] = "Minimal satu role wajib dipilih.";
+    if (empty($selectedRoles)) $errors[] = "Minimal satu peran wajib dipilih.";
     if (empty($fullName)) $errors[] = "Nama lengkap wajib diisi.";
     
     if (strlen($password) < 6) {
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmtRole->execute([$userId, $roleId]);
                 }
 
-                setFlash('success', 'User berhasil ditambahkan.');
+                setFlash('success', 'Pengguna berhasil ditambahkan.');
                 header('Location: ' . APP_URL . '/modules/users/index.php');
                 exit;
             } else {
@@ -87,7 +87,7 @@ require_once __DIR__ . '/../../includes/header.php';
     <div class="col-md-8 mx-auto">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-user-plus mr-2"></i>Form Tambah User</h3>
+                <h3 class="card-title"><i class="fas fa-user-plus mr-2"></i>Form Tambah Pengguna</h3>
                 <a href="<?= APP_URL ?>/modules/users/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
             </div>
             <form method="POST" enctype="multipart/form-data">
@@ -110,8 +110,8 @@ require_once __DIR__ . '/../../includes/header.php';
                     </div>
                     
                     <div class="form-group">
-                        <label>Role <span class="text-danger">*</span></label>
-                        <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Role --" required>
+                        <label>Peran <span class="text-danger">*</span></label>
+                        <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Peran --" required>
                             <?php
                             $stmtRoles = $pdo->query("SELECT * FROM roles ORDER BY role_name ASC");
                             $rolesList = $stmtRoles->fetchAll();
@@ -123,7 +123,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             }
                             ?>
                         </select>
-                        <small class="form-text text-muted mt-2"><strong>Akses Modul:</strong> <span id="moduleAccessList" class="text-info">Pilih role untuk melihat akses.</span></small>
+                        <small class="form-text text-muted mt-2"><strong>Akses Modul:</strong> <span id="moduleAccessList" class="text-info">Pilih peran untuk melihat akses.</span></small>
                     </div>
                     
                     <hr class="my-4">
@@ -179,7 +179,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     
                 </div>
                 <div class="card-footer text-right">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan User</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan Pengguna</button>
                 </div>
             </form>
         </div>
@@ -215,7 +215,7 @@ $(document).ready(function() {
     $('#roleSelect').on('change', function() {
         var selectedIds = $(this).val() || [];
         if (selectedIds.length === 0) {
-            $('#moduleAccessList').text('Pilih role untuk melihat akses.');
+            $('#moduleAccessList').text('Pilih peran untuk melihat akses.');
             return;
         }
 

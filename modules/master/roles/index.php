@@ -7,10 +7,10 @@ require_once __DIR__ . '/../../../includes/auth.php';
 // The migration mapped users to 'users'. We'll use requirePermission('users') to restrict to admin.
 requirePermission('users');
 
-$pageTitle = 'Manajemen Role & Akses';
+$pageTitle = 'Manajemen Peran & Hak Akses';
 $breadcrumbs = [
     ['label' => 'Administrasi', 'url' => '#'],
-    ['label' => 'Role & Akses']
+    ['label' => 'Peran & Hak Akses']
 ];
 
 // Handle Delete
@@ -21,13 +21,13 @@ if (isset($_POST['delete_id'])) {
     $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE role_id = ?");
     $stmtCheck->execute([$delId]);
     if ($stmtCheck->fetchColumn() > 0) {
-        setFlash('danger', 'Role tidak dapat dihapus karena sedang digunakan oleh user.');
+        setFlash('danger', 'Peran tidak dapat dihapus karena sedang digunakan oleh user.');
     } else {
         $stmtDel = $pdo->prepare("DELETE FROM roles WHERE id = ?");
         if ($stmtDel->execute([$delId])) {
-            setFlash('success', 'Role berhasil dihapus.');
+            setFlash('success', 'Peran berhasil dihapus.');
         } else {
-            setFlash('danger', 'Gagal menghapus role.');
+            setFlash('danger', 'Gagal menghapus peran.');
         }
     }
     header('Location: index.php');
@@ -42,9 +42,9 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-user-tag mr-2"></i>Daftar Role</h3>
+        <h3 class="card-title"><i class="fas fa-user-tag mr-2"></i>Daftar Peran</h3>
         <div class="card-tools">
-            <a href="create.php" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i> Tambah Role</a>
+            <a href="create.php" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i> Tambah Peran</a>
         </div>
     </div>
     <div class="card-body p-0">
@@ -53,8 +53,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <thead>
                     <tr>
                         <th width="50">No</th>
-                        <th>Nama Role</th>
-                        <th>Key Role</th>
+                        <th>Nama Peran</th>
+                        <th>Key Peran</th>
                         <th>Deskripsi</th>
                         <th width="150" class="text-center">Aksi</th>
                     </tr>
@@ -72,8 +72,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <td><code><?= sanitize($r['role_key']) ?></code></td>
                             <td><?= sanitize($r['description'] ?? '-') ?></td>
                             <td class="text-center">
-                                <a href="edit.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-info" title="Edit Role & Akses"><i class="fas fa-edit"></i> Akses</a>
-                                <form method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus role ini?');">
+                                <a href="edit.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-info" title="Edit Peran & Hak Akses"><i class="fas fa-edit"></i> Akses</a>
+                                <form method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus peran ini?');">
                                     <input type="hidden" name="delete_id" value="<?= $r['id'] ?>">
                                     <button type="submit" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash"></i></button>
                                 </form>

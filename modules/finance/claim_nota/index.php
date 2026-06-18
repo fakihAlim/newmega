@@ -14,8 +14,8 @@ $breadcrumbs = [
 $user = getCurrentUser();
 
 // Get filters
-$filterStart = $_GET['start_date'] ?? '';
-$filterEnd = $_GET['end_date'] ?? '';
+$filterStart = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$filterEnd = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
 $filterCompany = $_GET['company_id'] ?? '';
 $filterEmployee = $_GET['employee_name'] ?? '';
 $filterStatus = $_GET['status'] ?? '';
@@ -161,8 +161,7 @@ require_once __DIR__ . '/../../../includes/header.php';
     <div class="card-body">
         
         <!-- Total Filtered summary alert -->
-        <div class="alert alert-info py-2 px-3 mb-3 d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-info-circle mr-1"></i> Menampilkan hasil pencarian berdasarkan filter di atas.</span>
+        <div class="alert alert-info py-2 px-3 mb-3 d-flex justify-content-end align-items-center">
             <strong class="text-lg">Total Klaim: <?= formatRupiah($totalSum) ?></strong>
         </div>
 

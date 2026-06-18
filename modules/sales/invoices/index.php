@@ -37,6 +37,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 $user = getCurrentUser();
 
+// Set default filters
+$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$customerId = $_GET['customer_id'] ?? '';
+$status = $_GET['status'] ?? '';
+
+// Fetch customers for filter dropdown
+$customers = $pdo->query("SELECT id, company_name FROM customers ORDER BY company_name ASC")->fetchAll();
+
+// Build conditions
+$conditions = [];
+$params = [];
+
+if ($startDate) {
+    $conditions[] = "inv.invoice_date >= ?";
+    $params[] = $startDate;
+}
+if ($endDate) {
+    $conditions[] = "inv.invoice_date <= ?";
+    $params[] = $endDate;
+}
+if ($customerId) {
+    $conditions[] = "inv.customer_id = ?";
+    $params[] = $customerId;
+}
+if ($status) {
+    $conditions[] = "inv.status = ?";
+    $params[] = $status;
+}
+
+$whereClause = "";
+if (!empty($conditions)) {
+    $whereClause = "WHERE " . implode(" AND ", $conditions);
+}
+
 $sql = "
     SELECT inv.*, c.name as company_name, cust.company_name as customer_name, 
            q.quotation_no, u.full_name as creator_name
@@ -45,13 +80,58 @@ $sql = "
     JOIN customers cust ON inv.customer_id = cust.id
     JOIN quotations q ON inv.quotation_id = q.id
     LEFT JOIN users u ON inv.created_by = u.id
+    $whereClause
     ORDER BY inv.id DESC
 ";
-$stmt = $pdo->query($sql);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $invoices = $stmt->fetchAll();
 
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
+
+<!-- Filter Card -->
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="form-horizontal">
+            <div class="row">
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Mulai</label>
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($startDate) ?>">
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Selesai</label>
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($endDate) ?>">
+                </div>
+                <div class="col-md-4 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Customer</label>
+                    <select name="customer_id" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Customer --</option>
+                        <?php foreach ($customers as $c): ?>
+                            <option value="<?= $c['id'] ?>" <?= $customerId == $c['id'] ? 'selected' : '' ?>><?= sanitize($c['company_name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Status</label>
+                    <select name="status" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Status --</option>
+                        <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
+                        <option value="approved" <?= $status === 'approved' ? 'selected' : '' ?>>Approved</option>
+                        <option value="sent" <?= $status === 'sent' ? 'selected' : '' ?>>Sent</option>
+                        <option value="partial_paid" <?= $status === 'partial_paid' ? 'selected' : '' ?>>Partial Paid</option>
+                        <option value="paid" <?= $status === 'paid' ? 'selected' : '' ?>>Paid</option>
+                        <option value="rejected" <?= $status === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                    <a href="index.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -118,6 +198,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
+    initSelect2('.select2');
     initDataTable('#invTable');
     
     $('.action-btn').on('click', function() {

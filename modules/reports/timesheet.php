@@ -16,6 +16,17 @@ if (!$isAdmin) {
     $employee_id = $stmt->fetchColumn();
 }
 
+function formatUpah($val) {
+    $formatted = number_format($val, 2, ',', '.');
+    if (substr($formatted, -3) === ',00') {
+        return substr($formatted, 0, -3);
+    }
+    if (substr($formatted, -1) === '0' && strpos($formatted, ',') !== false) {
+        return substr($formatted, 0, -1);
+    }
+    return $formatted;
+}
+
 $pageTitle = 'Laporan Timesheet';
 $breadcrumbs = [
     ['label' => 'Laporan', 'url' => '#'],
@@ -261,8 +272,8 @@ require_once __DIR__ . '/../../includes/header.php';
                                     <td class="p-1 text-truncate"><?= sanitize($emp['jabatan_name']) ?></td>
                                     <td class="text-center p-1"><?= $emp['full_days'] ?></td>
                                     <td class="text-center p-1"><?= $emp['half_days'] ?></td>
-                                    <td class="text-right p-1" style="white-space:nowrap"><?= number_format($emp['daily_wage'], 2, '.', ',') ?></td>
-                                    <td class="text-right p-1" style="white-space:nowrap"><?= number_format($emp['total_upah'], 2, '.', ',') ?></td>
+                                    <td class="text-right p-1" style="white-space:nowrap"><?= formatUpah($emp['daily_wage']) ?></td>
+                                    <td class="text-right p-1" style="white-space:nowrap"><?= formatUpah($emp['total_upah']) ?></td>
                                     <td class="text-center p-1"><?= $jamKerjaNormal ?></td>
                                     <td class="text-center p-1"><?= $emp['total_overtime'] ?></td>
                                     <td class="text-right p-1" style="white-space:nowrap"><?= number_format($upahLemburPerJam, 0, ',', '.') ?></td>
@@ -273,8 +284,8 @@ require_once __DIR__ . '/../../includes/header.php';
                             </tbody>
                             <tfoot class="bg-light">
                                 <tr>
-                                    <th colspan="11" class="text-right p-1">Total Upah</th>
-                                    <th class="text-right p-1 text-primary" style="white-space:nowrap"><?= number_format($projectTotal, 0, ',', '.') ?></th>
+                                    <th colspan="11" class="text-right p-1" style="font-size: 13.5px;">Total Upah</th>
+                                    <th class="text-right p-1 text-primary" style="white-space:nowrap; font-size: 13.5px;"><?= formatUpah($projectTotal) ?></th>
                                 </tr>
                             </tfoot>
                         </table>

@@ -20,15 +20,15 @@ if ($userData) {
 
 
 if (!$userData) {
-    setFlash('danger', 'User tidak ditemukan.');
+    setFlash('danger', 'Pengguna tidak ditemukan.');
     header('Location: ' . APP_URL . '/modules/users/index.php');
     exit;
 }
 
-$pageTitle = 'Edit User: ' . sanitize($userData['username']);
+$pageTitle = 'Edit Pengguna: ' . sanitize($userData['username']);
 $breadcrumbs = [
     ['label' => 'Administrasi', 'url' => '#'],
-    ['label' => 'User', 'url' => APP_URL . '/modules/users/index.php'],
+    ['label' => 'Pengguna', 'url' => APP_URL . '/modules/users/index.php'],
     ['label' => 'Edit']
 ];
 
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Validation
     $errors = [];
-    if (empty($selectedRoles)) $errors[] = "Minimal satu role wajib dipilih.";
+    if (empty($selectedRoles)) $errors[] = "Minimal satu peran wajib dipilih.";
     if (empty($fullName)) $errors[] = "Nama lengkap wajib diisi.";
     
     if (empty($errors)) {
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $pdo->commit();
-                setFlash('success', 'Data user berhasil diperbarui.');
+                setFlash('success', 'Data pengguna berhasil diperbarui.');
                 header('Location: ' . APP_URL . '/modules/users/index.php');
                 exit;
             } catch (Exception $e) {
@@ -128,7 +128,7 @@ require_once __DIR__ . '/../../includes/header.php';
     <div class="col-md-8 mx-auto">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-user-edit mr-2"></i>Form Edit User</h3>
+                <h3 class="card-title"><i class="fas fa-user-edit mr-2"></i>Form Edit Pengguna</h3>
                 <a href="<?= APP_URL ?>/modules/users/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
             </div>
             <form method="POST" enctype="multipart/form-data">
@@ -153,15 +153,15 @@ require_once __DIR__ . '/../../includes/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Role <span class="text-danger">*</span></label>
+                                <label>Peran <span class="text-danger">*</span></label>
                                 <?php if ($userData['id'] == $_SESSION['user']['id']): ?>
                                     <?php foreach ($currentUserRoles as $roleId): ?>
                                         <input type="hidden" name="roles[]" value="<?= $roleId ?>">
                                     <?php endforeach; ?>
                                     <input type="text" class="form-control" value="<?= getUserRolesDisplay($userData['id']) ?>" readonly>
-                                    <small class="text-muted">Anda tidak dapat mengubah role Anda sendiri.</small>
+                                    <small class="text-muted">Anda tidak dapat mengubah peran Anda sendiri.</small>
                                 <?php else: ?>
-                                    <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Role --" required>
+                                    <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Peran --" required>
                                         <?php
                                         $stmtRoles = $pdo->query("SELECT * FROM roles ORDER BY role_name ASC");
                                         $rolesList = $stmtRoles->fetchAll();
@@ -173,7 +173,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                         }
                                         ?>
                                     </select>
-                                    <small class="form-text text-muted mt-2"><strong>Akses Modul:</strong> <span id="moduleAccessList" class="text-info">Pilih role untuk melihat akses.</span></small>
+                                    <small class="form-text text-muted mt-2"><strong>Akses Modul:</strong> <span id="moduleAccessList" class="text-info">Pilih peran untuk melihat akses.</span></small>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -287,7 +287,7 @@ $(document).ready(function() {
     $('#roleSelect').on('change', function() {
         var selectedIds = $(this).val() || [];
         if (selectedIds.length === 0) {
-            $('#moduleAccessList').text('Pilih role untuk melihat akses.');
+            $('#moduleAccessList').text('Pilih peran untuk melihat akses.');
             return;
         }
 

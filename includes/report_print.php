@@ -16,7 +16,7 @@
 
 // Fetch company data once
 if (!isset($__reportCompany)) {
-    $__companyStmt = $pdo->query("SELECT * FROM companies ORDER BY id ASC LIMIT 1");
+    $__companyStmt = $pdo->query("SELECT * FROM companies ORDER BY is_default DESC, id ASC LIMIT 1");
     $__reportCompany = $__companyStmt->fetch();
 }
 
