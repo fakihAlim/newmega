@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $i_proj  = !empty($projectIds[$i]) ? $projectIds[$i] : null;
                 $i_group = !empty($groupNames[$i]) ? trim($groupNames[$i]) : 'Money change';
                 $i_name  = trim($itemNames[$i] ?? '');
-                $i_qty   = parseRupiah($qtys[$i] ?? '1');
+                $i_qty   = parseQty($qtys[$i] ?? '1');
                 $i_price = parseRupiah($prices[$i] ?? '0');
                 $i_amount = $i_qty * $i_price;
 
@@ -522,7 +522,7 @@ $(document).ready(function() {
     });
 
     function calculateRowAmount(row) {
-        var qty = parseRupiahString(row.find('.qty-input').val()) || 0;
+        var qty = parseQtyString(row.find('.qty-input').val()) || 0;
         var price = parseRupiahString(row.find('.price-input').val()) || 0;
         var amount = qty * price;
         
@@ -533,11 +533,18 @@ $(document).ready(function() {
     function calculateGrandTotal() {
         var grandTotal = 0;
         tbody.find('.item-row').each(function() {
-            var qty = parseRupiahString($(this).find('.qty-input').val()) || 0;
+            var qty = parseQtyString($(this).find('.qty-input').val()) || 0;
             var price = parseRupiahString($(this).find('.price-input').val()) || 0;
             grandTotal += (qty * price);
         });
         $('#grandTotalDisplay').text(formatRupiahJS(grandTotal));
+    }
+
+    function parseQtyString(str) {
+        if (!str) return 0;
+        var clean = str.toString().replace(/,/g, '.');
+        clean = clean.replace(/[^0-9.-]/g, '');
+        return parseFloat(clean) || 0;
     }
 
     function parseRupiahString(str) {

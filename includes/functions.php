@@ -23,6 +23,18 @@ function parseRupiah($string) {
 }
 
 /**
+ * Parse quantity string back to float, supporting decimals with dot or comma.
+ */
+function parseQty($string) {
+    if ($string === null || $string === '') return 0;
+    if (is_int($string) || is_float($string)) return $string;
+    $clean = str_replace(',', '.', (string)$string);
+    // Hapus semua karakter kecuali angka, titik desimal, dan tanda minus
+    $clean = preg_replace('/[^0-9.-]/', '', $clean);
+    return $clean === '' ? 0 : (float)$clean;
+}
+
+/**
  * Format date to Indonesian format
  */
 function formatDate($date, $format = 'd-M-Y') {

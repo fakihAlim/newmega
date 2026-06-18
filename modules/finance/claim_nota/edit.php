@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $i_proj  = !empty($projectIds[$i]) ? $projectIds[$i] : null;
                 $i_group = !empty($groupNames[$i]) ? trim($groupNames[$i]) : 'Money change';
                 $i_name  = trim($itemNames[$i] ?? '');
-                $i_qty   = parseRupiah($qtys[$i] ?? '1');
+                $i_qty   = parseQty($qtys[$i] ?? '1');
                 $i_price = parseRupiah($prices[$i] ?? '0');
                 $i_amount = $i_qty * $i_price;
                 $i_existing_photo = $existingPhotos[$i] ?? null;
@@ -343,7 +343,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                                     <input type="text" name="item_name[]" class="form-control form-control-sm" value="<?= htmlspecialchars($item['item_name']) ?>" required>
                                 </td>
                                 <td>
-                                    <input type="text" name="qty[]" class="form-control form-control-sm input-number qty-input text-center" value="<?= number_format($item['qty'], 0, '', '') ?>" required>
+                                    <input type="text" name="qty[]" class="form-control form-control-sm input-number qty-input text-center" value="<?= (float)$item['qty'] ?>" required>
                                 </td>
                                 <td>
                                     <input type="text" name="price[]" class="form-control form-control-sm input-rupiah price-input text-right" value="<?= number_format($item['price'], 0, ',', '.') ?>" required>
@@ -506,7 +506,7 @@ $(document).ready(function() {
     });
 
     function calculateRowAmount(row) {
-        var qty = parseRupiahString(row.find('.qty-input').val()) || 0;
+        var qty = parseQtyString(row.find('.qty-input').val()) || 0;
         var price = parseRupiahString(row.find('.price-input').val()) || 0;
         var amount = qty * price;
         
@@ -517,11 +517,18 @@ $(document).ready(function() {
     function calculateGrandTotal() {
         var grandTotal = 0;
         tbody.find('.item-row').each(function() {
-            var qty = parseRupiahString($(this).find('.qty-input').val()) || 0;
+            var qty = parseQtyString($(this).find('.qty-input').val()) || 0;
             var price = parseRupiahString($(this).find('.price-input').val()) || 0;
             grandTotal += (qty * price);
         });
         $('#grandTotalDisplay').text(formatRupiahJS(grandTotal));
+    }
+
+    function parseQtyString(str) {
+        if (!str) return 0;
+        var clean = str.toString().replace(/,/g, '.');
+        clean = clean.replace(/[^0-9.-]/g, '');
+        return parseFloat(clean) || 0;
     }
 
     function parseRupiahString(str) {
