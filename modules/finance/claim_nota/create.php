@@ -246,6 +246,31 @@ require_once __DIR__ . '/../../../includes/header.php';
 
             <hr class="my-4">
 
+            <!-- AI Scanner Panel -->
+            <div class="card card-outline card-info mb-4 d-print-none shadow-sm">
+                <div class="card-header py-2">
+                    <h3 class="card-title font-weight-bold text-info" style="font-size:14px;"><i class="fas fa-robot mr-2"></i>Scan Nota Otomatis dengan AI</h3>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-9">
+                            <p class="text-muted mb-0" style="font-size:12.5px; line-height: 1.5;">
+                                Ingin menginput rincian item secara otomatis? Silakan unggah foto nota atau kuitansi Anda di sini. AI (Google Gemini) akan memproses gambar, mengekstrak rincian barang/jasa, kuantitas, harga satuan, dan menginputkannya secara otomatis ke dalam tabel rincian di bawah.
+                            </p>
+                        </div>
+                        <div class="col-md-3 text-md-right mt-2 mt-md-0">
+                            <div class="custom-file" id="aiScanContainer" style="max-width:260px;">
+                                <input type="file" id="aiScanInput" class="custom-file-input" accept="image/*">
+                                <label class="custom-file-label text-left text-truncate" style="font-size:13px;" for="aiScanInput">Pilih foto nota...</label>
+                            </div>
+                            <div id="aiScanSpinner" class="d-none text-info text-bold" style="font-size: 13px;">
+                                <i class="fas fa-spinner fa-spin mr-1"></i> Memindai nota...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Detail Items Section -->
             <h5 class="mb-3 text-secondary text-uppercase d-flex justify-content-between align-items-center" style="font-size:14px;letter-spacing:1px;font-weight:600;">
                 2. Rincian Nota & Pengeluaran
@@ -380,6 +405,88 @@ $(document).ready(function() {
 
     // Add first row by default
     addRow();
+
+    // AI Scan Handler
+    $('#aiScanInput').on('change', function() {
+        var file = this.files[0];
+        if (!file) return;
+
+        $(this).next('.custom-file-label').html(file.name);
+
+        var formData = new FormData();
+        formData.append('receipt', file);
+
+        $('#aiScanSpinner').removeClass('d-none');
+        $('#aiScanContainer').addClass('d-none');
+
+        $.ajax({
+            url: APP_URL + '/api/ai_scan_receipt.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(res) {
+                $('#aiScanSpinner').addClass('d-none');
+                $('#aiScanContainer').removeClass('d-none');
+                $('#aiScanInput').val('').next('.custom-file-label').html('Pilih foto nota...');
+
+                if (res.success && res.data) {
+                    var data = res.data;
+                    
+                    if (data.claim_date) {
+                        $('input[name="claim_date"]').val(data.claim_date);
+                    }
+
+                    if (data.items && data.items.length > 0) {
+                        // Remove default first row if it is empty and unused
+                        var firstRow = tbody.find('.item-row').first();
+                        var firstRowName = firstRow.find('input[name="item_name[]"]').val() || '';
+                        var firstRowPrice = firstRow.find('input[name="price[]"]').val() || '0';
+                        if (tbody.find('.item-row').length === 1 && !firstRowName.trim() && (firstRowPrice === "0" || firstRowPrice === "")) {
+                            firstRow.remove();
+                        }
+
+                        // Append AI items
+                        data.items.forEach(function(item) {
+                            var html = $(template);
+                            
+                            if (data.claim_date) {
+                                html.find('.item-date-input').val(data.claim_date);
+                             }
+                            if (item.group_name) {
+                                html.find('.group-input').val(item.group_name);
+                            }
+                            if (item.item_name) {
+                                html.find('input[name="item_name[]"]').val(item.item_name);
+                            }
+                            if (item.qty) {
+                                html.find('.qty-input').val(item.qty);
+                            }
+                            if (item.price) {
+                                html.find('.price-input').val(item.price.toLocaleString('id-ID'));
+                            }
+
+                            tbody.append(html);
+                            calculateRowAmount(html);
+                        });
+                        
+                        toastr.success('Berhasil mendeteksi ' + data.items.length + ' item pengeluaran.');
+                    } else {
+                        showError('AI tidak mendeteksi adanya rincian barang dalam nota.');
+                    }
+                } else {
+                    showError(res.error || 'Gagal memindai nota.');
+                }
+            },
+            error: function() {
+                $('#aiScanSpinner').addClass('d-none');
+                $('#aiScanContainer').removeClass('d-none');
+                $('#aiScanInput').val('').next('.custom-file-label').html('Pilih foto nota...');
+                showError('Terjadi kesalahan koneksi saat memindai nota.');
+            }
+        });
+    });
 
     $('#btnAddRow').on('click', function() {
         addRow();
