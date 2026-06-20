@@ -144,73 +144,73 @@ if (!empty($start_date) && !empty($end_date)) {
 }
 ?>
 
-<div class="card mb-4 print-hide">
-    <div class="card-body">
-        <form action="" method="GET" class="row align-items-end">
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label>Bulan</label>
-                <select name="month" class="form-control">
-                    <?php
-                    for ($m=1; $m<=12; $m++) {
-                        $sel = ($m == $month) ? 'selected' : '';
-                        echo "<option value=\"$m\" $sel>{$monthsLabel[$m]}</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label>Tahun</label>
-                <select name="year" class="form-control">
-                    <?php
-                    $currentYear = date('Y');
-                    for ($y = $currentYear - 2; $y <= $currentYear + 1; $y++) {
-                        $sel = ($y == $year) ? 'selected' : '';
-                        echo "<option value=\"$y\" $sel>$y</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label>Tgl Mulai</label>
-                <input type="date" name="start_date" class="form-control" value="<?= $start_date ?>">
-            </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label>Tgl Selesai</label>
-                <input type="date" name="end_date" class="form-control" value="<?= $end_date ?>">
-            </div>
-            
-            <?php if ($isAdmin): ?>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label>Perusahaan</label>
-                <select name="company_id" class="form-control select2">
-                    <option value="">-- Semua Perusahaan --</option>
-                    <?php
-                    $comps = $pdo->query("SELECT id, name FROM companies ORDER BY name")->fetchAll();
-                    foreach ($comps as $c) {
-                        $sel = ($c['id'] == $company_id) ? 'selected' : '';
-                        echo "<option value=\"{$c['id']}\" $sel>{$c['name']}</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label>Proyek</label>
-                <select name="project_id" class="form-control select2">
-                    <option value="">-- Semua Proyek --</option>
-                    <?php
-                    $projs = $pdo->query("SELECT id, name FROM projects ORDER BY name")->fetchAll();
-                    foreach ($projs as $p) {
-                        $sel = ($p['id'] == $project_id) ? 'selected' : '';
-                        echo "<option value=\"{$p['id']}\" $sel>{$p['name']}</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <?php endif; ?>
-            
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search mr-1"></i> Filter</button>
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="form-horizontal">
+            <div class="row">
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Bulan</label>
+                    <select name="month" class="form-control form-control-sm">
+                        <?php
+                        for ($m=1; $m<=12; $m++) {
+                            $sel = ($m == $month) ? 'selected' : '';
+                            echo "<option value=\"$m\" $sel>{$monthsLabel[$m]}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tahun</label>
+                    <select name="year" class="form-control form-control-sm">
+                        <?php
+                        $currentYear = date('Y');
+                        for ($y = $currentYear - 2; $y <= $currentYear + 1; $y++) {
+                            $sel = ($y == $year) ? 'selected' : '';
+                            echo "<option value=\"$y\" $sel>$y</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tgl Mulai</label>
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="<?= $start_date ?>">
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tgl Selesai</label>
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="<?= $end_date ?>">
+                </div>
+                <?php if ($isAdmin): ?>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Perusahaan</label>
+                    <select name="company_id" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Perusahaan --</option>
+                        <?php
+                        $comps = $pdo->query("SELECT id, name FROM companies ORDER BY name")->fetchAll();
+                        foreach ($comps as $c) {
+                            $sel = ($c['id'] == $company_id) ? 'selected' : '';
+                            echo "<option value=\"{$c['id']}\" $sel>{$c['name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Proyek</label>
+                    <select name="project_id" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Proyek --</option>
+                        <?php
+                        $projs = $pdo->query("SELECT id, name FROM projects ORDER BY name")->fetchAll();
+                        foreach ($projs as $p) {
+                            $sel = ($p['id'] == $project_id) ? 'selected' : '';
+                            echo "<option value=\"{$p['id']}\" $sel>{$p['name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+                <div class="col-md-12 d-flex justify-content-end mb-2 mt-2">
+                    <button type="submit" class="btn btn-primary btn-sm px-4"><i class="fas fa-search mr-1"></i> Filter</button>
+                    <a href="timesheet_detail.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i> Reset</a>
+                </div>
             </div>
         </form>
     </div>
@@ -242,7 +242,7 @@ if (!empty($start_date) && !empty($end_date)) {
                 <?php foreach ($groupedData as $companyName => $employees): ?>
                     <h5 class="bg-light p-2 mb-0 border"><i class="far fa-building mr-2"></i> <?= sanitize($companyName) ?></h5>
                     
-                    <table class="table table-bordered table-sm table-striped mb-4" style="font-size:11px; white-space: nowrap; min-width: max-content;">
+                    <table class="table table-bordered table-sm table-striped mb-4" style="white-space: nowrap; min-width: max-content;">
                         <thead class="thead-light">
                             <tr>
                                 <th rowspan="3" class="align-middle text-center p-2" style="min-width: 150px;">NAMA</th>
@@ -332,7 +332,7 @@ th:nth-child(even), td:nth-child(even) { border-right: 2px solid #dee2e6; }
 $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
-    $('.select2').select2({ theme: 'bootstrap4' });
+    initSelect2('.select2');
 });
 </script>
 JS;

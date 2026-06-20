@@ -57,7 +57,7 @@ require_once __DIR__ . '/../../includes/header.php';
         </a>
     </div>
     <div class="card-body">
-        <table id="usersTable" class="table table-bordered table-striped table-hover w-100" style="font-size: 13.5px;">
+        <table id="usersTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="5%">No</th>

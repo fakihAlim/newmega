@@ -86,7 +86,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Form Edit Vendor</h3>
                 <a href="<?= APP_URL ?>/modules/master/vendors/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
@@ -94,61 +94,62 @@ require_once __DIR__ . '/../../../includes/header.php';
             <form method="POST">
                 <div class="card-body">
                     
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label>Nama Perusahaan / Toko <span class="text-danger">*</span></label>
-                                <input type="text" name="company_name" class="form-control check-duplicate" data-type="vendor" data-id="<?= $id ?>" value="<?= sanitize($vendor['company_name']) ?>" required>
-                                <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Singkatan</label>
-                                <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($vendor['abbreviation']) ?>" maxlength="3" style="text-transform: uppercase;">
-                                <small class="text-muted">Digunakan di No. PO (Max 3 Char).</small>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Perusahaan / Toko <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="company_name" class="form-control check-duplicate" data-type="vendor" data-id="<?= $id ?>" value="<?= sanitize($vendor['company_name']) ?>" required>
+                            <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nama PIC (Person In Charge) <span class="text-danger">*</span></label>
-                                <input type="text" name="pic_name" class="form-control" value="<?= sanitize($vendor['pic_name']) ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Termin Pembayaran <small class="text-muted">(Opsional)</small></label>
-                                <input type="text" name="payment_terms" class="form-control" value="<?= sanitize($vendor['payment_terms']) ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Singkatan</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($vendor['abbreviation']) ?>" maxlength="3" style="text-transform: uppercase;">
+                            <small class="text-muted d-block mt-1">Digunakan di No. PO (Max 3 Char).</small>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No. HP / Telepon</label>
-                                <input type="text" name="phone" class="form-control" value="<?= sanitize($vendor['phone']) ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control" value="<?= sanitize($vendor['email']) ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama PIC (Person In Charge) <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="pic_name" class="form-control" value="<?= sanitize($vendor['pic_name']) ?>" required>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Alamat Lengkap</label>
-                        <textarea name="address" class="form-control" rows="2"><?= sanitize($vendor['address']) ?></textarea>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Termin Pembayaran <small class="text-muted">(Opsional)</small></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="payment_terms" class="form-control" value="<?= sanitize($vendor['payment_terms']) ?>">
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Catatan Tambahan</label>
-                        <textarea name="notes" class="form-control" rows="2"><?= sanitize($vendor['notes']) ?></textarea>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">No. HP / Telepon</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="phone" class="form-control" value="<?= sanitize($vendor['phone']) ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Email</label>
+                        <div class="col-sm-8">
+                            <input type="email" name="email" class="form-control" value="<?= sanitize($vendor['email']) ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Alamat Lengkap</label>
+                        <div class="col-sm-8">
+                            <textarea name="address" class="form-control" rows="2"><?= sanitize($vendor['address']) ?></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Catatan Tambahan</label>
+                        <div class="col-sm-8">
+                            <textarea name="notes" class="form-control" rows="2"><?= sanitize($vendor['notes']) ?></textarea>
+                        </div>
                     </div>
                     
                 </div>

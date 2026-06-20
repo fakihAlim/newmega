@@ -63,24 +63,26 @@ require_once __DIR__ . '/../../includes/header.php';
     <div class="col-md-6 mx-auto">
         <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-cogs mr-2"></i> Pengaturan Integrasi AI</h3>
+                <h3 class="card-title text-primary font-weight-bold"><i class="fas fa-cogs mr-2"></i> Pengaturan Integrasi AI</h3>
             </div>
             
             <form method="POST">
                 <div class="card-body">                    
-                    <div class="form-group">
-                        <label>Google Gemini API Key</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Google Gemini API Key</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                </div>
+                                <!-- Type password initially so it's not shoulder-surfed, with an eye icon to toggle -->
+                                <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control" value="<?= sanitize($currentApiKey) ?>" required placeholder="AIzaSyA... dsb">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-secondary" id="toggleKey"><i class="fas fa-eye"></i></button>
+                                </div>
                             </div>
-                            <!-- Type password initially so it's not shoulder-surfed, with an eye icon to toggle -->
-                            <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control" value="<?= sanitize($currentApiKey) ?>" required placeholder="AIzaSyA... dsb">
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-secondary" id="toggleKey"><i class="fas fa-eye"></i></button>
-                            </div>
+                            <small class="text-muted mt-2 d-block">Digunakan Untuk Menjalankan Fitur AI di Aplikasi. Untuk menggantinya silahkan masuk di url: https://aistudio.google.com/ dan login dengan akun google anda </small>
                         </div>
-                        <small class="text-muted mt-2 d-block">Digunaan Untuk Menjalankan Fitur AI di Aplikasi. Untuk menggantinya silahkan masuk di url: https://aistudio.google.com/ dan login dengan akun google anda </small>
                     </div>
                     
                 </div>

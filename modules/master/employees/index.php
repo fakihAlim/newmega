@@ -52,10 +52,16 @@ require_once __DIR__ . '/../../../includes/header.php';
             <button type="button" class="btn btn-success btn-sm ml-1" data-toggle="modal" data-target="#importModal">
                 <i class="fas fa-file-csv mr-1"></i> Import CSV
             </button>
+            <a href="<?= APP_URL ?>/modules/master/export_excel.php?type=employees" class="btn btn-info btn-sm ml-1">
+                <i class="fas fa-file-excel mr-1"></i> Export Excel
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary btn-sm ml-1">
+                <i class="fas fa-print mr-1"></i> Cetak
+            </button>
         </div>
     </div>
     <div class="card-body">
-        <table id="employeesTable" class="table table-bordered table-striped w-100" style="font-size: 13.5px;">
+        <table id="employeesTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="5%">No</th>
@@ -72,7 +78,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <?php foreach ($employees as $i => $e): ?>
                     <tr>
                         <td><?= $i + 1 ?></td>
-                        <td><code><?= sanitize($e['employee_code'] ?? '-') ?></code></td>
+                        <td><strong><?= sanitize($e['employee_code'] ?? '-') ?></strong></td>
                         <td>
                             <strong class="text-dark"><?= sanitize($e['full_name']) ?></strong><br>
                             <small class="text-muted"><i class="fas fa-phone mr-1"></i>
@@ -141,7 +147,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <h6 class="mb-0"><i class="fas fa-table mr-1"></i> Format CSV yang Dibutuhkan</h6>
                         </div>
                         <div class="card-body py-2">
-                            <table class="table table-sm table-bordered mb-2" style="font-size: 13px;">
+                            <table class="table table-bordered table-striped table-hover table-sm w-100" >
                                 <thead class="thead-light">
                                     <tr>
                                         <th>Kolom</th>

@@ -147,9 +147,6 @@ require_once __DIR__ . '/../../../includes/header.php';
         <div class="card-body bg-light">
             <div class="row">
                 <div class="col-md-6 border-right">
-                    <h5 class="mb-3 text-secondary text-uppercase font-weight-bold" style="font-size:12px;">1. Referensi
-                        Quotation</h5>
-
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Quotation <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
@@ -178,9 +175,6 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
 
                 <div class="col-md-6">
-                    <h5 class="mb-3 text-secondary text-uppercase font-weight-bold" style="font-size:12px;">2. Detail
-                        Termin</h5>
-
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Termin Ke-</label>
                         <div class="col-sm-8">
@@ -199,25 +193,21 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Syarat & Ketentuan</label>
                         <div class="col-sm-8">
-                            <textarea name="term_and_conditions" class="form-control" rows="2"
+                            <textarea name="term_and_conditions" class="form-control" rows="1"
                                 placeholder="Opsi: syarat pembayaran, garansi, dll."></textarea>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <hr class="my-3">
-
             <!-- Items -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="text-secondary text-uppercase font-weight-bold m-0" style="font-size:12px;">3. Daftar
-                    Pekerjaan</h5>
                 <button type="button" class="btn btn-sm btn-primary" id="btnAddRow"><i class="fas fa-plus mr-1"></i>
                     Tambah Baris</button>
             </div>
 
             <div class="table-responsive mb-3">
-                <table class="table table-bordered table-sm" style="font-size:13px;">
+                <table class="table table-bordered table-sm mb-0" >
                     <thead class="bg-dark text-white">
                         <tr>
                             <th width="25%">Deskripsi Pekerjaan</th>
@@ -267,14 +257,20 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
 
             <!-- Summary -->
-            <div class="row">
+            <style>
+            .summary-table td {
+                padding: 3px 5px !important;
+                vertical-align: middle !important;
+            }
+            </style>
+            <div class="row mt-0">
                 <div class="col-md-6 offset-md-6">
-                    <table class="table table-sm table-borderless font-weight-bold text-right" style="font-size:14px;">
+                    <table class="table table-sm table-borderless font-weight-bold text-right summary-table" >
                         <tr>
                             <td width="40%">Subtotal</td>
                             <td><input type="text" name="subtotal" id="calc_subtotal"
-                                    class="form-control text-right form-control-sm font-weight-bold" readonly
-                                    value="<?= $preQuotation ? number_format($preQuotation['subtotal'], 0, ',', '.') : '0' ?>">
+                                     class="form-control text-right form-control-sm font-weight-bold" readonly
+                                     value="<?= $preQuotation ? number_format($preQuotation['subtotal'], 0, ',', '.') : '0' ?>">
                             </td>
                         </tr>
                         <tr>
@@ -308,16 +304,16 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <tr>
                             <td>Ongkos Kirim</td>
                             <td><input type="text" name="shipping_cost" id="calc_shipping"
-                                    class="form-control text-right form-control-sm mask-rupiah"
-                                    value="<?= $preQuotation ? number_format($preQuotation['shipping'], 0, ',', '.') : '0' ?>">
+                                     class="form-control text-right form-control-sm mask-rupiah"
+                                     value="<?= $preQuotation ? number_format($preQuotation['shipping'], 0, ',', '.') : '0' ?>">
                             </td>
                         </tr>
-                        <tr style="border-top:2px solid #ccc;">
+                        <tr>
                             <td class="text-danger" style="font-size:16px;">GRAND TOTAL</td>
                             <td><input type="text" name="grand_total" id="calc_grandtotal"
-                                    class="form-control text-right text-danger font-weight-bold form-control-lg"
-                                    readonly style="font-size:20px;background-color:#fff8f8;"
-                                    value="<?= $preQuotation ? number_format($preQuotation['total'], 0, ',', '.') : '0' ?>">
+                                     class="form-control text-right text-danger font-weight-bold form-control-lg"
+                                     readonly style="font-size:20px;background-color:#fff8f8;"
+                                     value="<?= $preQuotation ? number_format($preQuotation['total'], 0, ',', '.') : '0' ?>">
                             </td>
                         </tr>
                     </table>
@@ -327,10 +323,9 @@ require_once __DIR__ . '/../../../includes/header.php';
 
         <div class="card-footer bg-white text-right">
             <input type="hidden" name="action" id="formAction" value="draft">
-            <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')"><i
-                    class="fas fa-save mr-1"></i> Simpan Draft</button>
-            <button type="button" class="btn btn-success" onclick="submitForm('submit')"><i
-                    class="fas fa-paper-plane mr-1"></i> Kirim untuk Persetujuan</button>
+            <a href="index.php" class="btn btn-default mr-2">Batal</a>
+            <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')">Simpan Draft</button>
+            <button type="button" class="btn btn-success" onclick="submitForm('submit')">Kirim untuk Persetujuan</button>
         </div>
     </form>
 </div>

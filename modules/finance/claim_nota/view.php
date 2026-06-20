@@ -90,9 +90,9 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card card-outline card-info">
+        <div class="card card-outline card-primary">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-info"><i class="fas fa-file-invoice-dollar mr-2"></i> Klaim Nota: <strong><?= sanitize($claim['claim_number']) ?></strong></h3>
+                <h3 class="card-title text-primary"><i class="fas fa-file-invoice-dollar mr-2"></i> Klaim Nota: <strong><?= sanitize($claim['claim_number']) ?></strong></h3>
                 <div class="ml-auto">
                     <!-- Status Badge -->
                     <?php
@@ -111,7 +111,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
             </div>
 
-            <div class="card-body printable-area">
+            <div class="card-body printable-area p-4 bg-white">
                 <h3 class="text-center font-weight-bold mb-4 text-uppercase">Nota Developer dan Kantor</h3>
 
                 <table class="table table-sm table-borderless table-header-info mb-4">

@@ -140,65 +140,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card">
+<div class="card card-outline card-primary">
     <div class="card-header">
-        <h3 class="card-title text-warning"><i class="fas fa-edit mr-2"></i> Edit Material Request: <?= sanitize($mr['mr_number']) ?></h3>
+        <h3 class="card-title"><i class="fas fa-edit mr-2"></i> Edit Material Request: <?= sanitize($mr['mr_number']) ?></h3>
         <a href="<?= APP_URL ?>/modules/procurement/mr/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Batal</a>
     </div>
     
     <form method="POST" id="mrForm">
         <div class="card-body bg-light">
             <!-- Header Section -->
-            <h5 class="mb-3 text-secondary text-uppercase" style="font-size:14px;letter-spacing:1px;font-weight:600;">1. Informasi Proyek</h5>
             <div class="row">
+                <div class="col-md-6 border-right">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Tujuan Proyek <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="project_id" id="project_id" class="form-control select2" required>
+                                <option value="">-- Pilih Proyek --</option>
+                                <?php foreach ($projects as $p): ?>
+                                    <option value="<?= $p['id'] ?>" data-location="<?= htmlspecialchars($p['location']) ?>" <?= ($mr['project_id'] == $p['id']) ? 'selected' : '' ?>><?= sanitize($p['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Alamat Pengiriman <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <textarea name="location" id="location" class="form-control" rows="2" placeholder="Otomatis terisi jika memilih proyek" required><?= sanitize($mr['location']) ?></textarea>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Tujuan Proyek <span class="text-danger">*</span></label>
-                        <select name="project_id" id="project_id" class="form-control select2" required>
-                            <option value="">-- Pilih Proyek --</option>
-                            <?php foreach ($projects as $p): ?>
-                                <option value="<?= $p['id'] ?>" data-location="<?= htmlspecialchars($p['location']) ?>" <?= ($mr['project_id'] == $p['id']) ? 'selected' : '' ?>><?= sanitize($p['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Tanggal Request <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="date" name="request_date" class="form-control" value="<?= sanitize($mr['request_date']) ?>" required>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Tanggal Request <span class="text-danger">*</span></label>
-                        <input type="date" name="request_date" class="form-control" value="<?= sanitize($mr['request_date']) ?>" required>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>Alamat Pengiriman (Delivery Location) <span class="text-danger">*</span></label>
-                        <textarea name="location" id="location" class="form-control" rows="2" placeholder="Otomatis terisi jika memilih proyek" required><?= sanitize($mr['location']) ?></textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>Catatan Tambahan (Header)</label>
-                        <textarea name="notes" class="form-control" rows="2"><?= sanitize($mr['notes']) ?></textarea>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Catatan Tambahan</label>
+                        <div class="col-sm-8">
+                            <textarea name="notes" class="form-control" rows="2"><?= sanitize($mr['notes']) ?></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <hr class="my-4">
-            
             <!-- Items Section -->
-            <h5 class="mb-3 text-secondary text-uppercase d-flex justify-content-between align-items-center" style="font-size:14px;letter-spacing:1px;font-weight:600;">
-                2. Detail Material
-                <button type="button" class="btn btn-sm btn-info" id="btnAddRow"><i class="fas fa-plus"></i> Tambah Baris</button>
-            </h5>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="text-secondary text-uppercase mb-0" style="font-size:14px;letter-spacing:1px;font-weight:600;">Daftar Item Pekerjaan / Material</h5>
+                <button type="button" class="btn btn-sm btn-primary" id="btnAddRow"><i class="fas fa-plus mr-1"></i> Tambah Baris</button>
+            </div>
             
             <div class="table-responsive">
-                <table class="table table-bordered table-sm" id="itemsTable">
-                    <thead class="thead-dark">
+                <table class="table table-bordered table-sm mb-0" id="itemsTable" >
+                    <thead class="bg-dark text-white">
                         <tr>
                             <th width="35%">Item Code & Description</th>
-                            <th width="15%">Type</th>
-                            <th width="15%">Qty</th>
-                            <th width="10%">Uom</th>
-                            <th width="20%">Remark</th>
+                            <th width="20%">Type</th>
+                            <th width="7%">Qty</th>
+                            <th width="5%">Uom</th>
+                            <th width="28%">Remark</th>
                             <th width="5%" class="text-center"><i class="fas fa-trash"></i></th>
                         </tr>
                     </thead>
@@ -207,7 +211,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <?php $master = $itemsMap[$mi['item_id']] ?? null; ?>
                             <tr class="item-row">
                                 <td>
-                                    <select name="item_id[]" class="form-control item-select" required>
+                                    <select name="item_id[]" class="form-control form-control-sm item-select" required>
                                         <option value="">-- Cari Barang --</option>
                                         <?php foreach ($items as $item): ?>
                                             <option value="<?= $item['id'] ?>" <?= ($item['id'] == $mi['item_id']) ? 'selected' : '' ?>><?= sanitize($item['item_code'] . ' - ' . $item['description']) ?></option>
@@ -225,13 +229,13 @@ require_once __DIR__ . '/../../../includes/header.php';
                                     </div>
                                 </td>
                                 <td>
-                                    <input type="text" name="qty[]" class="form-control input-number qty-input" value="<?= number_format($mi['qty'], 0, '', '') ?>" required>
+                                    <input type="text" name="qty[]" class="form-control form-control-sm input-number qty-input" value="<?= number_format($mi['qty'], 0, '', '') ?>" required>
                                 </td>
                                 <td class="item-uom text-center" style="vertical-align:middle;font-weight:bold;">
                                     <?= sanitize($mi['uom']) ?>
                                 </td>
                                 <td>
-                                    <input type="text" name="item_remark[]" class="form-control" value="<?= sanitize($mi['remark']) ?>">
+                                    <input type="text" name="item_remark[]" class="form-control form-control-sm" value="<?= sanitize($mi['remark']) ?>">
                                 </td>
                                 <td class="text-center" style="vertical-align:middle;">
                                     <button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class="fas fa-times"></i></button>
@@ -257,7 +261,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 <template id="rowTemplate">
     <tr class="item-row">
         <td>
-            <select name="item_id[]" class="form-control item-select" required>
+            <select name="item_id[]" class="form-control form-control-sm item-select" required>
                 <option value="">-- Cari Barang --</option>
                 <?php foreach ($items as $item): ?>
                     <option value="<?= $item['id'] ?>"><?= sanitize($item['item_code'] . ' - ' . $item['description']) ?></option>
@@ -268,13 +272,13 @@ require_once __DIR__ . '/../../../includes/header.php';
             <div class="item-info text-muted" style="font-size:12px;">Pilih barang...</div>
         </td>
         <td>
-            <input type="text" name="qty[]" class="form-control input-number qty-input" value="1" required>
+            <input type="text" name="qty[]" class="form-control form-control-sm input-number qty-input" value="1" required>
         </td>
         <td class="item-uom text-center" style="vertical-align:middle;font-weight:bold;">
             -
         </td>
         <td>
-            <input type="text" name="item_remark[]" class="form-control" placeholder="Cth: Untuk cor lantai 1">
+            <input type="text" name="item_remark[]" class="form-control form-control-sm" placeholder="Cth: Untuk cor lantai 1">
         </td>
         <td class="text-center" style="vertical-align:middle;">
             <button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class="fas fa-times"></i></button>
@@ -310,10 +314,7 @@ $(document).ready(function() {
         tbody.append(html);
         
         // Init select2 on new row
-        html.find('.item-select').select2({
-            theme: 'bootstrap4',
-            width: '100%'
-        });
+        initSelect2(html.find('.item-select'));
         updateItemSelects();
     }
     
@@ -341,7 +342,8 @@ $(document).ready(function() {
                 }
             });
             // trigger select2 refresh without firing change event
-            currentSelect.select2('destroy').select2({ theme: 'bootstrap4', width: '100%' });
+            currentSelect.select2('destroy');
+            initSelect2(currentSelect);
         });
     }
     

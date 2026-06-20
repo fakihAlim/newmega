@@ -49,16 +49,16 @@ $breadcrumbs = [
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-info">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center d-print-none">
-        <h3 class="card-title text-info"><i class="fas fa-receipt mr-2"></i> Kwitansi Penerimaan</h3>
+        <h3 class="card-title text-primary"><i class="fas fa-receipt mr-2"></i> Kwitansi Penerimaan</h3>
         <div class="ml-auto">
             <button class="btn btn-default btn-sm" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak Kwitansi</button>
             <a href="index.php" class="btn btn-secondary btn-sm ml-1"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
         </div>
     </div>
     
-    <div class="card-body printable-area p-5">
+    <div class="card-body printable-area p-4 bg-white">
         
         <!-- Header -->
         <div class="row mb-4 pb-3" style="border-bottom: 2px solid #333;">
@@ -100,7 +100,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         
         <!-- Payment Detail -->
         <div class="table-responsive mb-4">
-            <table class="table table-bordered" style="font-size:14px;">
+            <table class="table table-bordered" >
                 <thead class="bg-light">
                     <tr>
                         <th width="30%">Keterangan</th>
@@ -124,8 +124,8 @@ require_once __DIR__ . '/../../../includes/header.php';
         <div class="row no-gutters mb-4">
             <!-- Notes (Left) -->
             <div class="col-sm-7 pt-2 pr-3 d-flex flex-column">
-                <div class="p-1 px-2 text-white font-weight-bold"
-                    style="background-color: #666 !important; border: 1px solid #000; font-size: 12px;">
+                <div class="p-1 px-2 bg-light text-dark font-weight-bold"
+                    style="border: 1px solid #000; font-size: 12px;">
                     Catatan Penerimaan :</div>
                 <div class="p-2 flex-grow-1"
                     style="border: 1px solid #000 !important; font-size: 11px; border-top: none !important; color: #333;">
@@ -135,7 +135,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             
             <!-- Invoice Payment Summary (Right) -->
             <div class="col-sm-5 pt-2">
-                <table class="table table-sm table-bordered text-right font-weight-bold mb-0" style="font-size:13px; border: 1px solid #000;">
+                <table class="table table-sm table-bordered text-right font-weight-bold mb-0" style="border: 1px solid #000;">
                     <tr>
                         <td width="60%" class="bg-light px-2" style="border: 1px solid #000;">TOTAL NILAI INVOICE</td>
                         <td width="40%" class="px-2" style="border: 1px solid #000; color: #000;">

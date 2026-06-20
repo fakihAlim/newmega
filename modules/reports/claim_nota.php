@@ -101,59 +101,45 @@ require_once __DIR__ . '/../../includes/report_print.php';
 <?php renderReportPrintHeader('Laporan Claim Nota'); ?>
 
 <!-- Filter Card -->
-<div class="card card-outline card-primary mb-3">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-filter mr-1"></i> Filter</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-        </div>
-    </div>
-    <div class="card-body">
-        <form method="GET" class="row align-items-end">
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" class="row">
             <input type="hidden" name="tab" value="<?= sanitize($activeTab) ?>">
-            <div class="col-md-3">
-                <div class="form-group mb-0">
-                    <label class="small">Proyek</label>
-                    <select name="project_id" class="form-control form-control-sm select2" style="width:100%;">
-                        <option value="">Semua Proyek</option>
-                        <?php foreach ($projects as $p): ?>
-                            <option value="<?= $p['id'] ?>" <?= $filterProject == $p['id'] ? 'selected' : '' ?>>
-                                [<?= sanitize($p['abbreviation']) ?>] <?= sanitize($p['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+                <label style="font-size:12px;">Proyek</label>
+                <select name="project_id" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Proyek --</option>
+                    <?php foreach ($projects as $p): ?>
+                        <option value="<?= $p['id'] ?>" <?= $filterProject == $p['id'] ? 'selected' : '' ?>>
+                            [<?= sanitize($p['abbreviation']) ?>] <?= sanitize($p['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-            <div class="col-md-2">
-                <div class="form-group mb-0">
-                    <label class="small">Status</label>
-                    <select name="status" class="form-control form-control-sm">
-                        <option value="">Semua</option>
-                        <option value="pending" <?= $filterStatus === 'pending' ? 'selected' : '' ?>>Pending</option>
-                        <option value="approved" <?= $filterStatus === 'approved' ? 'selected' : '' ?>>Approved</option>
-                        <option value="rejected" <?= $filterStatus === 'rejected' ? 'selected' : '' ?>>Rejected</option>
-                        <option value="reimbursed" <?= $filterStatus === 'reimbursed' ? 'selected' : '' ?>>Reimbursed</option>
-                        <option value="not_reimbursed" <?= $filterStatus === 'not_reimbursed' ? 'selected' : '' ?>>Belum Reimburse</option>
-                    </select>
-                </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Status</label>
+                <select name="status" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Status --</option>
+                    <option value="pending" <?= $filterStatus === 'pending' ? 'selected' : '' ?>>Pending</option>
+                    <option value="approved" <?= $filterStatus === 'approved' ? 'selected' : '' ?>>Approved</option>
+                    <option value="rejected" <?= $filterStatus === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                    <option value="reimbursed" <?= $filterStatus === 'reimbursed' ? 'selected' : '' ?>>Reimbursed</option>
+                    <option value="not_reimbursed" <?= $filterStatus === 'not_reimbursed' ? 'selected' : '' ?>>Belum Reimburse</option>
+                </select>
             </div>
-            <div class="col-md-2">
-                <div class="form-group mb-0">
-                    <label class="small">Dari Tanggal</label>
-                    <input type="date" name="date_from" class="form-control form-control-sm" value="<?= $filterDateFrom ?>">
-                </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Dari Tanggal</label>
+                <input type="date" name="date_from" class="form-control form-control-sm" value="<?= $filterDateFrom ?>">
             </div>
-            <div class="col-md-2">
-                <div class="form-group mb-0">
-                    <label class="small">Sampai Tanggal</label>
-                    <input type="date" name="date_to" class="form-control form-control-sm" value="<?= $filterDateTo ?>">
-                </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Sampai Tanggal</label>
+                <input type="date" name="date_to" class="form-control form-control-sm" value="<?= $filterDateTo ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-12 d-flex align-items-end justify-content-end mb-2">
                 <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search mr-1"></i> Filter</button>
-                <a href="claim_nota.php" class="btn btn-default btn-sm ml-1">Reset</a>
-                <a href="export_excel.php?type=claim_nota&<?= http_build_query($_GET) ?>" class="btn btn-success btn-sm ml-1"><i class="fas fa-file-excel mr-1"></i> Excel</a>
-                <a href="export_csv.php?type=claim_nota&<?= http_build_query($_GET) ?>" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> CSV</a>
+                <a href="claim_nota.php" class="btn btn-default btn-sm ml-1" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+                <a href="export_excel.php?type=claim_nota&<?= http_build_query($_GET) ?>" class="btn btn-success btn-sm ml-1" title="Export Excel"><i class="fas fa-file-excel"></i></a>
+                <a href="export_csv.php?type=claim_nota&<?= http_build_query($_GET) ?>" class="btn btn-info btn-sm ml-1" title="Export CSV"><i class="fas fa-file-csv"></i></a>
             </div>
         </form>
     </div>
@@ -184,7 +170,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
     <!-- Detail Tab -->
     <div class="card card-outline card-primary" style="border-top-left-radius:0;">
         <div class="card-body">
-            <table id="reportTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+            <table id="reportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">
                     <tr>
                         <th width="12%">No. Claim</th>
@@ -242,7 +228,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
     <!-- Per Karyawan Tab -->
     <div class="card card-outline card-primary" style="border-top-left-radius:0;">
         <div class="card-body">
-            <table id="reportTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+            <table id="reportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">
                     <tr>
                         <th width="5%">No</th>
@@ -289,7 +275,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
     <!-- Per Proyek Tab -->
     <div class="card card-outline card-primary" style="border-top-left-radius:0;">
         <div class="card-body">
-            <table id="reportTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+            <table id="reportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">
                     <tr>
                         <th width="5%">No</th>
@@ -337,7 +323,7 @@ $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
     initDataTable('#reportTable');
-    $('.select2').select2({ theme: 'bootstrap4' });
+    initSelect2('.select2');
 });
 </script>
 JS;

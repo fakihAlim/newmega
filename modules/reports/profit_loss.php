@@ -87,59 +87,43 @@ require_once __DIR__ . '/../../includes/report_print.php';
 <?php renderReportPrintHeader('Laporan Laba Rugi (Profit & Loss)', $periodText); ?>
 
 <!-- Filter Card -->
-<div class="card card-default d-print-none mb-3">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-filter mr-2"></i>Filter Data</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
-    </div>
-    <form method="GET" action="">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Tahun</label>
-                        <select name="year" class="form-control form-control-sm">
-                            <?php for ($y = date('Y'); $y >= date('Y') - 5; $y--): ?>
-                                <option value="<?= $y ?>" <?= $filterYear == $y ? 'selected' : '' ?>><?= $y ?></option>
-                            <?php endfor; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Bulan</label>
-                        <select name="month" class="form-control form-control-sm">
-                            <option value="">-- Semua Bulan --</option>
-                            <?php foreach ($monthNames as $num => $name): ?>
-                                <option value="<?= $num ?>" <?= $filterMonth == $num ? 'selected' : '' ?>><?= $name ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-12">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Perusahaan</label>
-                        <select name="company_id" class="form-control form-control-sm select2">
-                            <option value="">-- Semua Perusahaan --</option>
-                            <?php foreach ($companies as $comp): ?>
-                                <option value="<?= $comp['id'] ?>" <?= $filterCompany == $comp['id'] ? 'selected' : '' ?>>
-                                    <?= sanitize($comp['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="row">
+            <div class="col-md-3 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tahun</label>
+                <select name="year" class="form-control form-control-sm select2">
+                    <?php for ($y = date('Y'); $y >= date('Y') - 5; $y--): ?>
+                        <option value="<?= $y ?>" <?= $filterYear == $y ? 'selected' : '' ?>><?= $y ?></option>
+                    <?php endfor; ?>
+                </select>
             </div>
-        </div>
-        <div class="card-footer text-right">
-            <a href="profit_loss.php" class="btn btn-secondary mr-2"><i class="fas fa-undo mr-1"></i> Reset</a>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i> Filter</button>
-        </div>
-    </form>
+            <div class="col-md-3 col-sm-6 mb-2">
+                <label style="font-size:12px;">Bulan</label>
+                <select name="month" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Bulan --</option>
+                    <?php foreach ($monthNames as $num => $name): ?>
+                        <option value="<?= $num ?>" <?= $filterMonth == $num ? 'selected' : '' ?>><?= $name ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-4 col-sm-6 mb-2">
+                <label style="font-size:12px;">Perusahaan</label>
+                <select name="company_id" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Perusahaan --</option>
+                    <?php foreach ($companies as $comp): ?>
+                        <option value="<?= $comp['id'] ?>" <?= $filterCompany == $comp['id'] ? 'selected' : '' ?>>
+                            <?= sanitize($comp['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                <a href="profit_loss.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Detailed Table -->
@@ -153,7 +137,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
         </div>
     </div>
     
-    <table class="table table-bordered" style="font-size:14px; color:#000000;">
+    <table class="table table-bordered table-sm table-hover" style="color:#000000;">
         <thead class="bg-light">
             <tr>
                 <th width="60%">Keterangan</th>
@@ -177,7 +161,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
     </table>
     
     <h5 class="mt-4 mb-3 text-secondary font-weight-bold" style="font-size:18px;">Arus Kas (Cash Flow)</h5>
-    <table class="table table-bordered" style="font-size:14px; color:#000000;">
+    <table class="table table-bordered table-sm table-hover" style="color:#000000;">
         <tbody>
             <tr>
                 <td width="60%" class="pl-4"><strong>Cash In (Penerimaan dari Customer)</strong></td>
@@ -201,10 +185,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
 $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
+    initSelect2('.select2');
 });
 </script>
 JS;

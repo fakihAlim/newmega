@@ -151,38 +151,36 @@ require_once __DIR__ . '/../../../includes/header.php';
 <!-- Filter Card -->
 <div class="card d-print-none mb-3">
     <div class="card-body p-3">
-        <form method="GET" action="" class="form-horizontal">
-            <div class="row">
-                <div class="col-md-2 col-sm-6 mb-2">
-                    <label style="font-size:12px;">Tanggal Mulai</label>
-                    <input type="date" name="start_date" class="form-control form-control-sm" value="<?= $startDate ?>" required>
-                </div>
-                <div class="col-md-2 col-sm-6 mb-2">
-                    <label style="font-size:12px;">Tanggal Selesai</label>
-                    <input type="date" name="end_date" class="form-control form-control-sm" value="<?= $endDate ?>" required>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-2">
-                    <label style="font-size:12px;">Perusahaan (Pemberi Dana)</label>
-                    <select name="company_id" class="form-control form-control-sm select2">
-                        <option value="">-- Semua Perusahaan --</option>
-                        <?php foreach ($companies as $comp): ?>
-                            <option value="<?= $comp['id'] ?>" <?= $companyId == $comp['id'] ? 'selected' : '' ?>><?= sanitize($comp['name']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-2 col-sm-6 mb-2">
-                    <label style="font-size:12px;">Metode Pembayaran</label>
-                    <select name="payment_method" class="form-control form-control-sm select2">
-                        <option value="">-- Semua Metode --</option>
-                        <?php foreach ($paymentMethods as $m): ?>
-                            <option value="<?= htmlspecialchars($m) ?>" <?= $paymentMethod == $m ? 'selected' : '' ?>><?= sanitize($m) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-3 col-sm-12 d-flex align-items-end mb-2">
-                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
-                    <a href="index.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
-                </div>
+        <form method="GET" action="" class="row">
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Mulai</label>
+                <input type="date" name="start_date" class="form-control form-control-sm" value="<?= $startDate ?>" required>
+            </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Selesai</label>
+                <input type="date" name="end_date" class="form-control form-control-sm" value="<?= $endDate ?>" required>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+                <label style="font-size:12px;">Perusahaan</label>
+                <select name="company_id" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Perusahaan --</option>
+                    <?php foreach ($companies as $comp): ?>
+                        <option value="<?= $comp['id'] ?>" <?= $companyId == $comp['id'] ? 'selected' : '' ?>><?= sanitize($comp['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+                <label style="font-size:12px;">Metode Pembayaran</label>
+                <select name="payment_method" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Metode --</option>
+                    <?php foreach ($paymentMethods as $m): ?>
+                        <option value="<?= htmlspecialchars($m) ?>" <?= $paymentMethod == $m ? 'selected' : '' ?>><?= sanitize($m) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                <a href="index.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
             </div>
         </form>
     </div>
@@ -254,7 +252,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         </div>
 
         <div class="table-responsive">
-            <table id="ledgerTable" class="table table-bordered table-striped table-hover mb-0 w-100" style="font-size:13px;">
+            <table id="ledgerTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">
                     <tr>
                         <th width="10%">Tanggal</th>

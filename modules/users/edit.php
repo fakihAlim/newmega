@@ -126,127 +126,123 @@ require_once __DIR__ . '/../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-edit mr-2"></i>Form Edit Pengguna</h3>
                 <a href="<?= APP_URL ?>/modules/users/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
             </div>
             <form method="POST" enctype="multipart/form-data">
                 <div class="card-body">
-                    
-                    <h5 class="text-primary mb-3">Informasi Akun</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Username <small class="text-muted">(Tidak dapat diubah)</small></label>
-                                <input type="text" class="form-control" value="<?= sanitize($userData['username']) ?>" readonly>
-                            </div>
+ 
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Username <small class="text-muted">(Tidak dapat diubah)</small></label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" value="<?= sanitize($userData['username']) ?>" readonly>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Reset Password <small class="text-muted">(Kosongkan jika tidak ingin diubah)</small></label>
-                                <input type="password" name="new_password" class="form-control" minlength="6">
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Reset Password <small class="text-muted">(Kosongkan jika tidak ingin diubah)</small></label>
+                        <div class="col-sm-8">
+                            <input type="password" name="new_password" class="form-control" minlength="6">
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Peran <span class="text-danger">*</span></label>
-                                <?php if ($userData['id'] == $_SESSION['user']['id']): ?>
-                                    <?php foreach ($currentUserRoles as $roleId): ?>
-                                        <input type="hidden" name="roles[]" value="<?= $roleId ?>">
-                                    <?php endforeach; ?>
-                                    <input type="text" class="form-control" value="<?= getUserRolesDisplay($userData['id']) ?>" readonly>
-                                    <small class="text-muted">Anda tidak dapat mengubah peran Anda sendiri.</small>
-                                <?php else: ?>
-                                    <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Peran --" required>
-                                        <?php
-                                        $stmtRoles = $pdo->query("SELECT * FROM roles ORDER BY role_name ASC");
-                                        $rolesList = $stmtRoles->fetchAll();
-                                        $roleIdToKey = [];
-                                        foreach ($rolesList as $r) {
-                                            $roleIdToKey[$r['id']] = $r['role_key'];
-                                            $selected = in_array($r['id'], $currentUserRoles) ? 'selected' : '';
-                                            echo "<option value=\"{$r['id']}\" {$selected}>{$r['role_name']}</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                    <small class="form-text text-muted mt-2"><strong>Akses Modul:</strong> <span id="moduleAccessList" class="text-info">Pilih peran untuk melihat akses.</span></small>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Status Akun</label>
-                                <div class="custom-control custom-switch mt-2">
-                                    <?php if ($userData['id'] == $_SESSION['user']['id']): ?>
-                                        <input type="checkbox" class="custom-control-input" id="isActive" checked disabled>
-                                        <input type="hidden" name="is_active" value="1">
-                                    <?php else: ?>
-                                        <input type="checkbox" name="is_active" class="custom-control-input" id="isActive" <?= $userData['is_active'] ? 'checked' : '' ?> value="1">
-                                    <?php endif; ?>
-                                    <label class="custom-control-label" for="isActive">Aktif</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <hr class="my-4">
-                    <h5 class="text-primary mb-3">Informasi Pribadi</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" name="full_name" class="form-control" value="<?= sanitize($userData['full_name']) ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Jenis Kelamin</label>
-                                <select name="gender" class="form-control">
-                                    <option value="">-- Pilih --</option>
-                                    <option value="Laki-laki" <?= ($userData['gender'] === 'Laki-laki') ? 'selected' : '' ?>>Laki-laki</option>
-                                    <option value="Perempuan" <?= ($userData['gender'] === 'Perempuan') ? 'selected' : '' ?>>Perempuan</option>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Peran <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <?php if ($userData['id'] == $_SESSION['user']['id']): ?>
+                                <?php foreach ($currentUserRoles as $roleId): ?>
+                                    <input type="hidden" name="roles[]" value="<?= $roleId ?>">
+                                <?php endforeach; ?>
+                                <input type="text" class="form-control" value="<?= getUserRolesDisplay($userData['id']) ?>" readonly>
+                                <small class="text-muted d-block mt-1">Anda tidak dapat mengubah peran Anda sendiri.</small>
+                            <?php else: ?>
+                                <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Peran --" required>
+                                    <?php
+                                    $stmtRoles = $pdo->query("SELECT * FROM roles ORDER BY role_name ASC");
+                                    $rolesList = $stmtRoles->fetchAll();
+                                    $roleIdToKey = [];
+                                    foreach ($rolesList as $r) {
+                                        $roleIdToKey[$r['id']] = $r['role_key'];
+                                        $selected = in_array($r['id'], $currentUserRoles) ? 'selected' : '';
+                                        echo "<option value=\"{$r['id']}\" {$selected}>{$r['role_name']}</option>";
+                                    }
+                                    ?>
                                 </select>
+                                <small class="form-text text-muted mt-2 d-block"><strong>Akses Modul:</strong> <span id="moduleAccessList" class="text-info">Pilih peran untuk melihat akses.</span></small>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Status Akun</label>
+                        <div class="col-sm-8 pt-1">
+                            <div class="custom-control custom-switch">
+                                <?php if ($userData['id'] == $_SESSION['user']['id']): ?>
+                                    <input type="checkbox" class="custom-control-input" id="isActive" checked disabled>
+                                    <input type="hidden" name="is_active" value="1">
+                                <?php else: ?>
+                                    <input type="checkbox" name="is_active" class="custom-control-input" id="isActive" <?= $userData['is_active'] ? 'checked' : '' ?> value="1">
+                                <?php endif; ?>
+                                <label class="custom-control-label font-weight-normal" for="isActive">Aktif</label>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No. HP</label>
-                                <input type="text" name="phone" class="form-control" value="<?= sanitize($userData['phone'] ?? '') ?>">
-                            </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="full_name" class="form-control" value="<?= sanitize($userData['full_name']) ?>" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control" value="<?= sanitize($userData['email'] ?? '') ?>">
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Jenis Kelamin</label>
+                        <div class="col-sm-8">
+                            <select name="gender" class="form-control">
+                                <option value="">-- Pilih --</option>
+                                <option value="Laki-laki" <?= ($userData['gender'] === 'Laki-laki') ? 'selected' : '' ?>>Laki-laki</option>
+                                <option value="Perempuan" <?= ($userData['gender'] === 'Perempuan') ? 'selected' : '' ?>>Perempuan</option>
+                            </select>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Alamat</label>
-                        <textarea name="address" class="form-control" rows="2"><?= sanitize($userData['address'] ?? '') ?></textarea>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">No. HP</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="phone" class="form-control" value="<?= sanitize($userData['phone'] ?? '') ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Email</label>
+                        <div class="col-sm-8">
+                            <input type="email" name="email" class="form-control" value="<?= sanitize($userData['email'] ?? '') ?>">
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Foto Profil</label>
-                        <?php if ($userData['photo']): ?>
-                            <div class="mb-2">
-                                <img src="<?= getProfilePhoto($userData['photo']) ?>" alt="Current Photo" class="img-thumbnail" style="height: 100px;">
-                            </div>
-                        <?php endif; ?>
-                        <div class="custom-file">
-                            <input type="file" name="photo" class="custom-file-input" id="photoInput" accept="image/*">
-                            <label class="custom-file-label" for="photoInput">Ganti gambar...</label>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Alamat</label>
+                        <div class="col-sm-8">
+                            <textarea name="address" class="form-control" rows="2"><?= sanitize($userData['address'] ?? '') ?></textarea>
                         </div>
-                        <small class="form-text text-muted">Format: JPG, PNG, GIF. Maks 2MB.</small>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Foto Profil</label>
+                        <div class="col-sm-8">
+                            <?php if ($userData['photo']): ?>
+                                <div class="mb-2">
+                                    <img src="<?= getProfilePhoto($userData['photo']) ?>" alt="Current Photo" class="img-thumbnail" style="height: 100px;">
+                                </div>
+                            <?php endif; ?>
+                            <div class="custom-file">
+                                <input type="file" name="photo" class="custom-file-input" id="photoInput" accept="image/*">
+                                <label class="custom-file-label" for="photoInput">Ganti gambar...</label>
+                            </div>
+                            <small class="form-text text-muted mt-1">Format: JPG, PNG, GIF. Maks 2MB.</small>
+                        </div>
                     </div>
                     
                 </div>
@@ -271,10 +267,7 @@ $roleIdMapJson = isset($roleIdToKey) ? json_encode($roleIdToKey) : '{}';
 $extraJS = <<<JS
 <script>
 $(document).ready(function() {
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
+    initSelect2('.select2');
 
     $('.custom-file-input').on('change', function() {
         var fileName = $(this).val().split('\\\\').pop();

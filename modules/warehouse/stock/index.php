@@ -30,7 +30,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         <h3 class="card-title">Stok Barang Gudang Utama</h3>
     </div>
     <div class="card-body">
-        <table id="stockTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="stockTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead class="bg-light">
                 <tr>
                     <th width="10%" class="text-center">Kode</th>

@@ -85,7 +85,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Form Edit Proyek</h3>
                 <a href="<?= APP_URL ?>/modules/master/projects/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
@@ -93,87 +93,85 @@ require_once __DIR__ . '/../../../includes/header.php';
             <form method="POST">
                 <div class="card-body">
                     
-                    <div class="row">
-                        <div class="col-md-9">
-                            <div class="form-group">
-                                <label>Nama Proyek <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control check-duplicate" data-type="project" data-id="<?= $id ?>" value="<?= sanitize($project['name']) ?>" required>
-                                <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Proyek <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="name" class="form-control check-duplicate" data-type="project" data-id="<?= $id ?>" value="<?= sanitize($project['name']) ?>" required>
+                            <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Singkatan <span class="text-danger">*</span></label>
-                                <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($project['abbreviation'] ?? '') ?>" placeholder="Cth: PKST1" required maxlength="10">
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Singkatan <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($project['abbreviation'] ?? '') ?>" placeholder="Cth: PKST1" required maxlength="10">
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Pilih Klien / Customer <span class="text-danger">*</span></label>
-                                <select name="customer_id" class="form-control select2" required>
-                                    <option value="">-- Pilih Customer --</option>
-                                    <?php foreach ($customers as $c): ?>
-                                        <option value="<?= $c['id'] ?>" <?= $project['customer_id'] == $c['id'] ? 'selected' : '' ?>>
-                                            <?= sanitize($c['company_name']) ?> (<?= sanitize($c['abbreviation']) ?>)
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Pilih Klien / Customer <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="customer_id" class="form-control select2" required>
+                                <option value="">-- Pilih Customer --</option>
+                                <?php foreach ($customers as $c): ?>
+                                    <option value="<?= $c['id'] ?>" <?= $project['customer_id'] == $c['id'] ? 'selected' : '' ?>>
+                                        <?= sanitize($c['company_name']) ?> (<?= sanitize($c['abbreviation']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Project Manager (PM)</label>
-                                <select name="manager_id" class="form-control select2">
-                                    <option value="">-- Belum Assign PM --</option>
-                                    <?php foreach ($pms as $pm): ?>
-                                        <option value="<?= $pm['id'] ?>" <?= $project['project_manager_id'] == $pm['id'] ? 'selected' : '' ?>>
-                                            <?= sanitize($pm['full_name']) ?> (@<?= sanitize($pm['username']) ?>)
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Project Manager (PM)</label>
+                        <div class="col-sm-8">
+                            <select name="manager_id" class="form-control select2">
+                                <option value="">-- Belum Assign PM --</option>
+                                <?php foreach ($pms as $pm): ?>
+                                    <option value="<?= $pm['id'] ?>" <?= $project['project_manager_id'] == $pm['id'] ? 'selected' : '' ?>>
+                                        <?= sanitize($pm['full_name']) ?> (@<?= sanitize($pm['username']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Lokasi Proyek / Alamat Pengiriman <span class="text-danger">*</span></label>
-                        <textarea name="location" class="form-control" rows="2" required><?= sanitize($project['location']) ?></textarea>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Tgl. Mulai Proyek</label>
-                                <input type="date" name="start_date" class="form-control" value="<?= sanitize($project['start_date']) ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Tgl. Selesai Target</label>
-                                <input type="date" name="end_date" class="form-control" value="<?= sanitize($project['end_date']) ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Lokasi Proyek / Alamat Pengiriman <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <textarea name="location" class="form-control" rows="2" required><?= sanitize($project['location']) ?></textarea>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Status Proyek</label>
-                                <select name="status" class="form-control" required>
-                                    <option value="active" <?= $project['status'] === 'active' ? 'selected' : '' ?>>Active (Berjalan)</option>
-                                    <option value="completed" <?= $project['status'] === 'completed' ? 'selected' : '' ?>>Completed (Selesai)</option>
-                                    <option value="cancelled" <?= $project['status'] === 'cancelled' ? 'selected' : '' ?>>Cancelled (Dibatalkan)</option>
-                                </select>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Tgl. Mulai Proyek</label>
+                        <div class="col-sm-8">
+                            <input type="date" name="start_date" class="form-control" value="<?= sanitize($project['start_date']) ?>">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nilai Rencana Anggaran (Budget)</label>
-                                <input type="text" name="budget" class="form-control input-rupiah" value="<?= number_format($project['budget'], 0, ',', '.') ?>">
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Tgl. Selesai Target</label>
+                        <div class="col-sm-8">
+                            <input type="date" name="end_date" class="form-control" value="<?= sanitize($project['end_date']) ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Status Proyek</label>
+                        <div class="col-sm-8">
+                            <select name="status" class="form-control" required>
+                                <option value="active" <?= $project['status'] === 'active' ? 'selected' : '' ?>>Active (Berjalan)</option>
+                                <option value="completed" <?= $project['status'] === 'completed' ? 'selected' : '' ?>>Completed (Selesai)</option>
+                                <option value="cancelled" <?= $project['status'] === 'cancelled' ? 'selected' : '' ?>>Cancelled (Dibatalkan)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nilai Rencana Anggaran (Budget)</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="budget" class="form-control input-rupiah" value="<?= number_format($project['budget'], 0, ',', '.') ?>">
                         </div>
                     </div>
                     

@@ -159,9 +159,9 @@ require_once __DIR__ . '/../../includes/header.php';
     <input type="hidden" name="post_action" value="bulk_input">
 
     <!-- STEP 1: Header Global -->
-    <div class="card mb-3">
+    <div class="card card-outline card-primary mb-3">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-calendar-check text-warning mr-2"></i>Input Timesheet Bulk</h3>
+            <h3 class="card-title text-primary font-weight-bold"><i class="fas fa-calendar-check mr-2"></i>Input Timesheet Bulk</h3>
         </div>
         <div class="card-body">
             <div class="row">
@@ -243,7 +243,7 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
         <div class="card-body p-0">
             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                <table class="table table-bordered table-sm mb-0" style="font-size: 13px;">
+                <table class="table table-bordered table-sm mb-0" >
                     <thead class="thead-light" style="position: sticky; top: 0; z-index: 1;">
                         <tr>
                             <th width="5%" class="text-center align-middle">No</th>
@@ -274,75 +274,87 @@ require_once __DIR__ . '/../../includes/header.php';
 <!-- ==================== KARYAWAN SELF VIEW ==================== -->
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm" style="border-radius: 12px; border-top: 4px solid #d97706;">
+        <div class="card card-outline card-primary shadow-sm" style="border-radius: 12px;">
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                <h4 class="card-title font-weight-bold text-center w-100" style="color: #4a5568;">
-                    <i class="fas fa-calendar-check text-warning mr-2"></i> Input Absensi / Timesheet
+                <h4 class="card-title font-weight-bold text-center text-primary w-100">
+                    <i class="fas fa-calendar-check mr-2"></i> Input Absensi / Timesheet
                 </h4>
             </div>
             <div class="card-body">
-                <form action="" method="POST">
+                <form method="POST">
                     <input type="hidden" name="post_action" value="self_input">
 
-                    <div class="form-group mb-3">
-                        <label class="font-weight-bold text-secondary">Tanggal Pekerjaan <span class="text-danger">*</span></label>
-                        <input type="date" name="work_date" class="form-control form-control-lg" required value="<?= date('Y-m-d') ?>" style="border-radius: 8px;">
+                    <div class="form-group row mb-3">
+                        <label class="col-sm-4 col-form-label font-weight-bold text-secondary">Tanggal Pekerjaan <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="date" name="work_date" class="form-control form-control-lg" required value="<?= date('Y-m-d') ?>" style="border-radius: 8px;">
+                        </div>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label class="font-weight-bold text-secondary">Perusahaan <span class="text-danger">*</span></label>
-                        <select name="company_id" class="form-control form-control-lg select2" required>
-                            <option value="">-- Pilih Perusahaan --</option>
-                            <?php foreach ($companies as $c): ?>
-                                <option value="<?= $c['id'] ?>"><?= sanitize($c['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div class="form-group row mb-3">
+                        <label class="col-sm-4 col-form-label font-weight-bold text-secondary">Perusahaan <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="company_id" class="form-control form-control-lg select2" required>
+                                <option value="">-- Pilih Perusahaan --</option>
+                                <?php foreach ($companies as $c): ?>
+                                    <option value="<?= $c['id'] ?>"><?= sanitize($c['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="form-group mb-4">
-                        <label class="font-weight-bold text-secondary">Proyek <span class="text-danger">*</span></label>
-                        <select name="project_id" class="form-control form-control-lg select2" required>
-                            <option value="">-- Pilih Proyek --</option>
-                            <?php foreach ($projects as $p): ?>
-                                <option value="<?= $p['id'] ?>"><?= sanitize($p['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div class="form-group row mb-4">
+                        <label class="col-sm-4 col-form-label font-weight-bold text-secondary">Proyek <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="project_id" class="form-control form-control-lg select2" required>
+                                <option value="">-- Pilih Proyek --</option>
+                                <?php foreach ($projects as $p): ?>
+                                    <option value="<?= $p['id'] ?>"><?= sanitize($p['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
 
                     <hr class="my-4">
 
-                    <div class="form-group mb-4">
-                        <label class="font-weight-bold text-secondary d-block">Tipe Kehadiran <span class="text-danger">*</span></label>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="custom-control custom-radio custom-control-inline w-100 border p-3 rounded" style="background:#f8f9fa;">
-                                    <input type="radio" id="type_full" name="work_type" class="custom-control-input" value="full" checked>
-                                    <label class="custom-control-label font-weight-bold w-100" style="cursor:pointer" for="type_full">Full Day <br><small class="text-muted font-weight-normal">(8 Jam)</small></label>
+                    <div class="form-group row mb-4">
+                        <label class="col-sm-4 col-form-label font-weight-bold text-secondary">Tipe Kehadiran <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="custom-control custom-radio custom-control-inline w-100 border p-3 rounded" style="background:#f8f9fa;">
+                                        <input type="radio" id="type_full" name="work_type" class="custom-control-input" value="full" checked>
+                                        <label class="custom-control-label font-weight-bold w-100" style="cursor:pointer" for="type_full">Full Day <br><small class="text-muted font-weight-normal">(8 Jam)</small></label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="custom-control custom-radio custom-control-inline w-100 border p-3 rounded" style="background:#f8f9fa;">
-                                    <input type="radio" id="type_half" name="work_type" class="custom-control-input" value="half">
-                                    <label class="custom-control-label font-weight-bold w-100" style="cursor:pointer" for="type_half">Half Day <br><small class="text-muted font-weight-normal">(4 Jam)</small></label>
+                                <div class="col-6">
+                                    <div class="custom-control custom-radio custom-control-inline w-100 border p-3 rounded" style="background:#f8f9fa;">
+                                        <input type="radio" id="type_half" name="work_type" class="custom-control-input" value="half">
+                                        <label class="custom-control-label font-weight-bold w-100" style="cursor:pointer" for="type_half">Half Day <br><small class="text-muted font-weight-normal">(4 Jam)</small></label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group mb-4">
-                        <label class="font-weight-bold text-secondary">Jam Lembur (Opsional)</label>
-                        <div class="input-group input-group-lg">
-                            <input type="number" step="0.5" min="0" max="24" name="overtime_hours" class="form-control" value="0">
-                            <div class="input-group-append"><span class="input-group-text bg-white">Jam</span></div>
+                    <div class="form-group row mb-4">
+                        <label class="col-sm-4 col-form-label font-weight-bold text-secondary">Jam Lembur</label>
+                        <div class="col-sm-8">
+                            <div class="input-group input-group-lg">
+                                <input type="number" step="0.5" min="0" max="24" name="overtime_hours" class="form-control" value="0">
+                                <div class="input-group-append"><span class="input-group-text bg-white">Jam</span></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group mb-4">
-                        <label class="font-weight-bold text-secondary">Keterangan / Catatan</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Apa yang dikerjakan hari ini..." style="border-radius:8px;"></textarea>
+                    <div class="form-group row mb-4">
+                        <label class="col-sm-4 col-form-label font-weight-bold text-secondary">Keterangan</label>
+                        <div class="col-sm-8">
+                            <textarea name="notes" class="form-control" rows="3" placeholder="Apa yang dikerjakan hari ini..." style="border-radius:8px;"></textarea>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-warning btn-lg btn-block text-white font-weight-bold" style="border-radius:8px; font-size:1.1rem; box-shadow:0 4px 6px rgba(217,119,6,0.3);">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block text-white font-weight-bold" style="border-radius:8px; font-size:1.1rem; box-shadow:0 4px 6px rgba(0,123,255,0.3);">
                         <i class="fas fa-paper-plane mr-2"></i> Submit Timesheet
                     </button>
                 </form>
@@ -406,7 +418,7 @@ if ($isAdmin) {
 $extraJS .= <<<'JS'
 <script>
 $(document).ready(function() {
-    $('.select2').select2({ theme: 'bootstrap4', width: '100%' });
+    initSelect2('.select2');
 
     let allEmployees = [];
     let selectedIds = new Set();
@@ -667,7 +679,7 @@ JS;
 $extraJS .= <<<'JS'
 <script>
 $(document).ready(function() {
-    $('.select2').select2({ theme: 'bootstrap4', width: '100%' });
+    initSelect2('.select2');
 });
 </script>
 JS;

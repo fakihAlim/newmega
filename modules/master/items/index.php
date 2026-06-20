@@ -87,10 +87,16 @@ require_once __DIR__ . '/../../../includes/header.php';
             <button type="button" class="btn btn-success btn-sm ml-1" data-toggle="modal" data-target="#importModal">
                 <i class="fas fa-file-excel mr-1"></i> Import Excel
             </button>
+            <a href="<?= APP_URL ?>/modules/master/export_excel.php?type=items" class="btn btn-info btn-sm ml-1">
+                <i class="fas fa-file-excel mr-1"></i> Export Excel
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary btn-sm ml-1">
+                <i class="fas fa-print mr-1"></i> Cetak
+            </button>
         </div>
     </div>
     <div class="card-body">
-        <table id="itemsTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="itemsTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="10%">Kode Barang</th>

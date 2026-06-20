@@ -51,9 +51,9 @@ $usageHistory = $stmtUsage->fetchAll();
     </div>
 </div>
 
-<h5 class="text-success"><i class="fas fa-shopping-cart mr-2"></i>Riwayat Pembelian (Purchase Orders)</h5>
+<h5 class="text-success">Riwayat Pembelian</h5>
 <div class="table-responsive mb-4">
-    <table class="table table-sm table-bordered table-striped" style="font-size:13px;">
+    <table class="table table-sm table-bordered table-striped" >
         <thead class="bg-light">
             <tr>
                 <th>No. PO</th>
@@ -83,9 +83,9 @@ $usageHistory = $stmtUsage->fetchAll();
     </table>
 </div>
 
-<h5 class="text-info"><i class="fas fa-hard-hat mr-2"></i>Riwayat Pemakaian (Transfer ke Proyek)</h5>
+<h5 class="text-info">Riwayat Pemakaian (Transfer ke Proyek)</h5>
 <div class="table-responsive">
-    <table class="table table-sm table-bordered table-striped" style="font-size:13px;">
+    <table class="table table-sm table-bordered table-striped" >
         <thead class="bg-light">
             <tr>
                 <th>No. Transfer</th>

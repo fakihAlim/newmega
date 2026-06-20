@@ -52,43 +52,40 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-money-bill-wave mr-2"></i>Form Tambah Master Upah</h3>
                 <a href="<?= APP_URL ?>/modules/master/wages/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
             </div>
-            <form action="" method="POST">
+            <form method="POST">
                 <div class="card-body">
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nama Jabatan <span class="text-danger">*</span></label>
-                                <input type="text" name="jabatan_name" class="form-control" required placeholder="Contoh: Tukang Las, Mandor, Helper" value="<?= htmlspecialchars($_POST['jabatan_name'] ?? '') ?>">
-                                <small class="form-text text-muted">Nama jabatan harus unik, tidak boleh sama.</small>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Jabatan <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="jabatan_name" class="form-control" required placeholder="Contoh: Tukang Las, Mandor, Helper" value="<?= htmlspecialchars($_POST['jabatan_name'] ?? '') ?>">
+                            <small class="form-text text-muted mt-1">Nama jabatan harus unik, tidak boleh sama.</small>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Upah Harian (Rp) <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><strong>Rp</strong></span>
-                                    </div>
-                                    <input type="text" name="daily_wage" class="form-control rupiah-input" required placeholder="0" value="<?= htmlspecialchars($_POST['daily_wage'] ?? '') ?>">
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Upah Harian (Rp) <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><strong>Rp</strong></span>
                                 </div>
-                                <small class="form-text text-muted">Upah lembur otomatis dihitung: Upah Harian / 8 per jam.</small>
+                                <input type="text" name="daily_wage" class="form-control rupiah-input" required placeholder="0" value="<?= htmlspecialchars($_POST['daily_wage'] ?? '') ?>">
                             </div>
+                            <small class="form-text text-muted mt-1">Upah lembur otomatis dihitung: Upah Harian / 8 per jam.</small>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-0">
-                                <label class="text-muted">Upah Lembur (Per Jam) — Otomatis</label>
-                                <input type="text" class="form-control" id="overtime_preview" readonly style="background-color: #f4f6f9; font-weight: bold; color: #28a745;">
-                                <small class="form-text text-muted">Dihitung dari Upah Harian ÷ 8.</small>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label text-muted">Upah Lembur (Per Jam) — Otomatis</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="overtime_preview" readonly style="background-color: #f4f6f9; font-weight: bold; color: #28a745;">
+                            <small class="form-text text-muted mt-1">Dihitung dari Upah Harian ÷ 8.</small>
                         </div>
                     </div>
                     

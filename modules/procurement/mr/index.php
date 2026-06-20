@@ -13,6 +13,15 @@ $breadcrumbs = [
 
 $user = getCurrentUser();
 
+// Set default filters
+$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$projectId = $_GET['project_id'] ?? '';
+$status = $_GET['status'] ?? '';
+
+// Fetch projects for filter
+$projects = $pdo->query("SELECT id, name FROM projects ORDER BY name ASC")->fetchAll();
+
 // Logic for Role-Based Access
 $conditions = [];
 $params = [];
@@ -20,6 +29,23 @@ $params = [];
 if (in_array($user['role'], ['gudang', 'project_manager'])) {
     $conditions[] = "m.requested_by = ?";
     $params[] = $user['id'];
+}
+
+if ($startDate) {
+    $conditions[] = "m.request_date >= ?";
+    $params[] = $startDate;
+}
+if ($endDate) {
+    $conditions[] = "m.request_date <= ?";
+    $params[] = $endDate;
+}
+if ($projectId) {
+    $conditions[] = "m.project_id = ?";
+    $params[] = $projectId;
+}
+if ($status) {
+    $conditions[] = "m.status = ?";
+    $params[] = $status;
 }
 
 $whereClause = "";
@@ -80,6 +106,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
+<!-- Filter Card -->
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="form-horizontal">
+            <div class="row">
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Mulai</label>
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($startDate) ?>">
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Selesai</label>
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($endDate) ?>">
+                </div>
+                <div class="col-md-4 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Proyek</label>
+                    <select name="project_id" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Proyek --</option>
+                        <?php foreach ($projects as $p): ?>
+                            <option value="<?= $p['id'] ?>" <?= $projectId == $p['id'] ? 'selected' : '' ?>><?= sanitize($p['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Status</label>
+                    <select name="status" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Status --</option>
+                        <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
+                        <option value="pending" <?= $status === 'pending' ? 'selected' : '' ?>>Pending</option>
+                        <option value="approved" <?= $status === 'approved' ? 'selected' : '' ?>>Approved</option>
+                        <option value="rejected" <?= $status === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                        <option value="completed" <?= $status === 'completed' ? 'selected' : '' ?>>Completed</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                    <a href="index.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title">Daftar Material Request</h3>
@@ -90,7 +158,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <table id="mrTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="mrTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="12%">No. MR</th>
@@ -168,6 +236,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
+    initSelect2('.select2');
     initDataTable('#mrTable');
 });
 

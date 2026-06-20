@@ -75,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Catat Pembayaran Vendor';
+$pageTitle = 'Catat Pembayaran Supplier';
 $breadcrumbs = [
     ['label' => 'Finance', 'url' => '#'],
-    ['label' => 'Pembayaran Vendor', 'url' => 'index.php'],
+    ['label' => 'Pembayaran Supplier', 'url' => 'index.php'],
     ['label' => 'Baru']
 ];
 
@@ -86,37 +86,41 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <div class="row">
-    <div class="col-md-8">
-        <form action="" method="POST" id="formPayment">
-            <div class="card card-success card-outline">
+    <div class="col-md-12">
+        <form method="POST" id="formPayment">
+            <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-money-check-alt mr-2"></i> Detail Pembayaran</h3>
+                    <h3 class="card-title text-primary font-weight-bold">Detail Pembayaran</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Pilih Purchase Order <span class="text-danger">*</span></label>
-                                <select class="form-control select2" name="po_id" id="po_id" required style="width:100%;">
-                                    <option value="">-- Pilih PO --</option>
-                                    <?php foreach ($eligiblePOs as $po): ?>
-                                        <option value="<?= $po['id'] ?>" 
-                                                data-total="<?= $po['total'] ?>" 
-                                                data-paid="<?= $po['total_paid'] ?>"
-                                                data-vendor="<?= sanitize($po['vendor_name']) ?>"
-                                                data-bank-name="<?= sanitize($po['vendor_bank_name']) ?>"
-                                                data-bank-account="<?= sanitize($po['vendor_bank_account']) ?>"
-                                                data-bank-holder="<?= sanitize($po['vendor_bank_holder']) ?>">
-                                            <?= sanitize($po['po_number']) ?> - <?= sanitize($po['vendor_name']) ?> (<?= formatRupiah($po['total']) ?>)
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Pilih PO <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control select2" name="po_id" id="po_id" required>
+                                        <option value="">-- Pilih PO --</option>
+                                        <?php foreach ($eligiblePOs as $po): ?>
+                                            <option value="<?= $po['id'] ?>" 
+                                                    data-total="<?= $po['total'] ?>" 
+                                                    data-paid="<?= $po['total_paid'] ?>"
+                                                    data-vendor="<?= sanitize($po['vendor_name']) ?>"
+                                                    data-bank-name="<?= sanitize($po['vendor_bank_name']) ?>"
+                                                    data-bank-account="<?= sanitize($po['vendor_bank_account']) ?>"
+                                                    data-bank-holder="<?= sanitize($po['vendor_bank_holder']) ?>">
+                                                <?= sanitize($po['po_number']) ?> - <?= sanitize($po['vendor_name']) ?> (<?= formatRupiah($po['total']) ?>)
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Tanggal Pembayaran <span class="text-danger">*</span></label>
-                                <input type="date" name="payment_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Tgl Bayar <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="date" name="payment_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -124,7 +128,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <!-- PO Info Panel -->
                     <div id="poInfoPanel" class="alert alert-info" style="display:none;">
                         <div class="row">
-                            <div class="col-md-4"><strong>Vendor:</strong> <span id="infoVendor">-</span></div>
+                            <div class="col-md-4"><strong>Supplier:</strong> <span id="infoVendor">-</span></div>
                             <div class="col-md-4"><strong>Total PO:</strong> <span id="infoTotal">-</span></div>
                             <div class="col-md-4"><strong>Sisa Outstanding:</strong> <span id="infoOutstanding" class="text-danger font-weight-bold">-</span></div>
                         </div>
@@ -134,82 +138,81 @@ require_once __DIR__ . '/../../../includes/header.php';
                     
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Jumlah Dibayar (Rp) <span class="text-danger">*</span></label>
-                                <input type="text" name="amount" id="inputAmount" class="form-control" required placeholder="Contoh: 5.000.000">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Jumlah (Rp) <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="amount" id="inputAmount" class="form-control" required placeholder="Contoh: 5.000.000">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Metode Pembayaran</label>
-                                <select name="payment_method" class="form-control">
-                                    <option value="">-- Pilih Metode --</option>
-                                    <option value="Transfer Bank">Transfer Bank</option>
-                                    <option value="Cash">Cash (Tunai)</option>
-                                    <option value="Cek / Giro">Cek / Giro</option>
-                                    <option value="E-Wallet">E-Wallet</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Termin Pembayaran</label>
-                                <input type="text" name="payment_term" class="form-control" placeholder="Cth: DP 50%, Pelunasan">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Nama Bank Tujuan</label>
-                                <input type="text" name="bank_name" id="bankName" class="form-control" placeholder="Cth: BCA">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>No. Rekening Tujuan</label>
-                                <input type="text" name="bank_account" id="bankAccount" class="form-control" placeholder="Cth: 123456789">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Metode</label>
+                                <div class="col-sm-8">
+                                    <select name="payment_method" class="form-control">
+                                        <option value="">-- Pilih Metode --</option>
+                                        <option value="Transfer Bank">Transfer Bank</option>
+                                        <option value="Cash">Cash (Tunai)</option>
+                                        <option value="Cek / Giro">Cek / Giro</option>
+                                        <option value="E-Wallet">E-Wallet</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No. Referensi / Bukti Transfer</label>
-                                <input type="text" name="reference_no" class="form-control" placeholder="Cth: TRF-0001234">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Termin</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="payment_term" class="form-control" placeholder="Cth: DP 50%">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Catatan</label>
-                                <textarea name="notes" class="form-control" rows="2" placeholder="Opsional..."></textarea>
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Bank</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="bank_name" id="bankName" class="form-control" placeholder="Cth: BCA">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Rekening</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="bank_account" id="bankAccount" class="form-control" placeholder="Cth: 123456789">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">No. Ref / Bukti</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="reference_no" class="form-control" placeholder="Cth: TRF-0001234">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Catatan</label>
+                                <div class="col-sm-8">
+                                    <textarea name="notes" class="form-control" rows="2" placeholder="Opsional..."></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer text-right">
                     <a href="index.php" class="btn btn-default">Batal</a>
-                    <button type="submit" class="btn btn-success ml-2"><i class="fas fa-save mr-1"></i> Simpan Pembayaran</button>
+                    <button type="submit" class="btn btn-primary ml-2">Simpan Pembayaran</button>
                 </div>
             </div>
         </form>
-    </div>
-    
-    <!-- Side Summary -->
-    <div class="col-md-4">
-        <div class="card card-outline card-warning">
-            <div class="card-header">
-                <h3 class="card-title">Petunjuk</h3>
-            </div>
-            <div class="card-body" style="font-size:13px;">
-                <p>Pencatatan pembayaran vendor dilakukan terhadap <strong>Purchase Order</strong> yang sudah di-approve.</p>
-                <ul>
-                    <li>Pilih PO terlebih dahulu, sistem akan menampilkan sisa <em>outstanding</em>.</li>
-                    <li>Masukkan jumlah yang dibayarkan. Sistem akan menolak jika melebihi outstanding.</li>
-                    <li>Pembayaran boleh dilakukan secara <strong>bertahap</strong> (DP, Pelunasan, dll).</li>
-                </ul>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -217,7 +220,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
-    $('.select2').select2({ theme: 'bootstrap4' });
+    initSelect2('.select2');
     
     // PO Selection Handler
     $('#po_id').on('change', function() {

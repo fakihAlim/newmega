@@ -47,6 +47,7 @@ $confirm = isset($_GET['confirm']) && $_GET['confirm'] === 'YES_DELETE_ALL_TRANS
                         <li>Quotations & Invoices</li>
                         <li>Payments (Vendor & Customer)</li>
                         <li>Timesheet Entries (Data Kerja Harian)</li>
+                        <li>Claim Nota / Reimbursement Karyawan</li>
                     </ul>
                     <hr>
                     <p><b>Data Master</b> (User, Item, Supplier, Customer, Proyek, Karyawan) akan <b>TETAP ADA</b>.</p>
@@ -83,7 +84,9 @@ $confirm = isset($_GET['confirm']) && $_GET['confirm'] === 'YES_DELETE_ALL_TRANS
                             'invoice_items',
                             'invoices',
                             'customer_payments',
-                            'timesheet_entries'
+                            'timesheet_entries',
+                            'nota_claim_items',
+                            'nota_claims'
                         ];
 
                         foreach ($tables as $table) {

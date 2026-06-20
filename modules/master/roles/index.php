@@ -49,7 +49,7 @@ require_once __DIR__ . '/../../../includes/header.php';
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0">
+            <table class="table table-bordered table-striped table-hover table-sm w-100">
                 <thead>
                     <tr>
                         <th width="50">No</th>

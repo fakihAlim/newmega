@@ -50,16 +50,16 @@ $breadcrumbs = [
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-info">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center d-print-none">
-        <h3 class="card-title text-info"><i class="fas fa-file-invoice mr-2"></i> Laporan Penerimaan Barang / Surat Jalan</h3>
+        <h3 class="card-title text-primary"><i class="fas fa-file-invoice mr-2"></i> Laporan Penerimaan Barang / Surat Jalan</h3>
         <div class="ml-auto">
             <button class="btn btn-default btn-sm ml-3" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak Tanda Terima</button>
             <a href="index.php" class="btn btn-secondary btn-sm ml-1"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
         </div>
     </div>
     
-    <div class="card-body printable-area p-5">
+    <div class="card-body printable-area p-4 bg-white">
         
         <!-- Print Header -->
         <div class="row mb-4 pb-3" style="border-bottom: 2px solid #ccc;">
@@ -109,7 +109,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         
         <!-- Items Table -->
         <div class="table-responsive mb-4">
-            <table class="table table-bordered table-sm print-table" style="font-size:14px;">
+            <table class="table table-bordered table-sm print-table" >
                 <thead class="bg-light">
                     <tr>
                         <th width="5%" class="text-center">No</th>

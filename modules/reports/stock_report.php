@@ -72,38 +72,24 @@ if ($itemId) {
     <?php renderReportPrintHeader('Kartu Stok: ' . sanitize($item['item_code']) . ' — ' . sanitize($item['description']), $periodText); ?>
     
     <!-- Filter Card for Kartu Stok -->
-    <div class="card card-default d-print-none mb-3">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-filter mr-2"></i>Filter Tanggal</h3>
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <form method="GET" action="">
-            <input type="hidden" name="item_id" value="<?= sanitize($itemId) ?>">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 col-sm-6">
-                        <div class="form-group mb-2 mb-md-0">
-                            <label>Tanggal Mulai</label>
-                            <input type="date" name="start_date" class="form-control form-control-sm" value="<?= sanitize($startDate) ?>">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6">
-                        <div class="form-group mb-2 mb-md-0">
-                            <label>Tanggal Selesai</label>
-                            <input type="date" name="end_date" class="form-control form-control-sm" value="<?= sanitize($endDate) ?>">
-                        </div>
-                    </div>
+    <div class="card d-print-none mb-3">
+        <div class="card-body p-3">
+            <form method="GET" action="" class="row">
+                <input type="hidden" name="item_id" value="<?= sanitize($itemId) ?>">
+                <div class="col-md-4 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Mulai</label>
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="<?= sanitize($startDate) ?>">
                 </div>
-            </div>
-            <div class="card-footer text-right">
-                <a href="stock_report.php?item_id=<?= $itemId ?>" class="btn btn-secondary mr-2"><i class="fas fa-undo mr-1"></i> Reset</a>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i> Filter</button>
-            </div>
-        </form>
+                <div class="col-md-4 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Selesai</label>
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="<?= sanitize($endDate) ?>">
+                </div>
+                <div class="col-md-4 col-sm-12 d-flex align-items-end mb-2">
+                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                    <a href="stock_report.php?item_id=<?= $itemId ?>" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="card card-outline card-primary">
@@ -128,7 +114,7 @@ if ($itemId) {
                 <div class="col-md-3"><strong>Stok Saat Ini:</strong> <span class="font-weight-bold text-primary" style="font-size:18px;"><?= (float)$item['current_stock'] ?></span></div>
             </div>
             
-            <table id="txTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+            <table id="txTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">
                     <tr>
                         <th width="15%">Waktu</th>
@@ -222,56 +208,38 @@ require_once __DIR__ . '/../../includes/report_print.php';
 <?php renderReportPrintHeader('Laporan Rekap Stok & Mutasi', $periodText); ?>
 
 <!-- Filter Card -->
-<div class="card card-default d-print-none mb-3">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-filter mr-2"></i>Filter Data</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
-    </div>
-    <form method="GET" action="">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3 col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Tanggal Mulai</label>
-                        <input type="date" name="start_date" class="form-control form-control-sm" value="<?= sanitize($startDate) ?>">
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Tanggal Selesai</label>
-                        <input type="date" name="end_date" class="form-control form-control-sm" value="<?= sanitize($endDate) ?>">
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Kategori</label>
-                        <select name="category_id" class="form-control form-control-sm select2">
-                            <option value="">-- Semua Kategori --</option>
-                            <?php foreach ($categories as $cat): ?>
-                                <option value="<?= $cat['id'] ?>" <?= $filterCategory == $cat['id'] ? 'selected' : '' ?>>
-                                    <?= sanitize($cat['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Lokasi Gudang</label>
-                        <input type="text" name="warehouse_location" class="form-control form-control-sm" placeholder="Contoh: Rak A" value="<?= sanitize($filterLocation) ?>">
-                    </div>
-                </div>
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="row">
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Mulai</label>
+                <input type="date" name="start_date" class="form-control form-control-sm" value="<?= sanitize($startDate) ?>">
             </div>
-        </div>
-        <div class="card-footer text-right">
-            <a href="stock_report.php" class="btn btn-secondary mr-2"><i class="fas fa-undo mr-1"></i> Reset</a>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i> Filter</button>
-        </div>
-    </form>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Selesai</label>
+                <input type="date" name="end_date" class="form-control form-control-sm" value="<?= sanitize($endDate) ?>">
+            </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+                <label style="font-size:12px;">Kategori</label>
+                <select name="category_id" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Kategori --</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= $cat['id'] ?>" <?= $filterCategory == $cat['id'] ? 'selected' : '' ?>>
+                            <?= sanitize($cat['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+                <label style="font-size:12px;">Lokasi Gudang</label>
+                <input type="text" name="warehouse_location" class="form-control form-control-sm" placeholder="Contoh: Rak A" value="<?= sanitize($filterLocation) ?>">
+            </div>
+            <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                <a href="stock_report.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card card-outline card-primary">
@@ -284,7 +252,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
         </div>
     </div>
     <div class="card-body">
-        <table id="stockReportTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="stockReportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead class="bg-light">
                 <tr>
                     <th width="10%">Kode</th>
@@ -334,10 +302,7 @@ $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
     initDataTable('#stockReportTable');
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
+    initSelect2('.select2');
 });
 </script>
 JS;

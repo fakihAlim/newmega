@@ -77,11 +77,15 @@ try {
         try {
             if ($type === 'categories') {
                 $name = trim($row[0] ?? '');
-                $prefix = trim($row[1] ?? '');
+                $prefix = strtoupper(trim($row[1] ?? ''));
                 $desc = trim($row[2] ?? '');
                 
                 if (empty($name) || empty($prefix)) {
                     throw new Exception("Nama dan Prefix wajib diisi.");
+                }
+                
+                if (strlen($prefix) > 10) {
+                    throw new Exception("Prefix maksimal 10 karakter.");
                 }
                 
                 // Check exist
@@ -99,7 +103,7 @@ try {
                 $successCount++;
                 
             } elseif ($type === 'items') {
-                $catPrefix = trim($row[0] ?? '');
+                $catPrefix = strtoupper(trim($row[0] ?? ''));
                 $desc      = trim($row[1] ?? '');
                 $typeSpec  = trim($row[2] ?? '');
                 $uom       = trim($row[3] ?? '');
@@ -149,7 +153,7 @@ try {
                     $nextSeq = intval(end($parts)) + 1;
                 }
                 
-                $itemCode = $cat['prefix'] . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+                $itemCode = $cat['prefix'] . '-' . str_pad($nextSeq, 3, '0', STR_PAD_LEFT);
                 
                 // Insert Item
                 $ins = $pdo->prepare("

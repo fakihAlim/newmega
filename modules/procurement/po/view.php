@@ -100,9 +100,9 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card card-outline card-info">
+        <div class="card card-outline card-primary">
             <div class="card-header d-flex justify-content-between align-items-center d-print-none">
-                <h3 class="card-title text-info"><i class="fas fa-file-invoice mr-2"></i> Purchase Order:
+                <h3 class="card-title text-primary"><i class="fas fa-file-invoice mr-2"></i> Purchase Order:
                     <strong><?= sanitize($po['po_number']) ?></strong>
                 </h3>
                 <div class="ml-auto">
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
             </div>
 
-            <div class="card-body printable-area p-5">
+            <div class="card-body printable-area p-4 bg-white">
 
                 <!-- Main Company Header -->
                 <div class="text-center mb-4">
@@ -142,7 +142,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     </div>
                     <div class="col-sm-5">
                         <table class="table table-sm table-bordered mb-0"
-                            style="font-size: 13px; border: 1px solid #000;">
+                            style="border: 1px solid #000;">
                             <tr>
                                 <td width="35%" class="font-weight-bold bg-light px-2" style="border: 1px solid #000;">
                                     PO NO :</td>
@@ -162,52 +162,52 @@ require_once __DIR__ . '/../../../includes/header.php';
 
                 <!-- Section 1: Supplier & Delivery Address -->
                 <div class="row no-gutters mb-0">
-                    <div class="col-sm-7 bg-secondary text-white font-weight-bold px-2 py-1 border"
-                        style="background-color: #666 !important; border: 1px solid #000 !important; font-size: 12px;">
+                    <div class="col-sm-7 bg-light text-dark font-weight-bold px-2 py-1 border"
+                        style="border: 1px solid #000 !important; font-size: 12px;">
                         SUPPLIER</div>
-                    <div class="col-sm-5 bg-secondary text-white font-weight-bold px-2 py-1 border"
-                        style="background-color: #666 !important; border: 1px solid #000 !important; border-left: none !important; font-size: 12px;">
+                    <div class="col-sm-5 bg-light text-dark font-weight-bold px-2 py-1 border"
+                        style="border: 1px solid #000 !important; border-left: none !important; font-size: 12px;">
                         DELIVERY ADDRESS / LOKASI</div>
                 </div>
                 <div class="row no-gutters mb-3"
                     style="min-height: 100px; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000;">
                     <div class="col-sm-7 p-2 border-right" style="border-right: 1px solid #000 !important;">
-                        <h6 class="font-weight-bold mb-1" style="color: #000;"><?= sanitize($po['vendor_name']) ?></h6>
-                        <div class="mb-2" style="font-size: 11px; color: #000; line-height: 1.2;">
+                        <h4 class="font-weight-bold mb-1" style="color: #000; font-size: 18px;"><?= sanitize($po['vendor_name']) ?></h4>
+                        <div class="mb-1" style="font-size: 13px; color: #000; line-height: 1.3;">
                             <?= nl2br(sanitize($po['vendor_address'])) ?>
                         </div>
-                        <table class="table-sm table-borderless mt-2" style="font-size: 12px;">
+                        <table class="table-borderless mt-2" style="font-size: 13px; line-height: 1.4;">
                             <tr>
-                                <td width="80px" class="font-weight-bold p-0">Terms</td>
-                                <td class="p-0">: <span
-                                        style="color: #000;"><?= sanitize($po['terms']) ?: 'CASH' ?></span></td>
+                                <td width="70px" class="font-weight-bold p-0">Terms</td>
+                                <td width="10px" class="p-0 text-center">:</td>
+                                <td class="p-0" style="color: #000;"><?= sanitize($po['terms']) ?: 'CASH' ?></td>
                             </tr>
                             <tr>
                                 <td class="font-weight-bold p-0">Phone no</td>
-                                <td class="p-0">: <span
-                                        style="color: #000;"><?= sanitize($po['vendor_phone']) ?: '-' ?></span></td>
+                                <td class="p-0 text-center">:</td>
+                                <td class="p-0" style="color: #000;"><?= sanitize($po['vendor_phone']) ?: '-' ?></td>
                             </tr>
                             <tr>
                                 <td class="font-weight-bold p-0">Email</td>
-                                <td class="p-0">: <span
-                                        style="color: #000;"><?= sanitize($po['vendor_email']) ?: '-' ?></span></td>
+                                <td class="p-0 text-center">:</td>
+                                <td class="p-0" style="color: #000;"><?= sanitize($po['vendor_email']) ?: '-' ?></td>
                             </tr>
                         </table>
                     </div>
                     <div class="col-sm-5 p-2">
-                        <div class="font-weight-bold mb-2" style="color: #000; font-size: 12px; line-height: 1.2;">
+                        <div class="font-weight-bold mb-1" style="color: #000; font-size: 13px; line-height: 1.3;">
                             <?= nl2br(sanitize($po['delivery_address'])) ?: 'Sesuai alamat perusahaan' ?>
                         </div>
-                        <table class="table-sm table-borderless mt-2" style="font-size: 12px;">
+                        <table class="table-borderless mt-2" style="font-size: 13px; line-height: 1.4;">
                             <tr>
-                                <td width="80px" class="font-weight-bold p-0">Contact</td>
-                                <td class="p-0">: <span
-                                        style="color: #000;"><?= sanitize($po['delivery_contact']) ?: '-' ?></span></td>
+                                <td width="60px" class="font-weight-bold p-0">Contact</td>
+                                <td width="10px" class="p-0 text-center">:</td>
+                                <td class="p-0" style="color: #000;"><?= sanitize($po['delivery_contact']) ?: '-' ?></td>
                             </tr>
                             <tr>
                                 <td class="font-weight-bold p-0">Attn</td>
-                                <td class="p-0">: <span
-                                        style="color: #000;"><?= sanitize($po['delivery_attn']) ?: '-' ?></span></td>
+                                <td class="p-0 text-center">:</td>
+                                <td class="p-0" style="color: #000;"><?= sanitize($po['delivery_attn']) ?: '-' ?></td>
                             </tr>
                         </table>
                     </div>
@@ -215,14 +215,14 @@ require_once __DIR__ . '/../../../includes/header.php';
 
                 <!-- Section 2: Dates & Requested By -->
                 <div class="row no-gutters mb-0">
-                    <div class="col-sm-3 bg-secondary text-white font-weight-bold text-center py-1 border"
-                        style="background-color: #888 !important; border: 1px solid #000 !important; font-size: 12px;">
+                    <div class="col-sm-3 bg-light text-dark font-weight-bold text-center py-1 border"
+                        style="border: 1px solid #000 !important; font-size: 12px;">
                         Delivery Date</div>
-                    <div class="col-sm-9 bg-secondary text-white font-weight-bold text-center py-1 border"
-                        style="background-color: #888 !important; border: 1px solid #000 !important; border-left: none !important; font-size: 12px;">
+                    <div class="col-sm-9 bg-light text-dark font-weight-bold text-center py-1 border"
+                        style="border: 1px solid #000 !important; border-left: none !important; font-size: 12px;">
                         Requested By</div>
                 </div>
-                <div class="row no-gutters mb-3 text-center font-weight-bold" style="font-size: 13px;">
+                <div class="row no-gutters mb-2 text-center font-weight-bold" style="font-size: 13px;">
                     <div class="col-sm-3 py-1"
                         style="border-left: 1px solid #000 !important; border-bottom: 1px solid #000 !important; border-right: 1px solid #000 !important; color: #000;">
                         <?= $po['delivery_date'] ? date('d-M-Y', strtotime($po['delivery_date'])) : '-' ?>
@@ -234,10 +234,10 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
 
                 <!-- Items Table -->
-                <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-sm print-table"
-                        style="font-size:11px; border: 1px solid #000;">
-                        <thead class="text-center" style="background-color: #666; color: #fff;">
+                <div class="table-responsive mb-2">
+                    <table class="table table-bordered table-sm print-table mb-0"
+                        style="border: 1px solid #000;">
+                        <thead class="text-center bg-light text-dark">
                             <tr>
                                 <th width="5%" style="border: 1px solid #000;">NO</th>
                                 <th width="40%" style="border: 1px solid #000;">ITEM NAME</th>
@@ -281,9 +281,9 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <!-- Summary & Notes Section -->
                 <div class="row no-gutters">
                     <!-- Additional Notes (Left) -->
-                    <div class="col-sm-7 pt-2 pr-3 d-flex flex-column">
-                        <div class="p-1 px-2 text-white font-weight-bold"
-                            style="background-color: #666 !important; border: 1px solid #000; font-size: 12px;">
+                    <div class="col-sm-7 pr-3 d-flex flex-column">
+                        <div class="p-1 px-2 bg-light text-dark font-weight-bold"
+                            style="border: 1px solid #000; font-size: 12px;">
                             Additional Notes :</div>
                         <div class="p-2 flex-grow-1"
                             style="border: 1px solid #000 !important; font-size: 11px; border-top: none !important; color: #333;">
@@ -298,34 +298,34 @@ require_once __DIR__ . '/../../../includes/header.php';
                     </div>
 
                     <!-- Summary Table (Right) -->
-                    <div class="col-sm-5 pt-2">
+                    <div class="col-sm-5">
                         <table class="table table-sm table-bordered text-right font-weight-bold mb-0"
-                            style="font-size:13px; border: 1px solid #000;">
+                            style="border: 1px solid #000;">
                             <tr>
-                                <td width="60%" class="bg-light px-2" style="border: 1px solid #000;">SHIPPING</td>
+                                <td width="60%" class="px-2" style="border: 1px solid #000;">SHIPPING</td>
                                 <td width="40%" class="px-2" style="border: 1px solid #000; color: #000;">
                                     <?= number_format($po['shipping'], 0, ',', '.') ?>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="bg-light px-2" style="border: 1px solid #000;">OTHER</td>
+                                <td class="px-2" style="border: 1px solid #000;">OTHER</td>
                                 <td class="px-2" style="border: 1px solid #000; color: #000;">
                                     <?= number_format($po['other_cost'], 0, ',', '.') ?>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="bg-light px-2" style="border: 1px solid #000;">TAX</td>
+                                <td class="px-2" style="border: 1px solid #000;">TAX</td>
                                 <td class="px-2" style="border: 1px solid #000; color: #000;">
                                     <?= number_format($po['tax'], 0, ',', '.') ?>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="bg-light px-2" style="border: 1px solid #000;">DISCOUNT</td>
+                                <td class="px-2" style="border: 1px solid #000;">DISCOUNT</td>
                                 <td class="px-2" style="border: 1px solid #000; color: #000;">
                                     <?= number_format($po['discount'], 0, ',', '.') ?>
                                 </td>
                             </tr>
-                            <tr style="background-color: #f2f2f2;">
+                            <tr>
                                 <td class="px-2" style="border: 1px solid #000; font-size: 15px;">ORDER TOTAL</td>
                                 <td class="px-2" style="border: 1px solid #000; font-size: 16px; color: #000;">
                                     <?= number_format($po['total'], 0, ',', '.') ?>

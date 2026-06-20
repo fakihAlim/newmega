@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card">
+<div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-plus mr-2"></i>Form Tambah Peran</h3>
         <a href="index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
@@ -89,25 +89,26 @@ require_once __DIR__ . '/../../../includes/header.php';
     <form method="POST">
         <div class="card-body">
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Nama Peran <span class="text-danger">*</span></label>
-                        <input type="text" name="role_name" class="form-control" value="<?= sanitize($_POST['role_name'] ?? '') ?>" required>
-                    </div>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Nama Peran <span class="text-danger">*</span></label>
+                <div class="col-sm-8">
+                    <input type="text" name="role_name" class="form-control" value="<?= sanitize($_POST['role_name'] ?? '') ?>" required>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Key Peran</label>
-                        <input type="text" name="role_key" class="form-control" value="<?= sanitize($_POST['role_key'] ?? '') ?>" placeholder="Cth: finance_manager">
-                        <small class="text-muted">Kosongkan agar digenerate otomatis dari Nama Peran.</small>
-                    </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Key Peran</label>
+                <div class="col-sm-8">
+                    <input type="text" name="role_key" class="form-control" value="<?= sanitize($_POST['role_key'] ?? '') ?>" placeholder="Cth: finance_manager">
+                    <small class="text-muted d-block mt-1">Kosongkan agar digenerate otomatis dari Nama Peran.</small>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea name="description" class="form-control" rows="2"><?= sanitize($_POST['description'] ?? '') ?></textarea>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Deskripsi</label>
+                <div class="col-sm-8">
+                    <textarea name="description" class="form-control" rows="2"><?= sanitize($_POST['description'] ?? '') ?></textarea>
+                </div>
             </div>
             
             <hr>

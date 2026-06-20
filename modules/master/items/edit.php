@@ -74,112 +74,106 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Form Edit Barang</h3>
+                <h3 class="card-title">Form Edit Barang</h3>
                 <a href="<?= APP_URL ?>/modules/master/items/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
             </div>
             <form method="POST">
                 <div class="card-body">
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Kode Barang <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="<?= sanitize($item['item_code']) ?>" readonly>
-                                <small class="text-muted">Kode barang tidak dapat diubah.</small>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Kode Barang <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" value="<?= sanitize($item['item_code']) ?>" readonly>
+                            <small class="text-muted d-block mt-1">Kode barang tidak dapat diubah.</small>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Kategori <span class="text-danger">*</span></label>
-                                <!-- Just showing the current category, readonly -->
-                                <?php 
-                                    $catName = '';
-                                    foreach($categories as $c) {
-                                        if ($c['id'] == $item['category_id']) {
-                                            $catName = $c['name'];
-                                            break;
-                                        }
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Kategori <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <?php 
+                                $catName = '';
+                                foreach($categories as $c) {
+                                    if ($c['id'] == $item['category_id']) {
+                                        $catName = $c['name'];
+                                        break;
                                     }
-                                ?>
-                                <input type="text" class="form-control" value="<?= sanitize($catName) ?>" readonly>
-                                <small class="text-muted">Kategori tidak dapat diubah setelah dibuat.</small>
+                                }
+                            ?>
+                            <input type="text" class="form-control" value="<?= sanitize($catName) ?>" readonly>
+                            <small class="text-muted d-block mt-1">Kategori tidak dapat diubah setelah dibuat.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label d-flex justify-content-between align-items-center">
+                            <span>Nama / Deskripsi Barang <span class="text-danger">*</span></span>
+                            <button type="button" class="btn btn-sm btn-outline-primary border-0 py-0" id="btnAiSuggest" title="Lengkapi Otomatis dengan AI">
+                                <i class="fas fa-magic"></i> AI Auto-Fill
+                            </button>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" id="itemName" name="description" class="form-control check-duplicate" data-type="item" data-id="<?= $id ?>" value="<?= sanitize($item['description']) ?>" required>
+                            <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Tipe / Spesifikasi Tambahan</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="type_specification" class="form-control" value="<?= sanitize($item['type_specification']) ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Satuan Unit (UoM) <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="uom" class="form-control" value="<?= sanitize($item['uom']) ?>" required style="text-transform: uppercase;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Catatan Tambahan (Remark)</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="remark" class="form-control" value="<?= sanitize($item['remark']) ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Stok Saat Ini (Hanya Info)</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control text-primary font-weight-bold" value="<?= number_format($item['current_stock'], 0) ?> <?= sanitize($item['uom']) ?>" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Tipe Distribusi Barang</label>
+                        <div class="col-sm-8 pt-2">
+                            <div class="custom-control custom-radio mb-2">
+                                <input class="custom-control-input" type="radio" id="typeStock" name="stock_type" value="stock" <?= $item['stock_type'] === 'stock' ? 'checked' : '' ?>>
+                                <label for="typeStock" class="custom-control-label font-weight-normal">Bisa distok di Gudang Umum</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input class="custom-control-input" type="radio" id="typeDirect" name="stock_type" value="direct" <?= $item['stock_type'] === 'direct' ? 'checked' : '' ?>>
+                                <label for="typeDirect" class="custom-control-label font-weight-normal">Langsung kirim ke lokasi Proyek (Tanpa Stok)</label>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-7">
-                            <div class="form-group">
-                                <label class="d-flex justify-content-between align-items-center w-100">
-                                    <span>Nama / Deskripsi Barang <span class="text-danger">*</span></span>
-                                    <button type="button" class="btn btn-sm btn-outline-primary border-0" id="btnAiSuggest" title="Lengkapi Otomatis dengan AI">
-                                        <i class="fas fa-magic"></i> AI Auto-Fill
-                                    </button>
-                                </label>
-                                <input type="text" id="itemName" name="description" class="form-control check-duplicate" data-type="item" data-id="<?= $id ?>" value="<?= sanitize($item['description']) ?>" required>
-                                <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label>Tipe / Spesifikasi Tambahan</label>
-                                <input type="text" name="type_specification" class="form-control" value="<?= sanitize($item['type_specification']) ?>">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Satuan Unit (UoM) <span class="text-danger">*</span></label>
-                                <input type="text" name="uom" class="form-control" value="<?= sanitize($item['uom']) ?>" required style="text-transform: uppercase;">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Catatan Tambahan (Remark)</label>
-                                <input type="text" name="remark" class="form-control" value="<?= sanitize($item['remark']) ?>">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Stok Saat Ini (Hanya Info)</label>
-                                <input type="text" class="form-control text-primary font-weight-bold" value="<?= number_format($item['current_stock'], 0) ?> <?= sanitize($item['uom']) ?>" readonly>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <hr class="my-4">
-                    <h5 class="text-primary mb-3">Pengaturan Gudang & Inventaris</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Tipe Distribusi Barang</label>
-                                <div class="custom-control custom-radio mb-2">
-                                    <input class="custom-control-input" type="radio" id="typeStock" name="stock_type" value="stock" <?= $item['stock_type'] === 'stock' ? 'checked' : '' ?>>
-                                    <label for="typeStock" class="custom-control-label">Bisa distok di Gudang Umum</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input class="custom-control-input" type="radio" id="typeDirect" name="stock_type" value="direct" <?= $item['stock_type'] === 'direct' ? 'checked' : '' ?>>
-                                    <label for="typeDirect" class="custom-control-label">Langsung kirim ke lokasi Proyek (Tanpa Stok)</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6" id="stockGroup">
-                            <div class="form-group">
-                                <label>Minimum Stok Alert</label>
+                    <div id="stockGroup">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Minimum Stok Alert</label>
+                            <div class="col-sm-8">
                                 <input type="text" name="minimum_stock" class="form-control input-number" value="<?= sanitize($item['minimum_stock'] ?? '0') ?>">
-                                <small class="text-muted">Masukkan angka 0 jika tidak butuh notifikasi stok menipis.</small>
+                                <small class="text-muted d-block mt-1">Masukkan angka 0 jika tidak butuh notifikasi stok menipis.</small>
                             </div>
-                            <div class="form-group mt-2">
-                                <label>Lokasi Gudang / Rak Penyimpanan</label>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Lokasi Gudang / Rak Penyimpanan</label>
+                            <div class="col-sm-8">
                                 <input type="text" name="warehouse_location" class="form-control" value="<?= sanitize($item['warehouse_location']) ?>" placeholder="Cth: Rak A1, Area Luar">
                             </div>
                         </div>

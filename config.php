@@ -30,10 +30,10 @@ define('APP_VERSION', '1.0.0');
 
 // Dynamic APP_URL calculation
 $current_protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-$current_host = $_SERVER['HTTP_HOST'];
+$current_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
 // Get the directory of the current script (config.php is in root, but it's included everywhere)
 // We want the base path relative to the domain
-$base_dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+$base_dir = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])) : '/';
 // If config.php is in the root, base_dir might be / or \. We want to normalize it.
 if (basename(dirname(__FILE__)) == 'newmega' || strpos(__FILE__, 'newmega') !== false) {
     // This is a bit risky if nested differently, let's use a simpler approach:

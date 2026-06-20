@@ -658,7 +658,7 @@ h1, h2, h3, h4, h5, h6,
                         <div class="progress-bar <?= $budgetUsedPct > 90 ? 'bg-danger' : ($budgetUsedPct > 70 ? 'bg-warning' : 'bg-info') ?>" style="width: <?= min($budgetUsedPct, 100) ?>%"></div>
                     </div>
                 </div>
-                <table class="table table-sm table-borderless m-0" style="font-size:13px;">
+                <table class="table table-sm table-borderless m-0" >
                     <tr>
                         <td><span class="indicator-dot bg-info"></span> Budget Total</td>
                         <td class="text-right font-weight-bold text-dark"><?= formatRupiah($project['budget']) ?></td>
@@ -726,7 +726,7 @@ h1, h2, h3, h4, h5, h6,
                         <div class="progress-bar bg-success" style="width: <?= $rcvPct ?>%"></div>
                     </div>
                 </div>
-                <table class="table table-sm table-borderless m-0" style="font-size:13px;">
+                <table class="table table-sm table-borderless m-0" >
                     <tr>
                         <td>Kebutuhan Total (PO + Gudang)</td>
                         <td class="text-right font-weight-bold"><?= number_format($combinedTarget, 0) ?></td>
@@ -755,7 +755,7 @@ h1, h2, h3, h4, h5, h6,
         <div class="card">
             <div class="card-header"><h3 class="card-title">Outstanding Hutang (Vendor)</h3></div>
             <div class="card-body p-0">
-                <table class="table table-sm table-bordered m-0" style="font-size:13px; border:none;">
+                <table class="table table-sm table-bordered m-0" style="border:none;">
                     <tr>
                         <td class="bg-light font-weight-bold" style="width:40%;">Total Nilai PO</td>
                         <td class="text-right font-weight-bold"><?= formatRupiah($totalPOValue) ?></td>
@@ -781,7 +781,7 @@ h1, h2, h3, h4, h5, h6,
         <div class="card">
             <div class="card-header"><h3 class="card-title">Outstanding Piutang (Customer)</h3></div>
             <div class="card-body p-0">
-                <table class="table table-sm table-bordered m-0" style="font-size:13px; border:none;">
+                <table class="table table-sm table-bordered m-0" style="border:none;">
                     <tr>
                         <td class="bg-light font-weight-bold" style="width:40%;">Total Invoice</td>
                         <td class="text-right font-weight-bold"><?= formatRupiah($invoice['total_invoice']) ?></td>
@@ -811,7 +811,7 @@ h1, h2, h3, h4, h5, h6,
         <div class="card">
             <div class="card-header"><h3 class="card-title">MR Terbaru</h3></div>
             <div class="card-body p-0">
-                <table class="table table-striped table-hover m-0" style="font-size:13px;">
+                <table class="table table-striped table-hover m-0" >
                     <thead>
                         <tr>
                             <th>No. MR</th>

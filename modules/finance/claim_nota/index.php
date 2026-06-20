@@ -63,12 +63,6 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $claims = $stmt->fetchAll();
 
-// Calculate total of filtered claims
-$totalSum = 0;
-foreach ($claims as $cl) {
-    $totalSum += $cl['total_amount'];
-}
-
 // Fetch all companies for filter dropdown
 $companies = $pdo->query("SELECT id, name FROM companies ORDER BY name ASC")->fetchAll();
 
@@ -76,68 +70,48 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <!-- Filter Card -->
-<div class="card card-default">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-filter mr-2"></i>Filter Data</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
-    </div>
-    <form method="GET" action="">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Tanggal Mulai</label>
-                        <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterStart) ?>">
-                    </div>
-                </div>
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Tanggal Selesai</label>
-                        <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterEnd) ?>">
-                    </div>
-                </div>
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Perusahaan</label>
-                        <select name="company_id" class="form-control form-control-sm select2">
-                            <option value="">-- Semua Perusahaan --</option>
-                            <?php foreach ($companies as $comp): ?>
-                                <option value="<?= $comp['id'] ?>" <?= $filterCompany == $comp['id'] ? 'selected' : '' ?>>
-                                    <?= sanitize($comp['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Nama Karyawan</label>
-                        <input type="text" name="employee_name" class="form-control form-control-sm" placeholder="Nama Karyawan..." value="<?= htmlspecialchars($filterEmployee) ?>">
-                    </div>
-                </div>
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Status</label>
-                        <select name="status" class="form-control form-control-sm">
-                            <option value="">-- Semua Status --</option>
-                            <option value="pending" <?= $filterStatus === 'pending' ? 'selected' : '' ?>>Pending Approval</option>
-                            <option value="approved" <?= $filterStatus === 'approved' ? 'selected' : '' ?>>Approved</option>
-                            <option value="paid" <?= $filterStatus === 'paid' ? 'selected' : '' ?>>Paid (Lunas)</option>
-                            <option value="rejected" <?= $filterStatus === 'rejected' ? 'selected' : '' ?>>Rejected</option>
-                        </select>
-                    </div>
-                </div>
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="row">
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Mulai</label>
+                <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterStart) ?>">
             </div>
-        </div>
-        <div class="card-footer text-right">
-            <a href="index.php" class="btn btn-secondary mr-2"><i class="fas fa-undo mr-1"></i> Reset</a>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i> Filter</button>
-        </div>
-    </form>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Selesai</label>
+                <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterEnd) ?>">
+            </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Perusahaan</label>
+                <select name="company_id" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Perusahaan --</option>
+                    <?php foreach ($companies as $comp): ?>
+                        <option value="<?= $comp['id'] ?>" <?= $filterCompany == $comp['id'] ? 'selected' : '' ?>>
+                            <?= sanitize($comp['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Nama Karyawan</label>
+                <input type="text" name="employee_name" class="form-control form-control-sm" placeholder="Nama Karyawan..." value="<?= htmlspecialchars($filterEmployee) ?>">
+            </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Status</label>
+                <select name="status" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Status --</option>
+                    <option value="pending" <?= $filterStatus === 'pending' ? 'selected' : '' ?>>Pending Approval</option>
+                    <option value="approved" <?= $filterStatus === 'approved' ? 'selected' : '' ?>>Approved</option>
+                    <option value="paid" <?= $filterStatus === 'paid' ? 'selected' : '' ?>>Paid (Lunas)</option>
+                    <option value="rejected" <?= $filterStatus === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                <a href="index.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Claims Table Card -->
@@ -160,12 +134,7 @@ require_once __DIR__ . '/../../../includes/header.php';
     </div>
     <div class="card-body">
         
-        <!-- Total Filtered summary alert -->
-        <div class="alert alert-info py-2 px-3 mb-3 d-flex justify-content-end align-items-center">
-            <strong class="text-lg">Total Klaim: <?= formatRupiah($totalSum) ?></strong>
-        </div>
-
-        <table id="claimsTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="claimsTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="12%">No. Klaim</th>
@@ -229,10 +198,7 @@ $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
     initDataTable('#claimsTable');
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
+    initSelect2('.select2');
 });
 
 function confirmDelete(id, number) {

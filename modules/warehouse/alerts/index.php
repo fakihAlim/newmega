@@ -25,17 +25,12 @@ $items = $stmt->fetchAll();
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="alert alert-warning">
-    <h5><i class="icon fas fa-exclamation-triangle"></i> Peringatan Inventori!</h5>
-    Daftar barang di bawah ini memiliki stok sama dengan atau kurang dari batas aman (Minimum Stock). Segera lakukan <strong>Material Request (MR)</strong> atau pengadaan untuk mencegah kehabisan stok.
-</div>
-
 <div class="card card-outline card-danger">
     <div class="card-header">
         <h3 class="card-title text-danger font-weight-bold">Barang Kritis (Defisit)</h3>
     </div>
     <div class="card-body">
-        <table id="alertsTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="alertsTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead class="bg-light">
                 <tr>
                     <th width="10%" class="text-center">Kode</th>

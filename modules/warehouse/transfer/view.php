@@ -51,9 +51,9 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card card-outline card-warning">
+        <div class="card card-outline card-primary">
             <div class="card-header d-flex justify-content-between align-items-center d-print-none">
-                <h3 class="card-title text-warning font-weight-bold"><i class="fas fa-truck-loading mr-2"></i> Pengeluaran Barang: <strong><?= sanitize($tr['transfer_number']) ?></strong></h3>
+                <h3 class="card-title text-primary font-weight-bold"><i class="fas fa-truck-loading mr-2"></i> Pengeluaran Barang: <strong><?= sanitize($tr['transfer_number']) ?></strong></h3>
                 <div class="ml-auto">
                     <?= getStatusBadge($tr['status']) ?>
                     <button class="btn btn-default btn-sm ml-3" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak SJ Keluar</button>
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
             </div>
             
-            <div class="card-body printable-area p-5">
+            <div class="card-body printable-area p-4 bg-white">
                 
                 <!-- Company Header (Standard like PO) -->
                 <div class="row mb-4">
@@ -105,7 +105,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 
                 <!-- Items Table -->
                 <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-sm print-table" style="font-size:14px;">
+                    <table class="table table-bordered table-sm print-table" >
                         <thead class="bg-light">
                             <tr>
                                 <th width="5%" class="text-center">No</th>

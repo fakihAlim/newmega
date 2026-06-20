@@ -52,10 +52,16 @@ require_once __DIR__ . '/../../../includes/header.php';
             <a href="<?= APP_URL ?>/modules/master/wages/create.php" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus mr-1"></i> Tambah Upah
             </a>
+            <a href="<?= APP_URL ?>/modules/master/export_excel.php?type=wages" class="btn btn-info btn-sm ml-1">
+                <i class="fas fa-file-excel mr-1"></i> Export Excel
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary btn-sm ml-1">
+                <i class="fas fa-print mr-1"></i> Cetak
+            </button>
         </div>
     </div>
     <div class="card-body">
-        <table id="wagesTable" class="table table-bordered table-striped w-100" style="font-size: 13.5px;">
+        <table id="wagesTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="5%">No</th>

@@ -76,62 +76,44 @@ renderReportPrintHeader('Rekap Hutang ke Vendor (Outstanding)', $periodText);
 ?>
 
 <!-- Filter Card -->
-<div class="card card-default d-print-none mb-3">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-filter mr-2"></i>Filter Data</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
-    </div>
-    <form method="GET" action="">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Tanggal Mulai</label>
-                        <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterStart) ?>">
-                    </div>
-                </div>
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Tanggal Selesai</label>
-                        <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterEnd) ?>">
-                    </div>
-                </div>
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Supplier / Vendor</label>
-                        <select name="vendor_id" class="form-control form-control-sm select2">
-                            <option value="">-- Semua Supplier --</option>
-                            <?php foreach ($vendors as $v): ?>
-                                <option value="<?= $v['id'] ?>" <?= $filterVendor == $v['id'] ? 'selected' : '' ?>>
-                                    <?= sanitize($v['company_name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md col-sm-6">
-                    <div class="form-group mb-2 mb-md-0">
-                        <label>Status PO</label>
-                        <select name="status" class="form-control form-control-sm">
-                            <option value="">-- Semua Status --</option>
-                            <option value="pending" <?= $filterStatus === 'pending' ? 'selected' : '' ?>>Pending Approval</option>
-                            <option value="approved" <?= $filterStatus === 'approved' ? 'selected' : '' ?>>Approved</option>
-                            <option value="partially_received" <?= $filterStatus === 'partially_received' ? 'selected' : '' ?>>Partially Received</option>
-                            <option value="completed" <?= $filterStatus === 'completed' ? 'selected' : '' ?>>Completed</option>
-                        </select>
-                    </div>
-                </div>
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="row">
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Mulai</label>
+                <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterStart) ?>">
             </div>
-        </div>
-        <div class="card-footer text-right">
-            <a href="vendor_outstanding.php" class="btn btn-secondary mr-2"><i class="fas fa-undo mr-1"></i> Reset</a>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i> Filter</button>
-        </div>
-    </form>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Tanggal Selesai</label>
+                <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($filterEnd) ?>">
+            </div>
+            <div class="col-md-4 col-sm-6 mb-2">
+                <label style="font-size:12px;">Supplier / Vendor</label>
+                <select name="vendor_id" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Supplier --</option>
+                    <?php foreach ($vendors as $v): ?>
+                        <option value="<?= $v['id'] ?>" <?= $filterVendor == $v['id'] ? 'selected' : '' ?>>
+                            <?= sanitize($v['company_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-6 mb-2">
+                <label style="font-size:12px;">Status PO</label>
+                <select name="status" class="form-control form-control-sm select2">
+                    <option value="">-- Semua Status --</option>
+                    <option value="pending" <?= $filterStatus === 'pending' ? 'selected' : '' ?>>Pending</option>
+                    <option value="approved" <?= $filterStatus === 'approved' ? 'selected' : '' ?>>Approved</option>
+                    <option value="partially_received" <?= $filterStatus === 'partially_received' ? 'selected' : '' ?>>Partially Received</option>
+                    <option value="completed" <?= $filterStatus === 'completed' ? 'selected' : '' ?>>Completed</option>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                <a href="vendor_outstanding.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card card-outline card-warning">
@@ -144,7 +126,7 @@ renderReportPrintHeader('Rekap Hutang ke Vendor (Outstanding)', $periodText);
         </div>
     </div>
     <div class="card-body">
-        <table id="reportTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="reportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead class="bg-light">
                 <tr>
                     <th width="12%">No. PO</th>
@@ -205,10 +187,7 @@ $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
     initDataTable('#reportTable');
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
+    initSelect2('.select2');
 });
 </script>
 JS;

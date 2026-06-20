@@ -163,7 +163,7 @@ require_once __DIR__ . '/../../../includes/header.php';
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover datatable" style="font-size:14px;">
+            <table class="table table-bordered table-striped table-hover datatable" >
                 <thead class="bg-light">
                     <tr>
                         <th width="5%">No</th>
@@ -221,7 +221,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </button>
             </div>
             <div class="modal-body p-0">
-                <table class="table table-sm table-striped m-0" style="font-size:13px;" id="historyTable">
+                <table class="table table-sm table-striped m-0"  id="historyTable">
                     <thead class="bg-light">
                         <tr>
                             <th>Tanggal</th>

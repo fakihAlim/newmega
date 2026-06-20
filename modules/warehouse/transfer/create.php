@@ -122,7 +122,6 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="row">
                         <!-- Left side: General Info -->
                         <div class="col-md-6 border-right">
-                            <h5 class="mb-3 text-secondary text-uppercase font-weight-bold" style="font-size:12px;letter-spacing:1px;">1. Informasi Pengiriman</h5>
                             
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">Perusahaan Header <span class="text-danger">*</span></label>
@@ -158,8 +157,6 @@ require_once __DIR__ . '/../../../includes/header.php';
 
                         <!-- Right side: Driver & Notes -->
                         <div class="col-md-6">
-                            <h5 class="mb-3 text-secondary text-uppercase font-weight-bold" style="font-size:12px;letter-spacing:1px;">2. Transportasi & Catatan</h5>
-
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">Nama Sopir</label>
                                 <div class="col-sm-8">
@@ -176,11 +173,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                         </div>
                     </div>
                     
-                    <hr class="my-4">
-                    
                     <!-- Items Section -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="text-secondary text-uppercase font-weight-bold m-0" style="font-size:12px;letter-spacing:1px;">3. Detail Barang yang Dikirim</h5>
                         <button type="button" class="btn btn-sm btn-primary" id="btnAddRow"><i class="fas fa-plus mr-1"></i> Tambah Baris</button>
                     </div>
                     

@@ -339,7 +339,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <h3 class="card-title"><i class="fas fa-chart-bar mr-2 text-primary"></i>Riwayat Upah Per Bulan</h3>
             </div>
             <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0" style="font-size:13px;">
+                <table class="table table-bordered table-striped table-hover table-sm w-100" >
                     <thead class="bg-light">
                         <tr>
                             <th>Periode</th>
@@ -382,7 +382,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <h3 class="card-title"><i class="fas fa-clock mr-2 text-warning"></i>10 Entri Terakhir</h3>
             </div>
             <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0" style="font-size:13px;">
+                <table class="table table-bordered table-striped table-hover table-sm w-100" >
                     <thead class="bg-light">
                         <tr>
                             <th>Tanggal</th>
@@ -530,121 +530,8 @@ require_once __DIR__ . '/../../includes/header.php';
 
 <?php if (hasRole(['super_admin', 'finance', 'project_manager'])): ?>
 <!-- Executive Charts Section -->
-<div class="row">
-    <!-- Chart 1: Cash Flow Trend -->
-    <div class="col-lg-7 col-md-12 mb-4 animate__animated animate__fadeIn">
-        <div class="card card-outline card-primary h-100 shadow-sm border-0" style="border-radius: 8px;">
-            <div class="card-header bg-white py-3 border-0">
-                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-chart-line mr-2 text-primary"></i>Tren Arus Kas (6 Bulan Terakhir)</h3>
-            </div>
-            <div class="card-body p-2">
-                <div id="chart-cash-flow" style="min-height: 350px;"></div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Chart 2: Top 5 Category Spending -->
-    <div class="col-lg-5 col-md-12 mb-4 animate__animated animate__fadeIn">
-        <div class="card card-outline card-info h-100 shadow-sm border-0" style="border-radius: 8px;">
-            <div class="card-header bg-white py-3 border-0">
-                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-chart-pie mr-2 text-info"></i>5 Kategori Terboros (PO)</h3>
-            </div>
-            <div class="card-body p-2 d-flex flex-column justify-content-center">
-                <div id="chart-categories" style="min-height: 350px;"></div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <!-- Chart 3: Project Budget vs Actual -->
-    <div class="col-lg-8 col-md-12 mb-4 animate__animated animate__fadeIn">
-        <div class="card card-outline card-success h-100 shadow-sm border-0" style="border-radius: 8px;">
-            <div class="card-header bg-white py-3 border-0">
-                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-chart-bar mr-2 text-success"></i>Budget vs Aktual Per Proyek</h3>
-            </div>
-            <div class="card-body p-2">
-                <div id="chart-projects" style="min-height: 350px;"></div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Widget 4: Financial Overview AP vs AR & Budget Efficiency -->
-    <div class="col-lg-4 col-md-12 mb-4 animate__animated animate__fadeIn">
-        <div class="card card-outline card-warning h-100 shadow-sm border-0" style="border-radius: 8px;">
-            <div class="card-header bg-white py-3 border-0">
-                <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-wallet mr-2 text-warning"></i>Analitis & Efisiensi Anggaran</h3>
-            </div>
-            <div class="card-body d-flex flex-column justify-content-between p-3">
-                <!-- AR vs AP Card -->
-                <div class="mb-3">
-                    <h6 class="text-muted font-weight-bold mb-2 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Outstanding Cash Flow</h6>
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="text-sm">Piutang Customer (AR)</span>
-                        <span class="font-weight-bold text-success text-sm"><?= formatRupiah($stats['customer_outstanding']) ?></span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-sm">Hutang Vendor (AP)</span>
-                        <span class="font-weight-bold text-danger text-sm"><?= formatRupiah($stats['vendor_outstanding']) ?></span>
-                    </div>
-                    <?php 
-                        $netOutstanding = $stats['customer_outstanding'] - $stats['vendor_outstanding'];
-                        $netColor = $netOutstanding >= 0 ? 'text-success' : 'text-danger';
-                    ?>
-                    <hr class="my-1">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="font-weight-bold text-sm">Proyeksi Bersih (Net)</span>
-                        <span class="font-weight-bold <?= $netColor ?> text-sm"><?= ($netOutstanding < 0 ? '-' : '') . formatRupiah(abs($netOutstanding)) ?></span>
-                    </div>
-                </div>
 
-                <!-- Budget Efficiency Analysis -->
-                <div>
-                    <h6 class="text-muted font-weight-bold mb-2 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Proyek Terboros & Anggaran</h6>
-                    <?php 
-                        // Find active project with highest % spent
-                        $highestPct = 0;
-                        $highestProjectName = 'Tidak ada';
-                        $totalActiveBudget = 0;
-                        $totalActiveSpent = 0;
-                        foreach ($projectsData as $row) {
-                            $spent = (float)$row['total_po_value'] + (float)$row['total_claim_value'];
-                            $totalActiveBudget += (float)$row['budget'];
-                            $totalActiveSpent += $spent;
-                            if ($row['budget'] > 0) {
-                                $pct = ($spent / (float)$row['budget']) * 100;
-                                if ($pct > $highestPct) {
-                                    $highestPct = $pct;
-                                    $highestProjectName = $row['name'];
-                                }
-                            }
-                        }
-                        $overallEfficiency = $totalActiveBudget > 0 ? ($totalActiveSpent / $totalActiveBudget) * 100 : 0;
-                        $efficiencyColor = $overallEfficiency > 90 ? 'danger' : ($overallEfficiency > 70 ? 'warning' : 'success');
-                    ?>
-                    <div class="mb-2">
-                        <span class="text-sm d-block text-muted">Total Anggaran Proyek Aktif:</span>
-                        <span class="font-weight-bold text-dark"><?= formatRupiah($totalActiveBudget) ?></span>
-                    </div>
-                    <div class="mb-3">
-                        <span class="text-sm d-block text-muted">Efisiensi Keseluruhan:</span>
-                        <div class="progress progress-sm" style="border-radius:4px; height:8px;">
-                            <div class="progress-bar bg-<?= $efficiencyColor ?>" style="width: <?= min(100, $overallEfficiency) ?>%"></div>
-                        </div>
-                        <span class="text-xs text-muted font-weight-bold"><?= round($overallEfficiency, 1) ?>% Terpakai dari total anggaran</span>
-                    </div>
-                    <?php if ($highestPct > 0): ?>
-                    <div class="p-2 bg-light" style="border-radius: 6px; border-left: 3px solid #dc3545;">
-                        <span class="text-xs text-uppercase font-weight-bold text-danger d-block">Anggaran Tertinggi Terpakai:</span>
-                        <span class="text-sm font-weight-bold text-dark"><?= sanitize($highestProjectName) ?></span>
-                        <span class="text-xs text-muted d-block"><?= round($highestPct, 1) ?>% Anggaran Terpakai</span>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <?php endif; ?>
 
 <!-- Quick Stats Footer -->
@@ -699,7 +586,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <?php endif; ?>
             </div>
             <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0">
+                <table class="table table-bordered table-striped table-hover table-sm w-100">
                     <thead>
                         <tr>
                             <th>No. MR</th>
@@ -741,7 +628,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <?php endif; ?>
             </div>
             <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0">
+                <table class="table table-bordered table-striped table-hover table-sm w-100">
                     <thead>
                         <tr>
                             <th>No. PO</th>
@@ -783,7 +670,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <h3 class="card-title"><i class="fas fa-exclamation-triangle mr-2 text-danger"></i>Peringatan Stok Minimum</h3>
             </div>
             <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0">
+                <table class="table table-bordered table-striped table-hover table-sm w-100">
                     <thead>
                         <tr>
                             <th>Kode</th>

@@ -98,7 +98,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Form Edit Perusahaan</h3>
                 <a href="<?= APP_URL ?>/modules/master/companies/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
@@ -106,76 +106,78 @@ require_once __DIR__ . '/../../../includes/header.php';
             <form method="POST" enctype="multipart/form-data">
                 <div class="card-body">
                     
-                    <div class="form-group">
-                        <label>Nama Perusahaan <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control check-duplicate" data-type="company" data-id="<?= $id ?>" value="<?= sanitize($companyData['name']) ?>" placeholder="Contoh: PT. Mega Karya Modern" required>
-                        <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Alamat Lengkap</label>
-                        <textarea name="address" class="form-control" rows="3" placeholder="Nama Jalan, Blok, RT/RW..."><?= sanitize($companyData['address']) ?></textarea>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Kota / Kabupaten</label>
-                                <input type="text" name="city" class="form-control" value="<?= sanitize($companyData['city']) ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Provinsi</label>
-                                <input type="text" name="province" class="form-control" value="<?= sanitize($companyData['province']) ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Kode Pos</label>
-                                <input type="text" name="postal_code" class="form-control" value="<?= sanitize($companyData['postal_code']) ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Perusahaan <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="name" class="form-control check-duplicate" data-type="company" data-id="<?= $id ?>" value="<?= sanitize($companyData['name']) ?>" placeholder="Contoh: PT. Mega Karya Modern" required>
+                            <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No. Telepon / HP</label>
-                                <input type="text" name="phone" class="form-control" value="<?= sanitize($companyData['phone']) ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control" value="<?= sanitize($companyData['email']) ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Alamat Lengkap</label>
+                        <div class="col-sm-8">
+                            <textarea name="address" class="form-control" rows="3" placeholder="Nama Jalan, Blok, RT/RW..."><?= sanitize($companyData['address']) ?></textarea>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Logo Perusahaan</label>
-                                <?php if ($companyData['logo']): ?>
-                                    <div class="mb-2">
-                                        <img src="<?= getCompanyLogo($companyData['logo']) ?>" alt="Current Logo" class="img-thumbnail" style="max-height: 80px;">
-                                    </div>
-                                <?php endif; ?>
-                                <div class="custom-file">
-                                    <input type="file" name="logo" class="custom-file-input" id="logoInput" accept="image/*">
-                                    <label class="custom-file-label" for="logoInput">Ganti logo...</label>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Kota / Kabupaten</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="city" class="form-control" value="<?= sanitize($companyData['city']) ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Provinsi</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="province" class="form-control" value="<?= sanitize($companyData['province']) ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Kode Pos</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="postal_code" class="form-control" value="<?= sanitize($companyData['postal_code']) ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">No. Telepon / HP</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="phone" class="form-control" value="<?= sanitize($companyData['phone']) ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Email</label>
+                        <div class="col-sm-8">
+                            <input type="email" name="email" class="form-control" value="<?= sanitize($companyData['email']) ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Logo Perusahaan</label>
+                        <div class="col-sm-8">
+                            <?php if ($companyData['logo']): ?>
+                                <div class="mb-2">
+                                    <img src="<?= getCompanyLogo($companyData['logo']) ?>" alt="Current Logo" class="img-thumbnail" style="max-height: 80px;">
                                 </div>
-                                <small class="form-text text-muted">Akan ditampilkan pada kop surat / PDF. Maks 2MB.</small>
+                            <?php endif; ?>
+                            <div class="custom-file">
+                                <input type="file" name="logo" class="custom-file-input" id="logoInput" accept="image/*">
+                                <label class="custom-file-label" for="logoInput">Ganti logo...</label>
                             </div>
+                            <small class="form-text text-muted mt-1">Akan ditampilkan pada kop surat / PDF. Maks 2MB.</small>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Set Sebagai Default?</label>
-                                <div class="custom-control custom-switch mt-2">
-                                    <input type="checkbox" name="is_default" class="custom-control-input" id="isDefault" value="1" <?= $companyData['is_default'] ? 'checked' : '' ?>>
-                                    <label class="custom-control-label" for="isDefault">Gunakan sebagai header utama</label>
-                                </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Set Sebagai Default?</label>
+                        <div class="col-sm-8 pt-1">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" name="is_default" class="custom-control-input" id="isDefault" value="1" <?= $companyData['is_default'] ? 'checked' : '' ?>>
+                                <label class="custom-control-label" for="isDefault">Gunakan sebagai header utama</label>
                             </div>
                         </div>
                     </div>

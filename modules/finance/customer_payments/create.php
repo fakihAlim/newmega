@@ -87,10 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Catat Penerimaan Customer';
+$pageTitle = 'Catat Penerimaan Pelanggan';
 $breadcrumbs = [
     ['label' => 'Finance', 'url' => '#'],
-    ['label' => 'Penerimaan Customer', 'url' => 'index.php'],
+    ['label' => 'Penerimaan Pelanggan', 'url' => 'index.php'],
     ['label' => 'Baru']
 ];
 
@@ -98,34 +98,38 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <div class="row">
-    <div class="col-md-8">
-        <form action="" method="POST" id="formPayment">
-            <div class="card card-info card-outline">
+    <div class="col-md-12">
+        <form method="POST" id="formPayment">
+            <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-hand-holding-usd mr-2"></i> Detail Penerimaan</h3>
+                    <h3 class="card-title text-primary font-weight-bold">Detail Penerimaan</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Pilih Invoice <span class="text-danger">*</span></label>
-                                <select class="form-control select2" name="invoice_id" id="invoice_id" required style="width:100%;">
-                                    <option value="">-- Pilih Invoice --</option>
-                                    <?php foreach ($eligibleInvoices as $inv): ?>
-                                        <option value="<?= $inv['id'] ?>" 
-                                                data-total="<?= $inv['total'] ?>" 
-                                                data-paid="<?= $inv['total_paid'] ?>"
-                                                data-customer="<?= sanitize($inv['customer_name']) ?>">
-                                            <?= sanitize($inv['invoice_no']) ?> - <?= sanitize($inv['customer_name']) ?> (<?= formatRupiah($inv['total']) ?>)
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Pilih Invoice <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control select2" name="invoice_id" id="invoice_id" required>
+                                        <option value="">-- Pilih Invoice --</option>
+                                        <?php foreach ($eligibleInvoices as $inv): ?>
+                                            <option value="<?= $inv['id'] ?>" 
+                                                    data-total="<?= $inv['total'] ?>" 
+                                                    data-paid="<?= $inv['total_paid'] ?>"
+                                                    data-customer="<?= sanitize($inv['customer_name']) ?>">
+                                                <?= sanitize($inv['invoice_no']) ?> - <?= sanitize($inv['customer_name']) ?> (<?= formatRupiah($inv['total']) ?>)
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Tanggal Terima Bayar <span class="text-danger">*</span></label>
-                                <input type="date" name="payment_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Tgl Terima <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="date" name="payment_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -133,7 +137,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <!-- Invoice Info Panel -->
                     <div id="invInfoPanel" class="alert alert-info" style="display:none;">
                         <div class="row">
-                            <div class="col-md-4"><strong>Customer:</strong> <span id="infoCustomer">-</span></div>
+                            <div class="col-md-4"><strong>Pelanggan:</strong> <span id="infoCustomer">-</span></div>
                             <div class="col-md-4"><strong>Total Invoice:</strong> <span id="infoTotal">-</span></div>
                             <div class="col-md-4"><strong>Sisa Outstanding:</strong> <span id="infoOutstanding" class="text-danger font-weight-bold">-</span></div>
                         </div>
@@ -143,60 +147,53 @@ require_once __DIR__ . '/../../../includes/header.php';
                     
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Jumlah Diterima (Rp) <span class="text-danger">*</span></label>
-                                <input type="text" name="amount" id="inputAmount" class="form-control" required placeholder="Contoh: 10.000.000">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Jumlah (Rp) <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="amount" id="inputAmount" class="form-control" required placeholder="Contoh: 10.000.000">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Metode Pembayaran</label>
-                                <select name="payment_method" class="form-control">
-                                    <option value="">-- Pilih Metode --</option>
-                                    <option value="Transfer Bank">Transfer Bank</option>
-                                    <option value="Cash">Cash (Tunai)</option>
-                                    <option value="Cek / Giro">Cek / Giro</option>
-                                    <option value="E-Wallet">E-Wallet</option>
-                                </select>
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Metode</label>
+                                <div class="col-sm-8">
+                                    <select name="payment_method" class="form-control">
+                                        <option value="">-- Pilih Metode --</option>
+                                        <option value="Transfer Bank">Transfer Bank</option>
+                                        <option value="Cash">Cash (Tunai)</option>
+                                        <option value="Cek / Giro">Cek / Giro</option>
+                                        <option value="E-Wallet">E-Wallet</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No. Referensi</label>
-                                <input type="text" name="reference_no" class="form-control" placeholder="Cth: TRF-xxx">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">No. Referensi</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="reference_no" class="form-control" placeholder="Cth: TRF-xxx">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Catatan</label>
-                                <textarea name="notes" class="form-control" rows="2" placeholder="Opsional..."></textarea>
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Catatan</label>
+                                <div class="col-sm-8">
+                                    <textarea name="notes" class="form-control" rows="2" placeholder="Opsional..."></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer text-right">
                     <a href="index.php" class="btn btn-default">Batal</a>
-                    <button type="submit" class="btn btn-info ml-2"><i class="fas fa-save mr-1"></i> Simpan Penerimaan</button>
+                    <button type="submit" class="btn btn-primary ml-2">Simpan Penerimaan</button>
                 </div>
             </div>
         </form>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card card-outline card-warning">
-            <div class="card-header">
-                <h3 class="card-title">Petunjuk</h3>
-            </div>
-            <div class="card-body" style="font-size:13px;">
-                <p>Pencatatan penerimaan pembayaran dari Customer dilakukan terhadap <strong>Invoice</strong> yang sudah berstatus <em>Approved</em>, <em>Sent</em>, atau <em>Partial Paid</em>.</p>
-                <ul>
-                    <li>Jika pembayaran diterima <strong>penuh</strong>, status Invoice otomatis berubah jadi <strong>Paid</strong>.</li>
-                    <li>Jika pembayaran diterima <strong>sebagian</strong>, status Invoice berubah menjadi <strong>Partial Paid</strong>.</li>
-                </ul>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -204,7 +201,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
-    $('.select2').select2({ theme: 'bootstrap4' });
+    initSelect2('.select2');
     
     // Invoice Selection Handler
     $('#invoice_id').on('change', function() {

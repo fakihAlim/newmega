@@ -85,7 +85,7 @@ require_once __DIR__ . '/../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-plus mr-2"></i>Form Tambah Pengguna</h3>
                 <a href="<?= APP_URL ?>/modules/users/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
@@ -93,88 +93,86 @@ require_once __DIR__ . '/../../includes/header.php';
             <form method="POST" enctype="multipart/form-data">
                 <div class="card-body">
                     
-                    <h5 class="text-primary mb-3">Informasi Akun</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Username <span class="text-danger">*</span></label>
-                                <input type="text" name="username" class="form-control" value="<?= sanitize($_POST['username'] ?? '') ?>" required>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Username <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="username" class="form-control" value="<?= sanitize($_POST['username'] ?? '') ?>" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Password <span class="text-danger">*</span></label>
-                                <input type="password" name="password" class="form-control" required minlength="6">
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Password <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="password" name="password" class="form-control" required minlength="6">
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Peran <span class="text-danger">*</span></label>
-                        <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Peran --" required>
-                            <?php
-                            $stmtRoles = $pdo->query("SELECT * FROM roles ORDER BY role_name ASC");
-                            $rolesList = $stmtRoles->fetchAll();
-                            $roleIdToKey = [];
-                            foreach ($rolesList as $r) {
-                                $roleIdToKey[$r['id']] = $r['role_key'];
-                                $selected = in_array($r['id'], $selectedRoles) ? 'selected' : '';
-                                echo "<option value=\"{$r['id']}\" {$selected}>{$r['role_name']}</option>";
-                            }
-                            ?>
-                        </select>
-                        <small class="form-text text-muted mt-2"><strong>Akses Modul:</strong> <span id="moduleAccessList" class="text-info">Pilih peran untuk melihat akses.</span></small>
-                    </div>
-                    
-                    <hr class="my-4">
-                    <h5 class="text-primary mb-3">Informasi Pribadi</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" name="full_name" class="form-control" value="<?= sanitize($_POST['full_name'] ?? '') ?>" required>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Peran <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="roles[]" id="roleSelect" class="form-control select2" multiple="multiple" data-placeholder="-- Pilih Peran --" required>
+                                <?php
+                                $stmtRoles = $pdo->query("SELECT * FROM roles ORDER BY role_name ASC");
+                                $rolesList = $stmtRoles->fetchAll();
+                                $roleIdToKey = [];
+                                foreach ($rolesList as $r) {
+                                    $roleIdToKey[$r['id']] = $r['role_key'];
+                                    $selected = in_array($r['id'], $selectedRoles) ? 'selected' : '';
+                                    echo "<option value=\"{$r['id']}\" {$selected}>{$r['role_name']}</option>";
+                                }
+                                ?>
+                            </select>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Jenis Kelamin</label>
-                                <select name="gender" class="form-control">
-                                    <option value="">-- Pilih --</option>
-                                    <option value="Laki-laki" <?= (($_POST['gender'] ?? '') === 'Laki-laki') ? 'selected' : '' ?>>Laki-laki</option>
-                                    <option value="Perempuan" <?= (($_POST['gender'] ?? '') === 'Perempuan') ? 'selected' : '' ?>>Perempuan</option>
-                                </select>
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="full_name" class="form-control" value="<?= sanitize($_POST['full_name'] ?? '') ?>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Jenis Kelamin</label>
+                        <div class="col-sm-8">
+                            <select name="gender" class="form-control">
+                                <option value="">-- Pilih --</option>
+                                <option value="Laki-laki" <?= (($_POST['gender'] ?? '') === 'Laki-laki') ? 'selected' : '' ?>>Laki-laki</option>
+                                <option value="Perempuan" <?= (($_POST['gender'] ?? '') === 'Perempuan') ? 'selected' : '' ?>>Perempuan</option>
+                            </select>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No. HP</label>
-                                <input type="text" name="phone" class="form-control" value="<?= sanitize($_POST['phone'] ?? '') ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">No. HP</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="phone" class="form-control" value="<?= sanitize($_POST['phone'] ?? '') ?>">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control" value="<?= sanitize($_POST['email'] ?? '') ?>">
-                            </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Email</label>
+                        <div class="col-sm-8">
+                            <input type="email" name="email" class="form-control" value="<?= sanitize($_POST['email'] ?? '') ?>">
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Alamat</label>
-                        <textarea name="address" class="form-control" rows="2"><?= sanitize($_POST['address'] ?? '') ?></textarea>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Alamat</label>
+                        <div class="col-sm-8">
+                            <textarea name="address" class="form-control" rows="2"><?= sanitize($_POST['address'] ?? '') ?></textarea>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Foto Profil</label>
-                        <div class="custom-file">
-                            <input type="file" name="photo" class="custom-file-input" id="photoInput" accept="image/*">
-                            <label class="custom-file-label" for="photoInput">Pilih gambar...</label>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Foto Profil</label>
+                        <div class="col-sm-8">
+                            <div class="custom-file">
+                                <input type="file" name="photo" class="custom-file-input" id="photoInput" accept="image/*">
+                                <label class="custom-file-label" for="photoInput">Pilih gambar...</label>
+                            </div>
+                            <small class="form-text text-muted mt-1">Format: JPG, PNG, GIF. Maks 2MB.</small>
                         </div>
-                        <small class="form-text text-muted">Format: JPG, PNG, GIF. Maks 2MB.</small>
                     </div>
                     
                 </div>
@@ -199,10 +197,7 @@ $roleIdMapJson = json_encode($roleIdToKey);
 $extraJS = <<<JS
 <script>
 $(document).ready(function() {
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
+    initSelect2('.select2');
     
     $('.custom-file-input').on('change', function() {
         var fileName = $(this).val().split('\\\\').pop();

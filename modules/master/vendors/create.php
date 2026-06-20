@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../../../includes/auth.php';
 requirePermission('master_vendors');
 
-$pageTitle = 'Tambah Vendor / Supplier';
+$pageTitle = 'Tambah Supplier';
 $breadcrumbs = [
     ['label' => 'Master Data', 'url' => '#'],
     ['label' => 'Vendor', 'url' => APP_URL . '/modules/master/vendors/index.php'],
@@ -67,69 +67,70 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-truck mr-2"></i>Form Tambah Vendor</h3>
+                <h3 class="card-title"><i class="fas fa-truck mr-2"></i>Form Tambah Supplier</h3>
                 <a href="<?= APP_URL ?>/modules/master/vendors/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
             </div>
             <form method="POST">
                 <div class="card-body">
                     
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label>Nama Perusahaan / Toko <span class="text-danger">*</span></label>
-                                <input type="text" name="company_name" class="form-control check-duplicate" data-type="vendor" value="<?= sanitize($_POST['company_name'] ?? '') ?>" required>
-                                <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Singkatan (Akan digenerate otomatis)</label>
-                                <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($_POST['abbreviation'] ?? '') ?>" maxlength="3" style="text-transform: uppercase;" placeholder="Cth: MKM">
-                                <small class="text-muted">Kosongkan agar OTOMATIS digenerate.</small>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Perusahaan / Toko <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="company_name" class="form-control check-duplicate" data-type="vendor" value="<?= sanitize($_POST['company_name'] ?? '') ?>" required>
+                            <div class="duplicate-warning text-danger" style="display:none; font-size: 12px; margin-top: 5px;"></div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nama PIC (Person In Charge) <span class="text-danger">*</span></label>
-                                <input type="text" name="pic_name" class="form-control" value="<?= sanitize($_POST['pic_name'] ?? '') ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Termin Pembayaran <small class="text-muted">(Opsional)</small></label>
-                                <input type="text" name="payment_terms" class="form-control" value="<?= sanitize($_POST['payment_terms'] ?? '') ?>" placeholder="Cth: Net 30, Cash On Delivery">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Singkatan (Akan digenerate otomatis)</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($_POST['abbreviation'] ?? '') ?>" maxlength="3" style="text-transform: uppercase;" placeholder="Cth: MKM">
+                            <small class="text-muted d-block mt-1">Kosongkan agar OTOMATIS digenerate.</small>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>No. HP / Telepon</label>
-                                <input type="text" name="phone" class="form-control" value="<?= sanitize($_POST['phone'] ?? '') ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control" value="<?= sanitize($_POST['email'] ?? '') ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama PIC (Person In Charge) <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="pic_name" class="form-control" value="<?= sanitize($_POST['pic_name'] ?? '') ?>" required>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Alamat Lengkap</label>
-                        <textarea name="address" class="form-control" rows="2"><?= sanitize($_POST['address'] ?? '') ?></textarea>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Termin Pembayaran <small class="text-muted">(Opsional)</small></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="payment_terms" class="form-control" value="<?= sanitize($_POST['payment_terms'] ?? '') ?>" placeholder="Cth: Net 30, Cash On Delivery">
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Catatan Tambahan</label>
-                        <textarea name="notes" class="form-control" rows="2"><?= sanitize($_POST['notes'] ?? '') ?></textarea>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">No. HP / Telepon</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="phone" class="form-control" value="<?= sanitize($_POST['phone'] ?? '') ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Email</label>
+                        <div class="col-sm-8">
+                            <input type="email" name="email" class="form-control" value="<?= sanitize($_POST['email'] ?? '') ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Alamat Lengkap</label>
+                        <div class="col-sm-8">
+                            <textarea name="address" class="form-control" rows="2"><?= sanitize($_POST['address'] ?? '') ?></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Catatan Tambahan</label>
+                        <div class="col-sm-8">
+                            <textarea name="notes" class="form-control" rows="2"><?= sanitize($_POST['notes'] ?? '') ?></textarea>
+                        </div>
                     </div>
                     
                 </div>

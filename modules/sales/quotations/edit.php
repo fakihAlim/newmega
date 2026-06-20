@@ -145,9 +145,9 @@ $breadcrumbs = [
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-warning">
+<div class="card card-outline card-primary">
     <div class="card-header">
-        <h3 class="card-title text-warning font-weight-bold"><i class="fas fa-edit mr-2"></i> Form Edit Quotation</h3>
+        <h3 class="card-title text-primary font-weight-bold"><i class="fas fa-edit mr-2"></i> Form Edit Quotation</h3>
         <a href="index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
     </div>
     
@@ -241,7 +241,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
             
             <div class="table-responsive mb-3">
-                <table class="table table-bordered table-sm" id="qItemsTable" style="font-size:13px;">
+                <table class="table table-bordered table-sm" id="qItemsTable" >
                     <thead class="bg-dark text-white">
                         <tr>
                             <th width="25%">Deskripsi Pekerjaan</th>
@@ -273,7 +273,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             
             <div class="row">
                 <div class="col-md-6 offset-md-6">
-                    <table class="table table-sm table-borderless font-weight-bold text-right" style="font-size:14px;">
+                    <table class="table table-sm table-borderless font-weight-bold text-right" >
                         <tr>
                             <td width="40%">Subtotal</td>
                             <td><input type="text" name="subtotal" id="calc_subtotal" class="form-control text-right form-control-sm font-weight-bold" readonly value="<?= number_format($q['subtotal'], 0, ',', '.') ?>"></td>

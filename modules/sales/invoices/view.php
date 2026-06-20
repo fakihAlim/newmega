@@ -92,9 +92,9 @@ $breadcrumbs = [
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-info">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center d-print-none">
-        <h3 class="card-title text-info"><i class="fas fa-file-invoice-dollar mr-2"></i> Invoice: <strong><?= sanitize($inv['invoice_no']) ?></strong></h3>
+        <h3 class="card-title text-primary"><i class="fas fa-file-invoice-dollar mr-2"></i> Invoice: <strong><?= sanitize($inv['invoice_no']) ?></strong></h3>
         <div class="ml-auto">
             <?= getStatusBadge($inv['status']) ?>
             <button class="btn btn-default btn-sm ml-3" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak Invoice</button>
@@ -110,7 +110,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <h1 class="font-weight-bold m-0" style="font-size: 48px; letter-spacing: 1px;">INVOICE</h1>
             </div>
             <div style="flex: 1; text-align: right;">
-                <table class="table-sm table-borderless font-weight-bold" style="font-size: 15px; margin-left: auto;">
+                <table class="table-sm table-borderless font-weight-bold" style="margin-left: auto;">
                     <tr>
                         <td class="text-left pr-2 pb-0">Invoice No</td>
                         <td class="text-left pb-0"><?= sanitize($inv['invoice_no']) ?></td>

@@ -72,7 +72,7 @@ switch ($type) {
         $headers = ['Nama Kategori*', 'Prefix*', 'Deskripsi'];
         $instructions = [
             'Wajib diisi. Cth: Construction Material',
-            'Wajib diisi, unik, 3-5 huruf. Cth: CMB',
+            'Wajib diisi, unik, 3-10 karakter. Cth: CN-SEM',
             'Opsional. Penjelasan kategori'
         ];
         $widths = [30, 15, 50];
@@ -81,7 +81,7 @@ switch ($type) {
     case 'items':
         $headers = ['Prefix Kategori*', 'Nama / Deskripsi*', 'Spesifikasi', 'Satuan (UoM)*', 'Tipe Distribusi*', 'Minimum Stok', 'Lokasi Gudang', 'Catatan'];
         $instructions = [
-            'Wajib. Prefix kategori yang sudah ada. Cth: CMB',
+            'Wajib. Prefix kategori yang sudah ada. Cth: CN-SEM',
             'Wajib. Nama barang / material',
             'Opsional. Merek/ukuran/tipe',
             'Wajib. Cth: PCS, ZAK, M2',

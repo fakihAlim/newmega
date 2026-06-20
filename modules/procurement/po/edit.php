@@ -191,9 +191,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-warning">
+<div class="card card-outline card-primary">
     <div class="card-header">
-        <h3 class="card-title text-warning font-weight-bold"><i class="fas fa-edit mr-2"></i> Edit Purchase Order (<?= ucfirst($po['status']) ?>)</h3>
+        <h3 class="card-title text-primary font-weight-bold"><i class="fas fa-edit mr-2"></i> Edit Purchase Order (<?= ucfirst($po['status']) ?>)</h3>
         <a href="<?= APP_URL ?>/modules/procurement/po/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
     </div>
     
@@ -295,8 +295,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
             </div>
             
-            <div class="table-responsive mb-3" style="min-height: 200px;">
-                <table class="table table-bordered table-sm" id="poItemsTable" style="font-size:13px;">
+            <div class="table-responsive mb-0" style="min-height: 200px;">
+                <table class="table table-bordered table-sm mb-0" id="poItemsTable" >
                     <thead class="bg-dark text-white">
                         <tr>
                             <th width="25%">Nama / Deskripsi Barang</th>
@@ -364,9 +364,15 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
             
             <!-- Summary Calc Section -->
-            <div class="row">
+            <style>
+            .summary-table td {
+                padding: 3px 5px !important;
+                vertical-align: middle !important;
+            }
+            </style>
+            <div class="row mt-0">
                 <div class="col-md-6 offset-md-6">
-                    <table class="table table-sm table-borderless font-weight-bold text-right" style="font-size:14px;">
+                    <table class="table table-sm table-borderless font-weight-bold text-right summary-table" >
                         <tr>
                             <td width="40%">Subtotal</td>
                             <td width="60%">
@@ -409,7 +415,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                                 <input type="text" name="other_cost" id="calc_other" class="form-control text-right form-control-sm mask-rupiah" value="<?= formatRupiah($po['other_cost'], '') ?>">
                             </td>
                         </tr>
-                        <tr style="border-top: 2px solid #ccc;">
+                        <tr>
                             <td class="text-danger" style="font-size:16px;">GRAND TOTAL</td>
                             <td>
                                 <input type="text" name="grand_total" id="calc_grandtotal" class="form-control text-right text-danger font-weight-bold form-control-lg" readonly style="font-size: 20px; background-color: #fff8f8;" value="<?= formatRupiah($po['total'], '') ?>">
@@ -420,13 +426,11 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
         </div>
         
-        <div class="card-footer bg-white d-flex justify-content-between">
-            <a href="<?= APP_URL ?>/modules/procurement/po/index.php" class="btn btn-default"><i class="fas fa-times mr-1"></i> Batal</a>
-            <div>
-                <input type="hidden" name="action" id="formAction" value="draft">
-                <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')"><i class="fas fa-save mr-1"></i> Simpan Draft</button>
-                <button type="button" class="btn btn-success" onclick="submitForm('submit')"><i class="fas fa-paper-plane mr-1"></i> Kirim untuk Persetujuan</button>
-            </div>
+        <div class="card-footer bg-white text-right">
+            <input type="hidden" name="action" id="formAction" value="draft">
+            <a href="<?= APP_URL ?>/modules/procurement/po/index.php" class="btn btn-default mr-2"><i class="fas fa-times mr-1"></i> Batal</a>
+            <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')"><i class="fas fa-save mr-1"></i> Simpan Draft</button>
+            <button type="button" class="btn btn-success" onclick="submitForm('submit')"><i class="fas fa-paper-plane mr-1"></i> Kirim untuk Persetujuan</button>
         </div>
     </form>
 </div>
@@ -444,7 +448,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
             <div class="modal-body" style="background:#f8f9fa;">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-sm w-100" id="dt_mr_items" style="font-size:12px; background:white;">
+                    <table class="table table-bordered table-hover table-sm w-100" id="dt_mr_items" style="background:white;">
                         <thead class="bg-light">
                             <tr>
                                 <th width="5%" class="text-center"><input type="checkbox" id="checkAllMR"></th>
@@ -483,7 +487,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             <div class="modal-body">
                 <div id="compareItemName" class="font-weight-bold mb-3" style="font-size: 16px;"></div>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm w-100" id="tablePriceComparison" style="font-size:13px;">
+                    <table class="table table-bordered table-striped table-hover table-sm w-100" id="tablePriceComparison" >
                         <thead class="bg-light">
                             <tr>
                                 <th width="10%" class="text-center">No</th>
@@ -857,7 +861,8 @@ $(document).ready(function() {
             });
             
             if (changed && currentSelect.hasClass("select2-hidden-accessible")) {
-                currentSelect.select2('destroy').select2({ theme: 'bootstrap4', width: '100%' });
+                currentSelect.select2('destroy');
+                initSelect2(currentSelect);
             }
         });
     }

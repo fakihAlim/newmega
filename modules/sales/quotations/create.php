@@ -132,8 +132,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             <!-- Header Section -->
             <div class="row">
                 <div class="col-md-6 border-right">
-                    <h5 class="mb-3 text-secondary text-uppercase font-weight-bold" style="font-size:12px;letter-spacing:1px;">1. Informasi Customer</h5>
-                    
+
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Customer <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
@@ -161,21 +160,19 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Catatan (Pesan)</label>
                         <div class="col-sm-8">
-                            <textarea name="comments" class="form-control" rows="2" placeholder="Catatan yang muncul di header..."><?= sanitize($_POST['comments'] ?? '') ?></textarea>
+                            <textarea name="comments" class="form-control" rows="1" placeholder="Catatan yang muncul di header..."><?= sanitize($_POST['comments'] ?? '') ?></textarea>
                         </div>
                     </div>
                     
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Syarat & Ketentuan</label>
                         <div class="col-sm-8">
-                            <textarea name="terms_and_conditions" class="form-control" rows="3" placeholder="Note 1: ...&#10;Note 2: ..."><?= sanitize($_POST['terms_and_conditions'] ?? '') ?></textarea>
+                            <textarea name="terms_and_conditions" class="form-control" rows="1" placeholder="Note 1: ..."><?= sanitize($_POST['terms_and_conditions'] ?? '') ?></textarea>
                         </div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
-                    <h5 class="mb-3 text-secondary text-uppercase font-weight-bold" style="font-size:12px;letter-spacing:1px;">2. Informasi Dokumen</h5>
-                    
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Perusahaan (Header) <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
@@ -220,11 +217,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
             </div>
             
-            <hr class="my-3">
-            
             <!-- Item List Section -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="text-secondary text-uppercase font-weight-bold m-0" style="font-size:12px;letter-spacing:1px;">3. Daftar Pekerjaan / Barang</h5>
                 <div>
                     <button type="button" class="btn btn-sm btn-outline-info mr-1" data-toggle="modal" data-target="#modalDuplicateQuotation"><i class="fas fa-copy mr-1"></i> Duplikat</button>
                     <button type="button" class="btn btn-sm btn-outline-primary mr-1" data-toggle="modal" data-target="#modalAiQuotation"><i class="fas fa-magic mr-1"></i> Buat dgn AI</button>
@@ -233,7 +227,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
             
             <div class="table-responsive mb-3">
-                <table class="table table-bordered table-sm" id="qItemsTable" style="font-size:13px;">
+                <table class="table table-bordered table-sm mb-0" id="qItemsTable" >
                     <thead class="bg-dark text-white">
                         <tr>
                             <th width="25%">Deskripsi Pekerjaan</th>
@@ -270,9 +264,15 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
             
             <!-- Summary -->
-            <div class="row">
+            <style>
+            .summary-table td {
+                padding: 3px 5px !important;
+                vertical-align: middle !important;
+            }
+            </style>
+            <div class="row mt-0">
                 <div class="col-md-6 offset-md-6">
-                    <table class="table table-sm table-borderless font-weight-bold text-right" style="font-size:14px;">
+                    <table class="table table-sm table-borderless font-weight-bold text-right summary-table" >
                         <tr>
                             <td width="40%">Subtotal</td>
                             <td><input type="text" name="subtotal" id="calc_subtotal" class="form-control text-right form-control-sm font-weight-bold" readonly value="<?= sanitize($_POST['subtotal'] ?? '0') ?>"></td>
@@ -301,7 +301,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <td>Ongkos Kirim</td>
                             <td><input type="text" name="shipping_cost" id="calc_shipping" class="form-control text-right form-control-sm mask-rupiah" value="<?= sanitize($_POST['shipping_cost'] ?? '0') ?>"></td>
                         </tr>
-                        <tr style="border-top: 2px solid #ccc;">
+                        <tr>
                             <td class="text-danger" style="font-size:16px;">GRAND TOTAL</td>
                             <td><input type="text" name="grand_total" id="calc_grandtotal" class="form-control text-right text-danger font-weight-bold form-control-lg" readonly style="font-size:20px;background-color:#fff8f8;" value="<?= sanitize($_POST['grand_total'] ?? '0') ?>"></td>
                         </tr>
@@ -312,8 +312,9 @@ require_once __DIR__ . '/../../../includes/header.php';
         
         <div class="card-footer bg-white text-right">
             <input type="hidden" name="action" id="formAction" value="draft">
-            <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')"><i class="fas fa-save mr-1"></i> Simpan Draft</button>
-            <button type="button" class="btn btn-success" onclick="submitForm('submit')"><i class="fas fa-paper-plane mr-1"></i> Kirim untuk Persetujuan</button>
+            <a href="index.php" class="btn btn-default mr-2">Batal</a>
+            <button type="button" class="btn btn-secondary mr-2" onclick="submitForm('draft')">Simpan Draft</button>
+            <button type="button" class="btn btn-success" onclick="submitForm('submit')">Kirim untuk Persetujuan</button>
         </div>
     </form>
 </div>

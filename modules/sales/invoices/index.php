@@ -143,7 +143,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <table id="invTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="invTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="12%">No. Invoice</th>

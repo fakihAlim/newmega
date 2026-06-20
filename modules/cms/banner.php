@@ -91,7 +91,7 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
     </div>
     <div class="card-body">
-        <table id="bannersTable" class="table table-bordered table-striped w-100" style="font-size: 13.5px;">
+        <table id="bannersTable" class="table table-bordered table-striped w-100" >
             <thead>
                 <tr>
                     <th width="5%">No</th>

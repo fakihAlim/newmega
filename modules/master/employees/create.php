@@ -88,12 +88,12 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-hard-hat mr-2"></i>Form Tambah Karyawan</h3>
                 <a href="<?= APP_URL ?>/modules/master/employees/index.php" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left mr-1"></i> Kembali</a>
             </div>
-            <form action="" method="POST">
+            <form method="POST">
                 <div class="card-body">
                     
                     <div class="alert alert-info" style="font-size: 13px;">
@@ -102,40 +102,37 @@ require_once __DIR__ . '/../../../includes/header.php';
                         Password default adalah <strong>123456</strong>.
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" name="full_name" class="form-control" required placeholder="Contoh: Ahmad Fauzi" value="<?= htmlspecialchars($_POST['full_name'] ?? '') ?>">
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" name="full_name" class="form-control" required placeholder="Contoh: Ahmad Fauzi" value="<?= htmlspecialchars($_POST['full_name'] ?? '') ?>">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nomor Telepon/HP</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                    </div>
-                                    <input type="text" name="phone" class="form-control" placeholder="08xx-xxxx-xxxx" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Nomor Telepon/HP</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                 </div>
+                                <input type="text" name="phone" class="form-control" placeholder="08xx-xxxx-xxxx" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
                             </div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Jabatan & Upah <span class="text-danger">*</span></label>
-                                <select name="wage_id" class="form-control select2" required>
-                                    <option value="">-- Pilih Jabatan --</option>
-                                    <?php foreach ($wages as $w): 
-                                        $selected = (($_POST['wage_id'] ?? '') == $w['id']) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $w['id'] ?>" <?= $selected ?>><?= sanitize($w['jabatan_name']) ?> - Rp <?= number_format($w['daily_wage'], 0, ',', '.') ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <small class="form-text text-muted">Jabatan harus sudah tersedia di <a href="<?= APP_URL ?>/modules/master/wages/index.php">Master Upah</a>.</small>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Jabatan & Upah <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="wage_id" class="form-control select2" required>
+                                <option value="">-- Pilih Jabatan --</option>
+                                <?php foreach ($wages as $w): 
+                                    $selected = (($_POST['wage_id'] ?? '') == $w['id']) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $w['id'] ?>" <?= $selected ?>><?= sanitize($w['jabatan_name']) ?> - Rp <?= number_format($w['daily_wage'], 0, ',', '.') ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small class="form-text text-muted mt-1">Jabatan harus sudah tersedia di <a href="<?= APP_URL ?>/modules/master/wages/index.php">Master Upah</a>.</small>
                         </div>
                     </div>
                     

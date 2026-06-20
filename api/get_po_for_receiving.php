@@ -43,11 +43,37 @@ try {
         $item['pending_qty'] = $item['qty'] - $item['qty_received'];
     }
 
+    // 3. Determine if PO belongs/refers to a project
+    $stmtProj = $pdo->prepare("
+        SELECT DISTINCT mr.project_id 
+        FROM po_mr_links pml
+        JOIN material_requests mr ON pml.mr_id = mr.id
+        WHERE pml.po_id = ?
+    ");
+    $stmtProj->execute([$poId]);
+    $projectIds = $stmtProj->fetchAll(PDO::FETCH_COLUMN);
+
+    if (empty($projectIds)) {
+        // Fallback: Try via items
+        $stmtProjItems = $pdo->prepare("
+            SELECT DISTINCT mr.project_id 
+            FROM purchase_order_items poi
+            JOIN material_request_items mri ON poi.mr_item_id = mri.id
+            JOIN material_requests mr ON mri.mr_id = mr.id
+            WHERE poi.po_id = ? AND poi.mr_item_id IS NOT NULL
+        ");
+        $stmtProjItems->execute([$poId]);
+        $projectIds = $stmtProjItems->fetchAll(PDO::FETCH_COLUMN);
+    }
+    $projectId = !empty($projectIds) ? (int)$projectIds[0] : null;
+
     echo json_encode([
         'success' => true,
         'po' => $po,
-        'items' => $items
+        'items' => $items,
+        'project_id' => $projectId
     ]);
 } catch (Exception $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }
+

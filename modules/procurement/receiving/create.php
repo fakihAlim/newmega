@@ -147,6 +147,31 @@ $breadcrumbs = [
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
+<style>
+.form-group {
+    margin-bottom: 0.5rem !important;
+}
+.form-group label {
+    margin-bottom: 0.25rem !important;
+    font-size: 13px;
+}
+/* Make custom file input match form-control-sm (31px) */
+.custom-file, .custom-file-input, .custom-file-label {
+    height: 31px !important;
+}
+.custom-file-label {
+    padding: .25rem .75rem !important;
+    line-height: 1.5 !important;
+    font-size: 13px;
+}
+.custom-file-label::after {
+    height: 29px !important;
+    line-height: 1.5 !important;
+    padding: .25rem .75rem !important;
+    font-size: 13px;
+}
+</style>
+
 <div class="row">
     <div class="col-md-12">
         <form action="" method="POST" id="formReceive" enctype="multipart/form-data">
@@ -160,7 +185,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Pilih Purchase Order <span class="text-danger">*</span></label>
-                                <select class="form-control select2" name="po_id" id="po_id" required>
+                                <select class="form-control form-control-sm select2" name="po_id" id="po_id" required>
                                     <option value="">-- Pilih PO --</option>
                                     <?php foreach ($eligiblePOs as $po): ?>
                                         <option value="<?= $po['id'] ?>"><?= sanitize($po['po_number']) ?> (<?= date('d-m-Y', strtotime($po['po_date'])) ?>)</option>
@@ -171,21 +196,21 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Tanggal Terima <span class="text-danger">*</span></label>
-                                <input type="date" name="receive_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                                <input type="date" name="receive_date" class="form-control form-control-sm" value="<?= date('Y-m-d') ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>No. Surat Jalan (S/J) <span class="text-danger">*</span></label>
-                                <input type="text" name="surat_jalan_no" class="form-control" required placeholder="Contoh: SJ-2026-X11">
+                                <input type="text" name="surat_jalan_no" class="form-control form-control-sm" required placeholder="Contoh: SJ-2026-X11">
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row mt-1">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Lokasi Terima <span class="text-danger">*</span></label>
-                                <select class="form-control" name="received_at" id="received_at" required>
+                                <select class="form-control form-control-sm" name="received_at" id="received_at" required>
                                     <option value="warehouse">Gudang Utama (Warehouse)</option>
                                     <option value="project">Lokasi Proyek</option>
                                 </select>
@@ -198,27 +223,27 @@ require_once __DIR__ . '/../../../includes/header.php';
                                     <input type="file" name="surat_jalan_file" class="custom-file-input" id="surat_jalan_file" accept=".jpg,.jpeg,.png,.pdf">
                                     <label class="custom-file-label" for="surat_jalan_file">Pilih file...</label>
                                 </div>
-                                <small class="text-muted">Format: JPG, PNG, PDF. Max: 5MB.</small>
+                                <small class="text-muted" style="font-size: 11px;">Format: JPG, PNG, PDF. Max: 5MB.</small>
                             </div>
                         </div>
                         <div class="col-md-4" id="project_selection" style="display:none;">
                             <div class="form-group">
                                 <label>Pilih Proyek <span class="text-danger">*</span></label>
-                                <select class="form-control select2" name="project_id" id="project_id" style="width:100%;">
+                                <select class="form-control form-control-sm select2" name="project_id" id="project_id" style="width:100%;">
                                     <option value="">-- Proyek --</option>
                                     <?php foreach ($projects as $p): ?>
                                     <option value="<?= $p['id'] ?>"><?= sanitize($p['name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <small class="text-muted">Penerimaan di proyek tidak menambah stok di gudang.</small>
+                                <small class="text-muted" style="font-size: 11px;">Penerimaan di proyek tidak menambah stok di gudang.</small>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row mt-1">
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label>Catatan</label>
-                                <textarea name="notes" class="form-control" rows="2" placeholder="Catatan tambahan opsional..."></textarea>
+                                <textarea name="notes" class="form-control form-control-sm" rows="1" placeholder="Catatan tambahan opsional..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -226,12 +251,12 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
 
             <!-- Items Section -->
-            <div class="card card-success card-outline" id="itemsCard" style="display:none;">
+            <div class="card card-success card-outline" id="itemsCard">
                 <div class="card-header">
                     <h3 class="card-title">Daftar Barang Diterima</h3>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-bordered table-striped m-0" id="tableItems" style="font-size: 14px;">
+                    <table class="table table-bordered table-sm table-striped m-0" id="tableItems" >
                         <thead class="bg-light">
                             <tr>
                                 <th width="30%">Nama Barang</th>
@@ -244,7 +269,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                         </thead>
                         <tbody id="itemsBody">
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Silakan pilih PO terlebih dahulu.</td>
+                                <td colspan="6" class="text-center text-muted py-4">Silakan pilih PO terlebih dahulu.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -286,12 +311,11 @@ $(document).ready(function() {
         let tbody = $('#itemsBody');
         
         if (!poId) {
-            $('#itemsCard').hide();
+            tbody.html('<tr><td colspan="6" class="text-center text-muted py-4">Silakan pilih PO terlebih dahulu.</td></tr>');
             return;
         }
 
-        tbody.html('<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>');
-        $('#itemsCard').show();
+        tbody.html('<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>');
 
         $.ajax({
             url: '../../../api/get_po_for_receiving.php',
@@ -301,6 +325,15 @@ $(document).ready(function() {
                 if (res.error) {
                     tbody.html(`<tr><td colspan="6" class="text-center text-danger">\${res.error}</td></tr>`);
                     return;
+                }
+
+                // Auto-select project if PO is linked to one
+                if (res.project_id) {
+                    $('#received_at').val('project').trigger('change');
+                    $('#project_id').val(res.project_id).trigger('change');
+                } else {
+                    $('#received_at').val('warehouse').trigger('change');
+                    $('#project_id').val('').trigger('change');
                 }
                 
                 let html = '';
@@ -326,7 +359,7 @@ $(document).ready(function() {
                         <td class="text-center text-danger font-weight-bold">\${pendingQty}</td>
                         <td>
                             <div class="input-group input-group-sm">
-                                <input type="number" step="0.01" min="0" max="\${pendingQty}" name="qty_received[]" class="form-control input-qty" value="\${pendingQty > 0 ? pendingQty : 0}" \${readonlyAttr} required>
+                                <input type="number" step="0.01" min="0" max="\${pendingQty}" name="qty_received[]" class="form-control form-control-sm input-qty" value="\${pendingQty > 0 ? pendingQty : 0}" \${readonlyAttr} required>
                                 <div class="input-group-append"><span class="input-group-text">\${uom}</span></div>
                             </div>
                         </td>

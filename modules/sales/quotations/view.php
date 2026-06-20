@@ -75,9 +75,9 @@ $breadcrumbs = [
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-info">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center d-print-none">
-        <h3 class="card-title text-info"><i class="fas fa-file-alt mr-2"></i> Quotation: <strong><?= sanitize($q['quotation_no']) ?></strong></h3>
+        <h3 class="card-title text-primary"><i class="fas fa-file-alt mr-2"></i> Quotation: <strong><?= sanitize($q['quotation_no']) ?></strong></h3>
         <div class="ml-auto">
             <?= getStatusBadge($q['status']) ?>
             <button class="btn btn-default btn-sm ml-3" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak</button>
@@ -88,7 +88,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         </div>
     </div>
     
-    <div class="card-body printable-area p-5">
+    <div class="card-body printable-area p-4 bg-white">
         <div class="row mb-5 pb-3">
             <div class="col-sm-7">
                 <div class="d-flex align-items-center mb-3">
@@ -118,7 +118,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             <div class="col-sm-5 pl-4">
                 <h1 class="font-weight-bold text-uppercase mb-4" style="letter-spacing:1px; font-size:32px;">QUOTATION</h1>
                 
-                <table class="table table-sm table-borderless" style="font-size:14px;">
+                <table class="table table-sm table-borderless" >
                     <tr>
                         <td width="40%" class="font-weight-bold p-0">Quotation No</td>
                         <td class="p-0">: <span class="font-weight-bold"><?= sanitize($q['quotation_no']) ?></span></td>
@@ -145,22 +145,22 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <?php endif; ?>
             </div>
         </div>
-        
-        <!-- Items Table -->
+
+        <!-- 3. Tabel Detail Item -->
         <div class="table-responsive mb-4">
-            <table class="table quotation-table">
+            <table class="table table-bordered table-sm report-table mb-0" style="width: 100%;">
                 <thead>
-                    <tr>
-                        <th rowspan="2" style="width: 1%; min-width: 30px;">NO</th>
-                        <th rowspan="2" style="width: 25%;">DESCRIPTION</th>
-                        <th rowspan="2" style="width: 20%;">TYPE</th>
-                        <th rowspan="2" style="width: 1%; min-width: 40px;">QTY</th>
-                        <th rowspan="2" style="width: 1%; min-width: 40px;">UOM</th>
+                    <tr class="text-center font-weight-bold">
+                        <th rowspan="2" style="width: 5%;">NO</th>
+                        <th rowspan="2">DESCRIPTION</th>
+                        <th rowspan="2" style="width: 15%;">TYPE</th>
+                        <th rowspan="2" style="width: 6%;">QTY</th>
+                        <th rowspan="2" style="width: 6%;">UOM</th>
                         <th colspan="2" style="width: 18%;">MATERIAL</th>
                         <th colspan="2" style="width: 18%;">MANPOWER</th>
-                        <th rowspan="2" style="width: 10%;">AMOUNT</th>
+                        <th rowspan="2" style="width: 12%;">AMOUNT</th>
                     </tr>
-                    <tr>
+                    <tr class="text-center font-weight-bold">
                         <th style="font-size: 10px; width: 9%;">UNIT PRICE</th>
                         <th style="font-size: 10px; width: 9%;">TOTAL MATERIAL</th>
                         <th style="font-size: 10px; width: 9%;">UNIT PRICE</th>
@@ -170,11 +170,11 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <tbody>
                     <?php $no = 1; foreach ($items as $item): ?>
                     <tr>
-                        <td class="text-right"><?= $no++ ?></td>
+                        <td class="text-center"><?= $no++ ?></td>
                         <td><?= sanitize($item['description']) ?></td>
                         <td><?= sanitize($item['type_specification']) ?: '-' ?></td>
                         <td class="text-right"><?= number_format($item['qty'], 0) ?></td>
-                        <td><?= sanitize($item['uom']) ?></td>
+                        <td class="text-center"><?= sanitize($item['uom']) ?></td>
                         <td class="text-right"><?= number_format($item['material_unit_price'], 0, ',', '.') ?></td>
                         <td class="text-right"><?= number_format($item['material_total'], 0, ',', '.') ?></td>
                         <td class="text-right"><?= number_format($item['manpower_unit_price'], 0, ',', '.') ?></td>
@@ -185,14 +185,15 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </tbody>
             </table>
         </div>
-        
-        <!-- Summary & Terms -->
-        <div class="row no-gutters">
-            <div class="col-sm-7 pt-2 pr-3 d-flex flex-column">
-                <div class="p-1 px-2 text-white font-weight-bold" style="background-color: #666 !important; border: 1px solid #000; font-size: 12px;">
+
+        <!-- 4. Catatan (Terms) & Ringkasan Biaya (Summary) -->
+        <div class="row no-gutters mb-4" style="gap: 20px; display: flex;">
+            <!-- Catatan / Terms -->
+            <div class="col pr-0 d-flex flex-column" style="flex: 7;">
+                <div class="p-2 px-3 font-weight-bold report-terms-header">
                     Term and Conditions :
                 </div>
-                <div class="p-2 flex-grow-1" style="border: 1px solid #000 !important; font-size: 11px; border-top: none !important; color: #000; min-height: 100px;">
+                <div class="p-3 flex-grow-1 report-terms-body">
                     <?= $q['terms_and_conditions'] ? nl2br(sanitize($q['terms_and_conditions'])) : '<span class="text-muted">No terms provided.</span>' ?>
                 </div>
 
@@ -202,49 +203,59 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
                 <?php endif; ?>
             </div>
-            <div class="col-sm-5 pt-2">
-                <table class="table table-sm table-bordered text-right font-weight-bold mb-0" style="font-size:13px; border: 1px solid #000;">
+            <!-- Summary -->
+            <div class="col pl-0" style="flex: 5;">
+                <table class="table-sm table-bordered report-summary-table w-100 h-100">
                     <tr>
-                        <td width="55%" class="bg-light px-2" style="border: 1px solid #000;">Subtotal</td>
-                        <td class="px-2" style="border: 1px solid #000;"><?= number_format($q['subtotal'], 0, ',', '.') ?></td>
+                        <td class="report-summary-label">Subtotal</td>
+                        <td class="report-summary-value"><?= number_format($q['subtotal'], 0, ',', '.') ?></td>
                     </tr>
                     <tr>
-                        <td class="bg-light px-2" style="border: 1px solid #000;">Shipping</td>
-                        <td class="px-2" style="border: 1px solid #000;"><?= number_format($q['shipping'], 0, ',', '.') ?></td>
+                        <td class="report-summary-label">Shipping</td>
+                        <td class="report-summary-value"><?= number_format($q['shipping'], 0, ',', '.') ?></td>
                     </tr>
                     <tr>
-                        <td class="bg-light px-2" style="border: 1px solid #000;">Tax</td>
-                        <td class="px-2" style="border: 1px solid #000;"><?= number_format($q['tax'], 0, ',', '.') ?></td>
+                        <td class="report-summary-label">Tax</td>
+                        <td class="report-summary-value"><?= number_format($q['tax'], 0, ',', '.') ?></td>
                     </tr>
                     <tr>
-                        <td class="bg-light px-2" style="border: 1px solid #000;">Discount</td>
-                        <td class="px-2" style="border: 1px solid #000;">- <?= number_format($q['discount'], 0, ',', '.') ?></td>
+                        <td class="report-summary-label">Discount</td>
+                        <td class="report-summary-value">- <?= number_format($q['discount'], 0, ',', '.') ?></td>
                     </tr>
-                    <tr style="background-color: #f2f2f2;">
-                        <td class="text-dark px-2" style="border: 1px solid #000; font-size: 15px;">Total</td>
-                        <td class="text-dark px-2" style="border: 1px solid #000; font-size: 16px;"><?= number_format($q['total'], 0, ',', '.') ?></td>
+                    <tr>
+                        <td class="report-summary-total-label">Total</td>
+                        <td class="report-summary-total-value"><?= number_format($q['total'], 0, ',', '.') ?></td>
                     </tr>
                 </table>
             </div>
         </div>
-        
-        <!-- Signatures -->
-        <div class="row mt-5 pt-3 text-center" style="font-size:14px;">
-            <div class="col-sm-4">
-                <p class="mb-5">Dibuat Oleh,</p>
-                <strong><?= sanitize($q['creator_name']) ?></strong>
+
+        <!-- 5. Bagian Tanda Tangan (Signature) -->
+        <div class="d-flex justify-content-between mt-4 pt-2" style="font-size: 12px;">
+            <div style="width: 200px; text-align: center; padding: 10px;">
+                <p class="mb-5 font-weight-bold text-uppercase">Dibuat Oleh,</p>
+                <div style="height: 60px;"></div>
+                <strong class="text-uppercase" style="text-decoration: underline;">
+                    <?= sanitize($q['creator_name']) ?>
+                </strong>
             </div>
-            <div class="col-sm-4">
-                <p class="mb-5">Menyetujui,</p>
-                <?php if ($q['approver_name']): ?>
-                    <strong><?= sanitize($q['approver_name']) ?></strong>
-                <?php else: ?>
-                    <strong class="text-muted">( Belum Disetujui )</strong>
-                <?php endif; ?>
+            <div style="width: 200px; text-align: center; padding: 10px;">
+                <p class="mb-5 font-weight-bold text-uppercase">Menyetujui,</p>
+                <div style="height: 60px;"></div>
+                <strong class="text-uppercase" style="text-decoration: underline;">
+                    <?php if ($q['approver_name']): ?>
+                        <?= sanitize($q['approver_name']) ?>
+                    <?php else: ?>
+                        <span class="text-muted" style="text-decoration: none;">( Belum Disetujui )</span>
+                    <?php endif; ?>
+                </strong>
             </div>
-            <div class="col-sm-4">
-                <p class="mb-5">Customer,</p>
-                <strong>( ................................... )</strong>
+            <div style="width: 200px; text-align: center; padding: 10px;">
+                <p class="mb-5 font-weight-bold text-uppercase">Customer,</p>
+                <div style="height: 60px;"></div>
+                <strong class="text-uppercase" style="text-decoration: underline;">
+                    ( ................................... )
+                </strong>
             </div>
         </div>
     </div>
@@ -291,61 +302,142 @@ require_once __DIR__ . '/../../../includes/header.php';
 </div>
 
 <style>
-.quotation-table {
-    border-collapse: collapse !important;
-    width: 100% !important;
-    border: 1px solid #000 !important;
-    font-family: Arial, sans-serif !important;
-    font-size: 11px !important;
-    margin-bottom: 0 !important;
-}
-.quotation-table th, .quotation-table td {
-    border: 1px solid #000 !important;
-    padding: 3px 5px !important;
-    color: #000 !important;
-    vertical-align: middle !important;
-    line-height: 1.2 !important;
-}
-.quotation-table thead th {
-    background-color: #ffffff !important;
-    font-weight: bold !important;
-    text-transform: uppercase !important;
-    text-align: center !important;
-    vertical-align: middle !important;
-}
-.quotation-table td.text-right {
-    text-align: right !important;
-}
-.quotation-table td.text-center {
-    text-align: center !important;
-}
-.quotation-table td.text-left {
-    text-align: left !important;
+/* --- Gaya Laporan di Layar --- */
+.printable-area {
+    color: #000000 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+    font-size: 13px;
 }
 
+/* Memaksa semua teks di area laporan berwarna hitam */
+.printable-area * {
+    color: #000000 !important;
+}
+
+.report-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+/* Font size 13px & padding baris 5px */
+.report-table th, .report-table td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 5px 10px !important;
+    vertical-align: middle !important;
+    font-size: 13px !important;
+}
+
+.report-table thead th {
+    background-color: #f1f5f9 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.report-terms-header {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.report-terms-body {
+    border: 1px solid #cbd5e1;
+    border-top: none;
+    font-size: 12px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.report-summary-table {
+    border-collapse: collapse !important;
+    font-size: 13px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.report-summary-table td {
+    padding: 6px 12px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.report-summary-label {
+    text-align: left !important;
+    font-weight: 600;
+    background-color: transparent !important;
+}
+
+.report-summary-value {
+    text-align: right !important;
+    font-weight: 600;
+}
+
+.report-summary-total-label {
+    text-align: left !important;
+    font-weight: 800;
+    font-size: 14px;
+    background-color: transparent !important;
+}
+
+.report-summary-total-value {
+    text-align: right !important;
+    font-weight: 800;
+    font-size: 15px;
+}
+
+/* --- Gaya Khusus Saat Cetak --- */
 @media print {
     @page {
         size: A4 portrait;
-        margin: 10mm;
+        margin: 15mm;
     }
-    * {
+    body { 
+        background-color: white !important; 
+    }
+    /* Sembunyikan elemen non-cetak */
+    .main-sidebar, .main-header, .d-print-none, .card-footer, .breadcrumb, .content-header { 
+        display: none !important; 
+    }
+    .content-wrapper { 
+        margin-left: 0 !important; 
+        padding: 0 !important; 
+        background: none !important;
+    }
+    .card { 
+        border: none !important; 
+        box-shadow: none !important; 
+    }
+    .card-header { 
+        display: none !important; 
+    }
+    .printable-area { 
+        width: 100% !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+    }
+    /* Memaksa border berwarna hitam solid saat diprint */
+    .report-table th, .report-table td,
+    .report-terms-header, .report-terms-body,
+    .report-summary-table, .report-summary-table td,
+    .report-info-col {
+        border: 1px solid #000000 !important;
+    }
+    .report-table th, .report-table td {
+        font-size: 13px !important;
+    }
+    /* Memaksa warna background abu-abu tercetak */
+    .report-table thead th,
+    .report-terms-header {
+        background-color: #f1f5f9 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
-    body { background-color: white !important; color: black !important; }
-    .main-sidebar, .main-header, .d-print-none, .card-footer, .breadcrumb, .content-header { display: none !important; }
-    .content-wrapper { margin-left: 0 !important; padding: 0 !important; }
-    .card { border: none !important; box-shadow: none !important; }
-    .card-body { border: none !important; }
-    .card-header { display: none !important; }
-    .printable-area { width: 100% !important; padding: 0 !important; border: none !important; color: #000 !important; }
-    .printable-area * { color: #000 !important; }
-    .quotation-table th { background-color: #ffffff !important; color: #000 !important; }
-    /* Ensure borders print properly */
-    .quotation-table, .quotation-table th, .quotation-table td { border: 1px solid #000 !important; }
+    .report-summary-table td {
+        background-color: transparent !important;
+    }
 }
-.printable-area { color: #000 !important; }
-.printable-area * { color: #000 !important; }
 </style>
 
 <?php require_once __DIR__ . '/../../../includes/footer.php'; ?>

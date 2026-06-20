@@ -13,6 +13,43 @@ $breadcrumbs = [
 
 $user = getCurrentUser();
 
+// Set default filters
+$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$vendorId = $_GET['vendor_id'] ?? '';
+$location = $_GET['location'] ?? ''; // 'warehouse' or 'project'
+
+// Fetch vendors for filter
+$vendors = $pdo->query("SELECT id, company_name FROM vendors ORDER BY company_name ASC")->fetchAll();
+
+$conditions = [];
+$params = [];
+
+if ($startDate) {
+    $conditions[] = "gr.receive_date >= ?";
+    $params[] = $startDate;
+}
+if ($endDate) {
+    $conditions[] = "gr.receive_date <= ?";
+    $params[] = $endDate;
+}
+if ($vendorId) {
+    $conditions[] = "po.vendor_id = ?";
+    $params[] = $vendorId;
+}
+if ($location) {
+    if ($location === 'warehouse') {
+        $conditions[] = "gr.received_at = 'warehouse'";
+    } elseif ($location === 'project') {
+        $conditions[] = "gr.received_at != 'warehouse'";
+    }
+}
+
+$whereClause = "";
+if (!empty($conditions)) {
+    $whereClause = "WHERE " . implode(" AND ", $conditions);
+}
+
 // Fetch Goods Receivings
 $sql = "
     SELECT gr.*, po.po_number, v.company_name as vendor_name, u.full_name as receiver_name, p.name as project_name
@@ -21,13 +58,54 @@ $sql = "
     JOIN vendors v ON po.vendor_id = v.id
     LEFT JOIN users u ON gr.received_by = u.id
     LEFT JOIN projects p ON gr.project_id = p.id
+    $whereClause
     ORDER BY gr.id DESC
 ";
-$stmt = $pdo->query($sql);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $receivings = $stmt->fetchAll();
 
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
+
+<!-- Filter Card -->
+<div class="card d-print-none mb-3">
+    <div class="card-body p-3">
+        <form method="GET" action="" class="form-horizontal">
+            <div class="row">
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Mulai</label>
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($startDate) ?>">
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Tanggal Selesai</label>
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($endDate) ?>">
+                </div>
+                <div class="col-md-4 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Vendor</label>
+                    <select name="vendor_id" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Vendor --</option>
+                        <?php foreach ($vendors as $v): ?>
+                            <option value="<?= $v['id'] ?>" <?= $vendorId == $v['id'] ? 'selected' : '' ?>><?= sanitize($v['company_name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6 mb-2">
+                    <label style="font-size:12px;">Lokasi Terima</label>
+                    <select name="location" class="form-control form-control-sm select2">
+                        <option value="">-- Semua Lokasi --</option>
+                        <option value="warehouse" <?= $location === 'warehouse' ? 'selected' : '' ?>>Gudang Utama</option>
+                        <option value="project" <?= $location === 'project' ? 'selected' : '' ?>>Proyek</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
+                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-search mr-1"></i>Filter</button>
+                    <a href="index.php" class="btn btn-default btn-sm ml-2" title="Reset Filters"><i class="fas fa-sync-alt"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -39,7 +117,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <table id="grTable" class="table table-bordered table-striped w-100" style="font-size: 13px;">
+        <table id="grTable" class="table table-bordered table-striped table-hover table-sm w-100" >
             <thead>
                 <tr>
                     <th width="12%">Tgl Terima</th>
@@ -87,6 +165,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
+    initSelect2('.select2');
     initDataTable('#grTable');
 });
 </script>
