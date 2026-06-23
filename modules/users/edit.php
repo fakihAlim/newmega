@@ -97,6 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $pdo->commit();
+
+                logActivity('update', 'users', "Memperbarui data pengguna: " . sanitize($userData['username']), 'users', $id);
+
                 setFlash('success', 'Data pengguna berhasil diperbarui.');
                 header('Location: ' . APP_URL . '/modules/users/index.php');
                 exit;

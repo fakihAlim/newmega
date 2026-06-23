@@ -21,8 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $status = $stmt->fetchColumn();
     
     if ($status === 'draft') {
+        $stmtNo = $pdo->prepare("SELECT quotation_no FROM quotations WHERE id = ?");
+        $stmtNo->execute([$id]);
+        $qNo = $stmtNo->fetchColumn();
+        
         $pdo->prepare("DELETE FROM quotation_items WHERE quotation_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM quotations WHERE id = ?")->execute([$id]);
+        
+        logActivity('delete', 'quotation', "Menghapus Quotation: {$qNo}");
+        
         setFlash('success', 'Quotation berhasil dihapus.');
     } else {
         setFlash('danger', 'Hanya quotation berstatus draft yang dapat dihapus.');

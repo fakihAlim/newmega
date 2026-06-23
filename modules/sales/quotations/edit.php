@@ -122,6 +122,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $pdo->commit();
+            
+            $logAction = ($status === 'pending') ? 'submit' : 'update';
+            $logDesc = ($status === 'pending') 
+                ? "Men-submit Quotation: {$q['quotation_no']}" 
+                : "Memperbarui draft Quotation: {$q['quotation_no']}";
+            logActivity($logAction, 'quotation', $logDesc, 'quotations', $id);
+            
             $msg = $status === 'pending' ? "Quotation {$q['quotation_no']} berhasil di-submit." : "Perubahan Quotation {$q['quotation_no']} berhasil disimpan.";
             setFlash('success', $msg);
             header('Location: index.php');

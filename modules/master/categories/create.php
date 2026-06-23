@@ -37,6 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO categories (name, prefix, description) VALUES (?, ?, ?)");
         
         if ($stmt->execute([$name, $prefix, $description])) {
+            $newId = $pdo->lastInsertId();
+            logActivity('create', 'master_categories', "Menambah Kategori: {$name}", 'categories', $newId);
             setFlash('success', 'Kategori berhasil ditambahkan.');
             header('Location: ' . APP_URL . '/modules/master/categories/index.php');
             exit;

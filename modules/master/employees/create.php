@@ -70,6 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $pdo->commit();
             
+            logActivity('create', 'master_employees', "Menambahkan karyawan baru: {$full_name} ({$employee_code})", 'employees', $user_id);
+            
             setFlash('success', "Karyawan berhasil ditambahkan. Kode: <b>$employee_code</b>, Username login: <b>$username</b>, Password default: <b>123456</b>");
             header('Location: ' . APP_URL . '/modules/master/employees/index.php');
             exit;

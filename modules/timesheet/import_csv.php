@@ -101,6 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
             }
             $pdo->commit();
             
+            if ($successCount > 0) {
+                logActivity('create', 'timesheet', "Berhasil mengimpor $successCount baris timesheet dari file CSV", 'timesheet_entries');
+            }
+            
             $msg = "Import selesai! Berhasil: $successCount baris.";
             if ($errorCount > 0) {
                 $msg .= " Gagal/Dilewati: $errorCount baris (User tidak ditemukan / Duplikat).";

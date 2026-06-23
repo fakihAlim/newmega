@@ -20,6 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     // Set default
     $stmt = $pdo->prepare("UPDATE companies SET is_default = 1 WHERE id = ?");
     if ($stmt->execute([$id])) {
+        $stmtName = $pdo->prepare("SELECT name FROM companies WHERE id = ?");
+        $stmtName->execute([$id]);
+        $compName = $stmtName->fetchColumn();
+        logActivity('update', 'master_companies', "Mengeset perusahaan {$compName} sebagai default header", 'companies', $id);
         setFlash('success', 'Perusahaan default berhasil diubah.');
     }
     header('Location: ' . APP_URL . '/modules/master/companies/index.php');
@@ -42,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($used_count > 0) {
         setFlash('danger', 'Perusahaan tidak dapat dihapus karena sudah memiliki histori transaksi (PO/Transfer).');
     } else {
-        $stmt = $pdo->prepare("SELECT logo FROM companies WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT name, logo FROM companies WHERE id = ?");
         $stmt->execute([$id]);
         $company = $stmt->fetch();
         
@@ -55,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             // Check if deleted was default, make first one default
             $pdo->query("UPDATE companies SET is_default = 1 ORDER BY id ASC LIMIT 1");
             
+            logActivity('delete', 'master_companies', "Menghapus data perusahaan: {$company['name']}");
             setFlash('success', 'Perusahaan berhasil dihapus.');
         } else {
             setFlash('danger', 'Gagal menghapus perusahaan.');

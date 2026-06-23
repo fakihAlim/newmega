@@ -87,6 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // So it's fine! It will query DB on every request for permissions!
             
             $pdo->commit();
+            
+            logActivity('update', 'master_roles', "Memperbarui peran & hak akses: {$roleName}", 'roles', $id);
+            
             setFlash('success', 'Data peran berhasil diperbarui.');
             header('Location: index.php');
             exit;

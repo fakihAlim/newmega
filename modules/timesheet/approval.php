@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         $stmt = $pdo->prepare("UPDATE timesheet_entries SET status = ?, approved_by = ?, approved_at = NOW() WHERE id = ?");
         if ($stmt->execute([$status, $user['id'], $id])) {
+            logActivity('update', 'timesheet', ucfirst($status) . " absensi ID: {$id}", 'timesheet_entries', $id);
             setFlash('success', "Timesheet berhasil di-" . $status . ".");
         } else {
             setFlash('danger', 'Gagal memproses timesheet.');

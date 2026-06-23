@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (preg_match($pattern, $envContent)) {
             $newEnvContent = preg_replace($pattern, $replacement, $envContent);
             if (file_put_contents($envFile, $newEnvContent)) {
+                logActivity('update', 'settings', "Memperbarui konfigurasi API Key (Gemini)");
                 setFlash('success', 'Berhasil memperbarui Google Gemini API Key.');
                 // Refresh the page so the constant is re-read from the file on the next load,
                 // although it won't affect this exact run since it's already defined.
@@ -40,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // If the pattern wasn't found (e.g. it was deleted manually)
             $appendContent = "\n// API Key ditambahkan secara otomatis\ndefine('GOOGLE_GEMINI_API_KEY', '{$newApiKey}');\n";
             if (file_put_contents($envFile, $appendContent, FILE_APPEND)) {
+                logActivity('create', 'settings', "Menambahkan konfigurasi API Key baru (Gemini)");
                 setFlash('success', 'Berhasil menambahkan Google Gemini API Key baru.');
                 header('Location: ' . APP_URL . '/modules/settings/index.php');
                 exit;

@@ -49,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         
         if ($stmt->execute([$companyName, $abbreviation, $picName, $phone, $email, $address, $paymentTerms, $notes])) {
+            $newId = $pdo->lastInsertId();
+            logActivity('create', 'master_vendors', "Menambah Vendor: {$companyName} ({$abbreviation})", 'vendors', $newId);
             setFlash('success', "Vendor berhasil ditambahkan dengan kode: $abbreviation");
             header('Location: ' . APP_URL . '/modules/master/vendors/index.php');
             exit;

@@ -357,3 +357,42 @@ function validateCsrfToken($token) {
 function csrfField() {
     return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generateCsrfToken()) . '">';
 }
+
+/**
+ * Log user activity to the database
+ *
+ * @param string $action  Action type: 'login', 'logout', 'create', 'update', 'delete', 'approve', 'reject', 'truncate', etc.
+ * @param string $module  Module name: 'material_request', 'purchase_order', 'users', etc.
+ * @param string $description  Human-readable description
+ * @param string|null $referenceType  Table name being referenced
+ * @param int|null $referenceId  ID of the referenced record
+ * @param array|null $oldData  Data before change (optional)
+ * @param array|null $newData  Data after change (optional)
+ */
+function logActivity($action, $module = null, $description = null, $referenceType = null, $referenceId = null, $oldData = null, $newData = null) {
+    global $pdo;
+    try {
+        $user = getCurrentUser();
+        $stmt = $pdo->prepare("
+            INSERT INTO activity_logs (user_id, user_name, action, module, description, reference_type, reference_id, ip_address, user_agent, old_data, new_data)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $user['id'] ?? null,
+            $user['full_name'] ?? ($user['username'] ?? 'System'),
+            $action,
+            $module,
+            $description,
+            $referenceType,
+            $referenceId,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            $oldData ? json_encode($oldData, JSON_UNESCAPED_UNICODE) : null,
+            $newData ? json_encode($newData, JSON_UNESCAPED_UNICODE) : null,
+        ]);
+    } catch (Exception $e) {
+        // Silently fail - logging should never break the main operation
+        error_log("Activity log error: " . $e->getMessage());
+    }
+}
+

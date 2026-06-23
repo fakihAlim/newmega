@@ -120,6 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $pdo->commit();
             
+            logActivity('update', 'material_request', "Memperbarui Material Request: {$mr['mr_number']}", 'material_requests', $id);
+            
             $msg = $status === 'pending' ? "MR {$mr['mr_number']} berhasil di-submit." : "Draft MR {$mr['mr_number']} berhasil diperbarui.";
             setFlash('success', $msg);
             header('Location: ' . APP_URL . '/modules/procurement/mr/index.php');

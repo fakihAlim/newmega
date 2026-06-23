@@ -171,6 +171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $pdo->commit();
             
+            logActivity('update', 'purchase_order', "Memperbarui Purchase Order: {$po['po_number']}", 'purchase_orders', $id);
+            
             $msg = $status === 'pending' ? "PO {$po['po_number']} berhasil di-submit untuk persetujuan." : "Draft PO {$po['po_number']} berhasil diperbarui.";
             setFlash('success', $msg);
             header('Location: ' . APP_URL . '/modules/procurement/po/index.php');

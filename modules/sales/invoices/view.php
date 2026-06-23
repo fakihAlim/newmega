@@ -53,9 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         if ($action === 'approve') {
             $pdo->prepare("UPDATE invoices SET status = 'approved', approved_by = ?, approved_at = NOW() WHERE id = ?")->execute([$user['id'], $id]);
+            logActivity('approve', 'invoice', "Menyetujui Invoice: {$inv['invoice_no']}", 'invoices', $id);
             setFlash('success', "Invoice {$inv['invoice_no']} disetujui.");
         } else {
             $pdo->prepare("UPDATE invoices SET status = 'rejected', approved_by = ?, approved_at = NOW(), reject_reason = ? WHERE id = ?")->execute([$user['id'], $rejectReason, $id]);
+            logActivity('reject', 'invoice', "Menolak Invoice: {$inv['invoice_no']}", 'invoices', $id);
             setFlash('danger', "Invoice {$inv['invoice_no']} ditolak.");
         }
     } elseif ($action === 'send') {
@@ -65,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
         }
         $pdo->prepare("UPDATE invoices SET status = 'sent' WHERE id = ?")->execute([$id]);
+        logActivity('update', 'invoice', "Menandai Invoice sebagai Terkirim (Sent): {$inv['invoice_no']}", 'invoices', $id);
         setFlash('info', "Invoice {$inv['invoice_no']} ditandai sebagai 'Sent'.");
     }
     

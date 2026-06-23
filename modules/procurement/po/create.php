@@ -169,7 +169,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $pdo->commit();
-
+            
+            logActivity('create', 'purchase_order', "Membuat Purchase Order: {$poNumber}", 'purchase_orders', $poId);
+            
             $msg = $status === 'pending' ? "PO $poNumber berhasil di-submit untuk persetujuan." : "PO $poNumber disimpan sebagai Draft.";
             setFlash('success', $msg);
             header('Location: ' . APP_URL . '/modules/procurement/po/index.php');

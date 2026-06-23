@@ -46,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         
         if ($stmt->execute([$name, $abbreviation, $customerId, $managerId, $location, $startDate, $endDate, $budget])) {
+            $newId = $pdo->lastInsertId();
+            logActivity('create', 'master_projects', "Menambah Proyek: {$name}", 'projects', $newId);
             setFlash('success', "Proyek berhasil ditambahkan.");
             header('Location: ' . APP_URL . '/modules/master/projects/index.php');
             exit;

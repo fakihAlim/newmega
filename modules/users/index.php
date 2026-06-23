@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         // We will just deactivate instead of hard delete to maintain data integrity
         $stmt = $pdo->prepare("UPDATE users SET is_active = 0 WHERE id = ?");
         if ($stmt->execute([$id])) {
+            logActivity('update', 'users', "Menonaktifkan pengguna ID: {$id}", 'users', $id);
             setFlash('success', 'Pengguna berhasil dinonaktifkan.');
         } else {
             setFlash('danger', 'Gagal menonaktifkan pengguna.');
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $id = $_POST['id'] ?? 0;
     $stmt = $pdo->prepare("UPDATE users SET is_active = 1 WHERE id = ?");
     if ($stmt->execute([$id])) {
+        logActivity('update', 'users', "Mengaktifkan pengguna ID: {$id}", 'users', $id);
         setFlash('success', 'Pengguna berhasil diaktifkan.');
     } else {
         setFlash('danger', 'Gagal mengaktifkan pengguna.');

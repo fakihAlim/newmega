@@ -52,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $pdo->commit();
             
+            logActivity('update', 'master_employees', "Memperbarui data karyawan: {$full_name}", 'employees', $emp['user_id']);
+            
             setFlash('success', "Data karyawan berhasil diperbarui.");
             header('Location: ' . APP_URL . '/modules/master/employees/index.php');
             exit;

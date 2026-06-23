@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         
         if ($stmt->execute([$companyName, $abbreviation, $picName, $phone, $email, $address, $notes])) {
+            logActivity('create', 'master_customers', "Menambahkan customer baru: {$companyName} ({$abbreviation})", 'customers', $pdo->lastInsertId());
             setFlash('success', "Customer berhasil ditambahkan dengan kode: $abbreviation");
             header('Location: ' . APP_URL . '/modules/master/customers/index.php');
             exit;

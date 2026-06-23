@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         
         if ($stmt->execute([$name, $abbreviation, $customerId, $managerId, $location, $startDate, $endDate, $budget, $status, $id])) {
+            logActivity('update', 'master_projects', "Memperbarui Proyek: {$name}", 'projects', $id);
             setFlash('success', "Data proyek berhasil diperbarui.");
             header('Location: ' . APP_URL . '/modules/master/projects/index.php');
             exit;

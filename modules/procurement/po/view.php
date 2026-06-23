@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($action === 'approve') {
             $stmt = $pdo->prepare("UPDATE purchase_orders SET status = 'approved', approved_by = ?, approved_at = NOW() WHERE id = ?");
             $stmt->execute([$user['id'], $id]);
+            logActivity('approve', 'purchase_order', "Menyetujui Purchase Order: {$po['po_number']}", 'purchase_orders', $id);
             setFlash('success', "PO {$po['po_number']} berhasil disetujui.");
         } elseif ($action === 'reject') {
             $stmt = $pdo->prepare("UPDATE purchase_orders SET status = 'rejected', approved_by = ?, approved_at = NOW(), reject_reason = ? WHERE id = ?");
@@ -70,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
             // Optional: delete po_mr_links? Usually kept for tracking.
 
+            logActivity('reject', 'purchase_order', "Menolak Purchase Order: {$po['po_number']}", 'purchase_orders', $id);
             setFlash('danger', "PO {$po['po_number']} telah ditolak.");
         }
         $pdo->commit();

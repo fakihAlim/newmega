@@ -127,6 +127,10 @@ try {
     
     $pdo->commit();
     
+    if ($successCount > 0) {
+        logActivity('create', 'master_employees', "Berhasil mengimpor $successCount karyawan dari file CSV", 'employees');
+    }
+    
     $msg = "Import CSV selesai! <strong>$successCount</strong> karyawan berhasil ditambahkan.";
     if ($errorCount > 0) {
         $msg .= " <strong>$errorCount</strong> baris gagal/dilewati.";

@@ -41,10 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($action === 'approve') {
         $upStmt = $pdo->prepare("UPDATE nota_claims SET status = 'approved', reject_reason = NULL WHERE id = ?");
         $upStmt->execute([$id]);
+        logActivity('approve', 'finance', "Menyetujui Klaim Nota: {$claim['claim_number']}", 'nota_claims', $id);
         setFlash('success', "Klaim {$claim['claim_number']} berhasil disetujui.");
     } elseif ($action === 'pay') {
         $upStmt = $pdo->prepare("UPDATE nota_claims SET status = 'paid' WHERE id = ?");
         $upStmt->execute([$id]);
+        logActivity('update', 'finance', "Membayar Klaim Nota (Lunas): {$claim['claim_number']}", 'nota_claims', $id);
         setFlash('success', "Klaim {$claim['claim_number']} ditandai sebagai Telah Dibayar (Lunas).");
     } elseif ($action === 'reject') {
         if (empty($reason)) {
@@ -52,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } else {
             $upStmt = $pdo->prepare("UPDATE nota_claims SET status = 'rejected', reject_reason = ? WHERE id = ?");
             $upStmt->execute([$reason, $id]);
+            logActivity('reject', 'finance', "Menolak Klaim Nota: {$claim['claim_number']}", 'nota_claims', $id);
             setFlash('danger', "Klaim {$claim['claim_number']} telah ditolak.");
         }
     }

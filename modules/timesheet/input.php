@@ -48,6 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $stmt = $pdo->prepare("INSERT INTO timesheet_entries (employee_id, company_id, project_id, work_date, work_type, overtime_hours, daily_wage_at_time, notes, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)");
                 $stmt->execute([$emp['id'], $company_id, $project_id, $work_date, $work_type, $overtime_hours, $emp['daily_wage'], $notes, $user['id']]);
+                
+                logActivity('create', 'timesheet', "Input absensi (Self): {$work_date} - Proyek ID: {$project_id}", 'timesheet_entries', $pdo->lastInsertId());
+                
                 setFlash('success', 'Timesheet berhasil disimpan!');
             } catch (PDOException $e) {
                 error_log('[NEWMEGA] ' . $e->getMessage());
@@ -133,6 +136,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             $pdo->commit();
+            
+            if ($successCount > 0 || $updateCount > 0) {
+                logActivity('create', 'timesheet', "Bulk Input: {$successCount} insert, {$updateCount} update untuk Proyek ID: {$project_id} pada {$work_date}", 'timesheet_entries');
+            }
+            
             $msg = "<strong>$successCount</strong> ditambah baru. <strong>$updateCount</strong> berhasil di-update.";
             if ($skipCount > 0) $msg .= " <strong>$skipCount</strong> dilewati (melebihi batas Full Day).";
             setFlash('success', $msg);

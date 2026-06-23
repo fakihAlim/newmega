@@ -19,8 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         $validStatuses = ['active', 'completed', 'cancelled'];
         if (in_array($status, $validStatuses)) {
+            $stmt = $pdo->prepare("SELECT name FROM projects WHERE id = ?");
+            $stmt->execute([$id]);
+            $projectName = $stmt->fetchColumn();
+            
             $update = $pdo->prepare("UPDATE projects SET status = ? WHERE id = ?");
             if ($update->execute([$status, $id])) {
+                logActivity('update', 'master_projects', "Mengubah Status Proyek ({$status}): {$projectName}", 'projects', $id);
                 setFlash('success', 'Status proyek berhasil diubah.');
             } else {
                 setFlash('danger', 'Gagal mengubah status proyek.');
@@ -30,9 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         exit;
     } elseif ($_POST['action'] === 'delete') {
         $id = $_POST['id'] ?? 0;
+        
+        $stmt = $pdo->prepare("SELECT name FROM projects WHERE id = ?");
+        $stmt->execute([$id]);
+        $projectName = $stmt->fetchColumn();
+        
         try {
             $delete = $pdo->prepare("DELETE FROM projects WHERE id = ?");
             if ($delete->execute([$id])) {
+                logActivity('delete', 'master_projects', "Menghapus Proyek: {$projectName}", 'projects', $id);
                 setFlash('success', 'Proyek berhasil dihapus secara permanen.');
             } else {
                 setFlash('danger', 'Gagal menghapus proyek.');

@@ -104,6 +104,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("UPDATE quotations SET status = 'invoiced' WHERE id = ?")->execute([$quotationId]);
 
         $pdo->commit();
+        
+        $logAction = ($status === 'pending') ? 'submit' : 'create';
+        $logDesc = ($status === 'pending') 
+            ? "Men-submit Invoice baru: {$invoiceNo} (Ref Quotation ID: {$quotationId})" 
+            : "Menyimpan draft Invoice: {$invoiceNo} (Ref Quotation ID: {$quotationId})";
+        logActivity($logAction, 'invoice', $logDesc, 'invoices', $invId);
+        
         setFlash('success', "Invoice $invoiceNo berhasil dibuat.");
         header('Location: index.php');
         exit;

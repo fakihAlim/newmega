@@ -23,8 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($usedInEmployees > 0) {
         setFlash('danger', 'Jabatan tidak dapat dihapus karena sedang digunakan oleh karyawan.');
     } else {
+        $stmtName = $pdo->prepare("SELECT jabatan_name FROM master_wages WHERE id = ?");
+        $stmtName->execute([$id]);
+        $jabatanName = $stmtName->fetchColumn();
+        
         $stmt = $pdo->prepare("DELETE FROM master_wages WHERE id = ?");
         if ($stmt->execute([$id])) {
+            logActivity('delete', 'master_wages', "Menghapus master upah: {$jabatanName}");
             setFlash('success', 'Master upah berhasil dihapus.');
         } else {
             setFlash('danger', 'Gagal menghapus master upah.');

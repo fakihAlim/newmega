@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         
         if ($stmt->execute([$companyName, $abbreviation, $picName, $phone, $email, $address, $notes, $id])) {
+            logActivity('update', 'master_customers', "Memperbarui data customer: {$companyName}", 'customers', $id);
             setFlash('success', "Data customer berhasil diperbarui.");
             header('Location: ' . APP_URL . '/modules/master/customers/index.php');
             exit;

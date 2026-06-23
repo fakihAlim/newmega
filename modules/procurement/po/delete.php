@@ -51,6 +51,8 @@ try {
     
     $pdo->commit();
     
+    logActivity('delete', 'purchase_order', "Menghapus Purchase Order: {$po['po_number']}", 'purchase_orders', $id);
+    
     setFlash('success', "PO {$po['po_number']} berhasil dihapus.");
 } catch (Exception $e) {
     $pdo->rollBack();

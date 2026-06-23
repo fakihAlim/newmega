@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([$invoiceId, $paymentDate, $amount, $paymentMethod, $referenceNo, $notes, $user['id']]);
+        $paymentId = $pdo->lastInsertId();
         
         // Re-check total paid to update invoice status
         $stmtNewTotal = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM customer_payments WHERE invoice_id = ?");
@@ -76,6 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $pdo->commit();
+        
+        $stmtInvNo = $pdo->prepare("SELECT invoice_no FROM invoices WHERE id = ?");
+        $stmtInvNo->execute([$invoiceId]);
+        $invNo = $stmtInvNo->fetchColumn();
+        logActivity('create', 'finance', "Menerima pembayaran customer untuk Invoice: {$invNo} sebesar Rp " . number_format($amount, 0, ',', '.'), 'customer_payments', $paymentId);
+        
         setFlash('success', 'Penerimaan pembayaran customer berhasil dicatat.');
         header('Location: index.php');
         exit;

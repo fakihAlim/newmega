@@ -65,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['last_activity'] = time();
                     $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
 
+                    logActivity('login', 'auth', 'Berhasil masuk ke sistem');
+
                     session_write_close();
                     header('Location: ' . APP_URL . '/modules/dashboard/index.php');
                     exit;

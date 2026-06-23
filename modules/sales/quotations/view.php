@@ -52,9 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     if ($action === 'approve') {
         $pdo->prepare("UPDATE quotations SET status = 'approved', approved_by = ?, approved_at = NOW() WHERE id = ?")->execute([$user['id'], $id]);
+        logActivity('approve', 'quotation', "Menyetujui Quotation: {$q['quotation_no']}", 'quotations', $id);
         setFlash('success', "Quotation {$q['quotation_no']} disetujui.");
     } elseif ($action === 'reject') {
         $pdo->prepare("UPDATE quotations SET status = 'rejected', approved_by = ?, approved_at = NOW(), reject_reason = ? WHERE id = ?")->execute([$user['id'], $rejectReason, $id]);
+        logActivity('reject', 'quotation', "Menolak Quotation: {$q['quotation_no']}", 'quotations', $id);
         setFlash('danger', "Quotation {$q['quotation_no']} ditolak.");
     }
     header("Location: view.php?id=$id");

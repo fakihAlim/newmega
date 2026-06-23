@@ -36,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $stmt->execute([$jabatan_name, $daily_wage]);
             
+            logActivity('create', 'master_wages', "Menambahkan master upah baru: {$jabatan_name}", 'master_wages', $pdo->lastInsertId());
+            
             setFlash('success', 'Master upah berhasil ditambahkan.');
             header('Location: ' . APP_URL . '/modules/master/wages/index.php');
             exit;

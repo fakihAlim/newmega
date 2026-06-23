@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO companies (name, address, city, province, postal_code, phone, email, logo, is_default) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             if ($stmt->execute([$name, $address, $city, $province, $postalCode, $phone, $email, $logoFilename, $isDefault])) {
+                logActivity('create', 'master_companies', "Menambahkan perusahaan baru: {$name}", 'companies', $pdo->lastInsertId());
                 setFlash('success', 'Perusahaan berhasil ditambahkan.');
                 header('Location: ' . APP_URL . '/modules/master/companies/index.php');
                 exit;

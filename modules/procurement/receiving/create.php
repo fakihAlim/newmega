@@ -125,6 +125,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtUpdatePO = $pdo->prepare("UPDATE purchase_orders SET status = ? WHERE id = ?");
         $stmtUpdatePO->execute([$newStatus, $poId]);
         
+        $stmtPONum = $pdo->prepare("SELECT po_number FROM purchase_orders WHERE id = ?");
+        $stmtPONum->execute([$poId]);
+        $poNumber = $stmtPONum->fetchColumn();
+        
+        logActivity('create', 'goods_receiving', "Menerima Barang (SJ: {$suratJalan}) untuk PO: {$poNumber}", 'goods_receivings', $grId);
+        
         $pdo->commit();
         setFlash('success', 'Barang berhasil diterima dan disimpan. Status PO terupdate: ' . $newStatus);
         header('Location: index.php');

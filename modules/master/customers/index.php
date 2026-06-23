@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             $newStatus = $customer['is_active'] ? 0 : 1;
             $update = $pdo->prepare("UPDATE customers SET is_active = ? WHERE id = ?");
             if ($update->execute([$newStatus, $id])) {
+                $statusText = $newStatus ? 'mengaktifkan' : 'menonaktifkan';
+                logActivity('update', 'master_customers', ucfirst($statusText) . " customer ID {$id}", 'customers', $id);
                 setFlash('success', 'Status customer berhasil diubah.');
             } else {
                 setFlash('danger', 'Gagal mengubah status customer.');
@@ -45,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                 try {
                     $delete = $pdo->prepare("DELETE FROM customers WHERE id = ?");
                     if ($delete->execute([$id])) {
+                        logActivity('delete', 'master_customers', "Menghapus data customer ID {$id} secara permanen");
                         setFlash('success', 'Customer berhasil dihapus secara permanen.');
                     } else {
                         setFlash('danger', 'Gagal menghapus customer.');

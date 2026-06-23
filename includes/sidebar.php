@@ -456,6 +456,12 @@ function isActiveClass($dirs, $pages = []) {
                                 <p>Pengaturan Sistem</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="<?= APP_URL ?>/modules/admin/activity_logs/index.php" class="nav-link <?= isActiveClass(['activity_logs']) ?>">
+                                <i class="nav-icon fas fa-history"></i>
+                                <p>Log Aktivitas</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <?php endif; ?>

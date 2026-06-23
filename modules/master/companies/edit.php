@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("UPDATE companies SET name=?, address=?, city=?, province=?, postal_code=?, phone=?, email=?, logo=?, is_default=? WHERE id=?");
             
             if ($stmt->execute([$name, $address, $city, $province, $postalCode, $phone, $email, $logoFilename, $isDefault, $id])) {
+                logActivity('update', 'master_companies', "Memperbarui data perusahaan: {$name}", 'companies', $id);
                 setFlash('success', 'Data perusahaan berhasil diperbarui.');
                 header('Location: ' . APP_URL . '/modules/master/companies/index.php');
                 exit;

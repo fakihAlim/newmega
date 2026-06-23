@@ -15,7 +15,7 @@ $breadcrumbs = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array($_POST['action'], ['status_toggle', 'delete'])) {
     $id = $_POST['id'] ?? 0;
     
-    $stmt = $pdo->prepare("SELECT is_active, current_stock FROM items WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT item_code, description, is_active, current_stock FROM items WHERE id = ?");
     $stmt->execute([$id]);
     $item = $stmt->fetch();
     
@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             $newStatus = $item['is_active'] ? 0 : 1;
             $update = $pdo->prepare("UPDATE items SET is_active = ? WHERE id = ?");
             if ($update->execute([$newStatus, $id])) {
+                $statusText = $newStatus ? 'Aktif' : 'Nonaktif';
+                logActivity('update', 'master_items', "Mengubah Status Barang ({$statusText}): {$item['item_code']} - {$item['description']}", 'items', $id);
                 setFlash('success', 'Status barang berhasil diubah.');
             } else {
                 setFlash('danger', 'Gagal mengubah status barang.');
@@ -45,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                 try {
                     $delete = $pdo->prepare("DELETE FROM items WHERE id = ?");
                     if ($delete->execute([$id])) {
+                        logActivity('delete', 'master_items', "Menghapus Barang: {$item['item_code']} - {$item['description']}", 'items', $id);
                         setFlash('success', 'Barang berhasil dihapus secara permanen.');
                     } else {
                         setFlash('danger', 'Gagal menghapus barang.');

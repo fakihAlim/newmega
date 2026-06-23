@@ -89,6 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmtLog->execute([$itemId, $q, $transferId, $toProjectId, $user['id'], $logNotes]);
         }
         
+        logActivity('create', 'warehouse_transfer', "Membuat Surat Jalan Keluar: {$transferNumber} ke Proyek {$pName}", 'warehouse_transfers', $transferId);
+        
         $pdo->commit();
         setFlash('success', 'Transfer Barang (' . $transferNumber . ') berhasil disimpan dan stok telah terpotong.');
         header("Location: view.php?id=$transferId");

@@ -21,11 +21,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $invData = $stmt->fetch();
     
     if ($invData && $invData['status'] === 'draft') {
+        $stmtNo = $pdo->prepare("SELECT invoice_no FROM invoices WHERE id = ?");
+        $stmtNo->execute([$id]);
+        $invNo = $stmtNo->fetchColumn();
+        
         $pdo->prepare("DELETE FROM invoice_items WHERE invoice_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM invoices WHERE id = ?")->execute([$id]);
         
         // Revert quotation status if no other invoices exist
         $pdo->prepare("UPDATE quotations SET status = 'approved' WHERE id = ? AND NOT EXISTS (SELECT 1 FROM invoices WHERE quotation_id = ?)")->execute([$invData['quotation_id'], $invData['quotation_id']]);
+        
+        logActivity('delete', 'invoice', "Menghapus Invoice: {$invNo}");
         
         setFlash('success', 'Invoice berhasil dihapus.');
     } else {

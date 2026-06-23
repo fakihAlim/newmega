@@ -291,6 +291,20 @@ try {
     
     $pdo->commit();
     
+    // Log Activity
+    if ($successCount > 0) {
+        $moduleMap = [
+            'categories' => 'master_categories',
+            'items'      => 'master_items',
+            'companies'  => 'master_companies',
+            'customers'  => 'master_customers',
+            'vendors'    => 'master_vendors',
+            'projects'   => 'master_projects',
+        ];
+        $modName = $moduleMap[$type] ?? 'master';
+        logActivity('import', $modName, "Import {$successCount} data {$type} dari Excel");
+    }
+    
     // Set Flash Message
     if ($successCount > 0 && empty($errors)) {
         setFlash('success', "Import berhasil! {$successCount} data sukses diproses.");

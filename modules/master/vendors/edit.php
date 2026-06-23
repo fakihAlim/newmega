@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         
         if ($stmt->execute([$companyName, $abbreviation, $picName, $phone, $email, $address, $paymentTerms, $notes, $id])) {
+            logActivity('update', 'master_vendors', "Memperbarui Vendor: {$companyName}", 'vendors', $id);
             setFlash('success', "Data vendor berhasil diperbarui.");
             header('Location: ' . APP_URL . '/modules/master/vendors/index.php');
             exit;

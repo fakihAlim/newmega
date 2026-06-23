@@ -63,6 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $pdo->commit();
+            
+            logActivity('create', 'master_roles', "Menambahkan peran baru: {$roleName} ({$roleKey})", 'roles', $newRoleId);
+            
             setFlash('success', 'Peran berhasil ditambahkan.');
             header('Location: index.php');
             exit;

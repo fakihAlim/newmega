@@ -49,10 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($action === 'approve') {
         $stmt = $pdo->prepare("UPDATE material_requests SET status = 'approved', approved_by = ?, approved_at = NOW() WHERE id = ?");
         $stmt->execute([$user['id'], $id]);
+        logActivity('approve', 'material_request', "Menyetujui Material Request: {$mr['mr_number']}", 'material_requests', $id);
         setFlash('success', "MR {$mr['mr_number']} berhasil disetujui.");
     } elseif ($action === 'reject') {
         $stmt = $pdo->prepare("UPDATE material_requests SET status = 'rejected', approved_by = ?, approved_at = NOW(), reject_reason = ? WHERE id = ?");
         $stmt->execute([$user['id'], $rejectReason, $id]);
+        logActivity('reject', 'material_request', "Menolak Material Request: {$mr['mr_number']}", 'material_requests', $id);
         setFlash('danger', "MR {$mr['mr_number']} telah ditolak.");
     }
     

@@ -66,6 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $insert->execute([$categoryId, $itemCode, $description, $typeSpec, $uom, $stockType === 'stock' ? $minimumStock : 0, $whLocation, $remark, $stockType]);
             
+            $newId = $pdo->lastInsertId();
+            logActivity('create', 'master_items', "Menambah Barang: {$itemCode} - {$description}", 'items', $newId);
+            
             $pdo->commit();
             setFlash('success', "Barang berhasil ditambahkan dengan kode: $itemCode");
             header('Location: ' . APP_URL . '/modules/master/items/index.php');

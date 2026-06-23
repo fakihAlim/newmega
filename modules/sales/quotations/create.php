@@ -95,6 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $pdo->commit();
+            
+            $cStmt = $pdo->prepare("SELECT company_name FROM customers WHERE id = ?");
+            $cStmt->execute([$customerId]);
+            $cName = $cStmt->fetchColumn();
+            
+            $logAction = ($status === 'pending') ? 'submit' : 'create';
+            $logDesc = ($status === 'pending') 
+                ? "Men-submit Quotation baru: {$quotationNo} untuk {$cName}" 
+                : "Menyimpan draft Quotation: {$quotationNo} untuk {$cName}";
+            logActivity($logAction, 'quotation', $logDesc, 'quotations', $qId);
+            
             $msg = $status === 'pending' ? "Quotation $quotationNo berhasil di-submit." : "Quotation $quotationNo disimpan sebagai Draft.";
             setFlash('success', $msg);
             header('Location: index.php');

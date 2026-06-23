@@ -15,7 +15,7 @@ $breadcrumbs = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array($_POST['action'], ['status_toggle', 'delete'])) {
     $id = $_POST['id'] ?? 0;
     
-    $stmt = $pdo->prepare("SELECT is_active FROM vendors WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT company_name, is_active FROM vendors WHERE id = ?");
     $stmt->execute([$id]);
     $vendor = $stmt->fetch();
     
@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             $newStatus = $vendor['is_active'] ? 0 : 1;
             $update = $pdo->prepare("UPDATE vendors SET is_active = ? WHERE id = ?");
             if ($update->execute([$newStatus, $id])) {
+                $statusText = $newStatus ? 'Aktif' : 'Nonaktif';
+                logActivity('update', 'master_vendors', "Mengubah Status Vendor ({$statusText}): {$vendor['company_name']}", 'vendors', $id);
                 setFlash('success', 'Status vendor berhasil diubah.');
             } else {
                 setFlash('danger', 'Gagal mengubah status vendor.');
@@ -40,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                 try {
                     $delete = $pdo->prepare("DELETE FROM vendors WHERE id = ?");
                     if ($delete->execute([$id])) {
+                        logActivity('delete', 'master_vendors', "Menghapus Vendor: {$vendor['company_name']}", 'vendors', $id);
                         setFlash('success', 'Vendor berhasil dihapus secara permanen.');
                     } else {
                         setFlash('danger', 'Gagal menghapus vendor.');

@@ -158,7 +158,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updateHeader->execute([$totalClaimAmount, $claimId]);
 
             $pdo->commit();
-
+            
+            logActivity('create', 'finance', "Membuat Klaim Nota baru: {$claimNumber} untuk {$employeeName} sebesar Rp " . number_format($totalClaimAmount, 0, ',', '.'), 'nota_claims', $claimId);
+            
             setFlash('success', "Klaim Nota $claimNumber berhasil disimpan.");
             header('Location: ' . APP_URL . '/modules/finance/claim_nota/index.php');
             exit;

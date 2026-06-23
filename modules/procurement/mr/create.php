@@ -93,6 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $pdo->commit();
             
+            logActivity('create', 'material_request', "Membuat Material Request: {$mrNumber}", 'material_requests', $mrId);
+            
             $msg = $status === 'pending' ? "MR $mrNumber berhasil di-submit." : "MR $mrNumber disimpan sebagai Draft.";
             setFlash('success', $msg);
             header('Location: ' . APP_URL . '/modules/procurement/mr/index.php');

@@ -48,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE categories SET name = ?, prefix = ?, description = ? WHERE id = ?");
         
         if ($stmt->execute([$name, $prefix, $description, $id])) {
+            logActivity('update', 'master_categories', "Memperbarui Kategori: {$name}", 'categories', $id);
             setFlash('success', 'Data kategori berhasil diperbarui.');
             header('Location: ' . APP_URL . '/modules/master/categories/index.php');
             exit;

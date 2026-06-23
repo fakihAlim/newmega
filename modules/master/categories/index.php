@@ -23,8 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($usedInItems > 0) {
         setFlash('danger', 'Kategori tidak dapat dihapus karena sedang digunakan pada data barang.');
     } else {
+        $stmtCat = $pdo->prepare("SELECT name FROM categories WHERE id = ?");
+        $stmtCat->execute([$id]);
+        $catName = $stmtCat->fetchColumn();
+        
         $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
         if ($stmt->execute([$id])) {
+            logActivity('delete', 'master_categories', "Menghapus Kategori: {$catName}", 'categories', $id);
             setFlash('success', 'Kategori berhasil dihapus.');
         } else {
             setFlash('danger', 'Gagal menghapus kategori.');

@@ -31,7 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmtDel->execute([$id]);
 
             $pdo->commit();
-
+            
+            logActivity('delete', 'finance', "Menghapus Klaim Nota: {$claim['claim_number']}");
+            
             // Delete physical files after transaction commits successfully
             foreach ($photos as $photo) {
                 if ($photo) {

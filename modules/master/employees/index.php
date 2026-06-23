@@ -24,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $newStatus = $emp['is_active'] ? 0 : 1;
         $pdo->prepare("UPDATE employees SET is_active = ? WHERE id = ?")->execute([$newStatus, $id]);
         $pdo->prepare("UPDATE users SET is_active = ? WHERE id = ?")->execute([$newStatus, $emp['user_id']]);
+        
+        $statusText = $newStatus ? 'mengaktifkan' : 'menonaktifkan';
+        logActivity('update', 'master_employees', ucfirst($statusText) . " karyawan ID {$id}", 'employees', $emp['user_id']);
+        
         setFlash('success', 'Status karyawan berhasil diubah.');
     }
     header('Location: ' . APP_URL . '/modules/master/employees/index.php');

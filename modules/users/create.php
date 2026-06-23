@@ -66,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmtRole->execute([$userId, $roleId]);
                 }
 
+                logActivity('create', 'users', "Membuat pengguna baru: {$username}", 'users', $userId);
+
                 setFlash('success', 'Pengguna berhasil ditambahkan.');
                 header('Location: ' . APP_URL . '/modules/users/index.php');
                 exit;

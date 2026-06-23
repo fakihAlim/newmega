@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         
         if ($update->execute([$description, $typeSpec, $uom, $stockType === 'stock' ? $minimumStock : 0, $whLocation, $remark, $stockType, $id])) {
+            logActivity('update', 'master_items', "Memperbarui Barang: {$item['item_code']} - {$description}", 'items', $id);
             setFlash('success', "Data barang berhasil diperbarui.");
             header('Location: ' . APP_URL . '/modules/master/items/index.php');
             exit;

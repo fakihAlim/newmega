@@ -212,7 +212,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $pdo->commit();
-
+            
+            logActivity('update', 'finance', "Memperbarui Klaim Nota: {$claimNumber} untuk {$employeeName} menjadi sebesar Rp " . number_format($totalClaimAmount, 0, ',', '.'), 'nota_claims', $id);
+            
             setFlash('success', "Klaim Nota $claimNumber berhasil diperbarui.");
             header('Location: ' . APP_URL . '/modules/finance/claim_nota/view.php?id=' . $id);
             exit;

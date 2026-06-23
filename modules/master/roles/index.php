@@ -23,8 +23,13 @@ if (isset($_POST['delete_id'])) {
     if ($stmtCheck->fetchColumn() > 0) {
         setFlash('danger', 'Peran tidak dapat dihapus karena sedang digunakan oleh user.');
     } else {
+        $stmtName = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+        $stmtName->execute([$delId]);
+        $roleName = $stmtName->fetchColumn();
+        
         $stmtDel = $pdo->prepare("DELETE FROM roles WHERE id = ?");
         if ($stmtDel->execute([$delId])) {
+            logActivity('delete', 'master_roles', "Menghapus peran: {$roleName}");
             setFlash('success', 'Peran berhasil dihapus.');
         } else {
             setFlash('danger', 'Gagal menghapus peran.');

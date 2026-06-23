@@ -64,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([$poId, $paymentDate, $amount, $paymentMethod, $paymentTerm, $bankName, $bankAccount, $referenceNo, $notes, $user['id']]);
+        $paymentId = $pdo->lastInsertId();
+        
+        $stmtPoNo = $pdo->prepare("SELECT po_number FROM purchase_orders WHERE id = ?");
+        $stmtPoNo->execute([$poId]);
+        $poNo = $stmtPoNo->fetchColumn();
+        logActivity('create', 'finance', "Mencatat pembayaran supplier untuk PO: {$poNo} sebesar Rp " . number_format($amount, 0, ',', '.'), 'vendor_payments', $paymentId);
         
         setFlash('success', 'Pembayaran vendor berhasil dicatat.');
         header('Location: index.php');
