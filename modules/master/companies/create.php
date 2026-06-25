@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle Logo Upload
         $logoFilename = null;
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $result = uploadFile($_FILES['logo'], LOGOS_PATH);
+            $result = uploadFile($_FILES['logo'], LOGOS_PATH, ['jpg', 'jpeg', 'png', 'gif'], 5242880, ['quality' => 80, 'maxWidth' => 400, 'maxHeight' => 400]);
             if ($result['success']) {
                 $logoFilename = $result['filename'];
             } else {

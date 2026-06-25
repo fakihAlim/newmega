@@ -36,7 +36,7 @@ try {
 
     // 2. Prepare the prompt for Gemini
     $prompt = "You are an AI assistant for a procurement and inventory system (mostly construction and mechanical materials in Indonesia). 
-Given an item name, suggest the most appropriate category, type/specification (extract extra details from the name), and standard Unit of Measure (UoM).
+Given an item name, suggest the most appropriate category, type/specification (extract extra details from the name), a standard Unit of Measure (UoM), and a short manual item code.
 
 Item Name: \"{$itemName}\"
 
@@ -49,7 +49,8 @@ Respond ONLY with a raw JSON object (without markdown code blocks) using this ex
 {
     \"category_id\": integer (the closest matching ID from the list above),
     \"type_specification\": \"string (extract any sizes, brands, or specific types from the name, or leave empty)\",
-    \"uom\": \"string (choose an appropriate UoM, must be uppercase)\"
+    \"uom\": \"string (choose an appropriate UoM, must be uppercase)\",
+    \"manual_code\": \"string (generate a short 2-5 letter code representing the item's BRAND or specific model, EXCLUDING general category words like Cat, Kabel, Pipa, Besi. e.g. for 'Cat APP 37' -> 'APP', for 'Kabel Supreme' -> 'SUP')\"
 }";
 
     // 3. Call Google Gemini API
@@ -107,6 +108,35 @@ Respond ONLY with a raw JSON object (without markdown code blocks) using this ex
     
     if (json_last_error() !== JSON_ERROR_NONE) {
         throw new Exception("Failed to parse JSON from AI response: " . $aiText);
+    }
+    
+    // Append sequence number to manual code
+    if (!empty($suggestedData['manual_code']) && !empty($suggestedData['category_id'])) {
+        $shortCode = strtoupper(str_replace(' ', '', $suggestedData['manual_code']));
+        
+        $stmt = $pdo->prepare("SELECT prefix FROM categories WHERE id = ?");
+        $stmt->execute([$suggestedData['category_id']]);
+        $prefix = $stmt->fetchColumn();
+        
+        if ($prefix) {
+            $stmt = $pdo->prepare("
+                SELECT item_code 
+                FROM items 
+                WHERE item_code LIKE ?
+                ORDER BY CAST(SUBSTRING_INDEX(item_code, '-', -1) AS UNSIGNED) DESC 
+                LIMIT 1
+            ");
+            $stmt->execute([$prefix . '-' . $shortCode . '-%']);
+            $lastCode = $stmt->fetchColumn();
+            
+            $nextSeq = 1;
+            if ($lastCode) {
+                $parts = explode('-', $lastCode);
+                $nextSeq = intval(end($parts)) + 1;
+            }
+            
+            $suggestedData['manual_code'] = $shortCode . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+        }
     }
     
     // 4. Return success

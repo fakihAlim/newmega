@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($abbreviation)) {
         $abbreviation = generateAbbreviation($companyName);
     } else {
-        $abbreviation = strtoupper(substr($abbreviation, 0, 3));
+        $abbreviation = strtoupper($abbreviation);
     }
     
     // Validation
@@ -88,8 +88,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Singkatan (Akan digenerate otomatis)</label>
                         <div class="col-sm-8">
-                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($_POST['abbreviation'] ?? '') ?>" maxlength="3" style="text-transform: uppercase;" placeholder="Cth: MKM">
-                            <small class="text-muted d-block mt-1">Kosongkan agar OTOMATIS digenerate.</small>
+                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($_POST['abbreviation'] ?? '') ?>" maxlength="15" style="text-transform: uppercase;" placeholder="Cth: MKM001">
+                            <small class="text-muted d-block mt-1">Kosongkan agar OTOMATIS digenerate (Max 15 Char).</small>
                         </div>
                     </div>
                     

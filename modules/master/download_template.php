@@ -79,9 +79,10 @@ switch ($type) {
         break;
         
     case 'items':
-        $headers = ['Prefix Kategori*', 'Nama / Deskripsi*', 'Spesifikasi', 'Satuan (UoM)*', 'Tipe Distribusi*', 'Minimum Stok', 'Lokasi Gudang', 'Catatan'];
+        $headers = ['Prefix Kategori*', 'Kode Barang*', 'Nama / Deskripsi*', 'Spesifikasi', 'Satuan (UoM)*', 'Tipe Distribusi*', 'Minimum Stok', 'Lokasi Gudang', 'Catatan'];
         $instructions = [
             'Wajib. Prefix kategori yang sudah ada. Cth: CN-SEM',
+            'Wajib. Kode barang (gabungan Prefix & Manual). Cth: CN-SEM-001',
             'Wajib. Nama barang / material',
             'Opsional. Merek/ukuran/tipe',
             'Wajib. Cth: PCS, ZAK, M2',
@@ -90,7 +91,7 @@ switch ($type) {
             'Opsional. Cth: Rak A1',
             'Opsional.'
         ];
-        $widths = [18, 40, 25, 15, 18, 15, 20, 30];
+        $widths = [18, 25, 40, 25, 15, 18, 15, 20, 30];
         break;
 
     case 'companies':
@@ -112,7 +113,7 @@ switch ($type) {
         $headers = ['Nama Pelanggan*', 'Singkatan*', 'Nama PIC', 'No. Telp', 'Email', 'Alamat', 'Nama Bank', 'No. Rekening', 'Atas Nama Rekening', 'Catatan'];
         $instructions = [
             'Wajib diisi.',
-            'Wajib diisi. Singkatan 3-5 karakter',
+            'Wajib diisi. Singkatan maksimal 20 karakter',
             'Opsional.',
             'Opsional.',
             'Opsional.',
@@ -129,7 +130,7 @@ switch ($type) {
         $headers = ['Nama Pemasok*', 'Singkatan*', 'Kontak Person', 'No. Telp', 'Email', 'Alamat', 'Nama Bank', 'No. Rekening', 'Atas Nama Rekening', 'Term Pembayaran', 'Catatan'];
         $instructions = [
             'Wajib diisi.',
-            'Wajib diisi. Singkatan 3-5 karakter',
+            'Wajib diisi. Singkatan maksimal 15 karakter',
             'Opsional.',
             'Opsional.',
             'Opsional.',

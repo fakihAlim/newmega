@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($baseAbbr)) {
         $baseAbbr = generateAbbreviation($companyName);
     } else {
-        $baseAbbr = strtoupper(substr($baseAbbr, 0, 3));
+        $baseAbbr = strtoupper($baseAbbr);
     }
     
     // Find the next sequence for this base abbreviation
@@ -90,10 +90,10 @@ require_once __DIR__ . '/../../../includes/header.php';
                     </div>
                     
                     <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">Singkatan</label>
+                        <label class="col-sm-4 col-form-label">Singkatan (Akan digenerate otomatis)</label>
                         <div class="col-sm-8">
-                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($_POST['abbreviation'] ?? '') ?>" maxlength="10" style="text-transform: uppercase;" placeholder="Cth: MKM">
-                            <small class="text-muted d-block mt-1">Kosongkan agar otomatis digenerate.</small>
+                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($_POST['abbreviation'] ?? '') ?>" maxlength="20" style="text-transform: uppercase;" placeholder="Cth: CUS">
+                            <small class="text-muted d-block mt-1">Kosongkan agar OTOMATIS digenerate (Max 20 Char).</small>
                         </div>
                     </div>
                     

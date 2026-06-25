@@ -35,29 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo->beginTransaction();
             
+            $manualCode = $_POST['manual_code'] ?? '';
+            $manualCode = strtoupper(str_replace(' ', '', $manualCode));
+            if (empty($manualCode)) {
+                throw new Exception("Kode barang manual wajib diisi.");
+            }
+            
             // Generate Item Code based on category prefix
             $stmt = $pdo->prepare("SELECT prefix FROM categories WHERE id = ?");
             $stmt->execute([$categoryId]);
             $prefix = $stmt->fetchColumn();
             
-            // Get last sequence for this category
-            $stmt = $pdo->prepare("
-                SELECT item_code 
-                FROM items 
-                WHERE category_id = ?
-                ORDER BY CAST(SUBSTRING_INDEX(item_code, '-', -1) AS UNSIGNED) DESC 
-                LIMIT 1
-            ");
-            $stmt->execute([$categoryId]);
-            $lastCode = $stmt->fetchColumn();
+            $itemCode = $prefix . '-' . $manualCode;
             
-            $nextSeq = 1;
-            if ($lastCode) {
-                $parts = explode('-', $lastCode);
-                $nextSeq = intval(end($parts)) + 1;
+            // Check if already exists
+            $stmt = $pdo->prepare("SELECT id FROM items WHERE item_code = ?");
+            $stmt->execute([$itemCode]);
+            if ($stmt->fetch()) {
+                throw new Exception("Kode barang $itemCode sudah digunakan.");
             }
-            
-            $itemCode = $prefix . '-' . str_pad($nextSeq, 3, '0', STR_PAD_LEFT);
+
             
             $insert = $pdo->prepare("
                 INSERT INTO items (category_id, item_code, description, type_specification, uom, minimum_stock, warehouse_location, remark, stock_type, current_stock, is_active) 
@@ -102,7 +99,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Kategori <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
-                            <select name="category_id" class="form-control select2" required>
+                            <select id="categoryId" name="category_id" class="form-control select2" required>
                                 <option value="">-- Pilih Kategori --</option>
                                 <?php foreach ($categories as $cat): ?>
                                     <option value="<?= $cat['id'] ?>" <?= ($_POST['category_id'] ?? '') == $cat['id'] ? 'selected' : '' ?>>
@@ -110,7 +107,14 @@ require_once __DIR__ . '/../../../includes/header.php';
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <small class="text-muted d-block mt-1">Kode barang akan digenerate otomatis berdasarkan prefix kategori yang dipilih.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Kode barang <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" id="manualCode" name="manual_code" class="form-control" value="<?= sanitize($_POST['manual_code'] ?? '') ?>" required style="text-transform: uppercase;">
+                            <div id="codeFeedback" class="mt-1 font-weight-bold" style="font-size: 13px; display: none;"></div>
                         </div>
                     </div>
                     
@@ -206,6 +210,50 @@ $(document).ready(function() {
     // Trigger on load
     $('input[name="stock_type"]').trigger('change');
     
+    // Check Item Code logic
+    function checkItemCode() {
+        let catId = $('#categoryId').val();
+        let manualCode = $('#manualCode').val();
+        let feedback = $('#codeFeedback');
+        
+        // Remove spaces and uppercase locally for feedback visual
+        if (manualCode) {
+            manualCode = manualCode.toUpperCase().replace(/\s+/g, '');
+            $('#manualCode').val(manualCode);
+        }
+        
+        if (!catId || !manualCode) {
+            feedback.hide();
+            return;
+        }
+        
+        $.ajax({
+            url: APP_URL + '/api/check_item_code.php',
+            type: 'GET',
+            data: { category_id: catId, manual_code: manualCode },
+            dataType: 'json',
+            success: function(res) {
+                if (res.error) return;
+                
+                feedback.show().removeClass('text-danger text-success text-warning');
+                
+                if (res.exists) {
+                    feedback.addClass('text-danger').html('<i class="fas fa-times-circle"></i> Peringatan: Kode ' + res.full_code + ' sudah digunakan!');
+                } else {
+                    let msg = '<span class="text-success"><i class="fas fa-check-circle"></i> Kode ' + res.full_code + ' tersedia.</span>';
+                    if (res.last_code) {
+                        msg += '<br><span class="text-warning"><i class="fas fa-info-circle"></i> Nomor terakhir untuk ini: ' + res.last_code + '</span>';
+                    }
+                    feedback.html(msg);
+                }
+            }
+        });
+    }
+    
+    $('#categoryId, #manualCode').on('change keyup', function() {
+        checkItemCode();
+    });
+    
     // AI Auto-Fill feature
     $('#btnAiSuggest').on('click', function() {
         let itemName = $('#itemName').val().trim();
@@ -229,6 +277,9 @@ $(document).ready(function() {
                     let d = res.data;
                     if (d.category_id) {
                         $('select[name="category_id"]').val(d.category_id).trigger('change');
+                    }
+                    if (d.manual_code) {
+                        $('input[name="manual_code"]').val(d.manual_code).trigger('change');
                     }
                     if (d.type_specification) {
                         $('input[name="type_specification"]').val(d.type_specification);

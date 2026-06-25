@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fileName = null;
     if (isset($_FILES['surat_jalan_file']) && $_FILES['surat_jalan_file']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/../../../uploads/receiving';
-        $uploadResult = uploadFile($_FILES['surat_jalan_file'], $uploadDir, ['jpg', 'jpeg', 'png', 'pdf']);
+        $uploadResult = uploadFile($_FILES['surat_jalan_file'], $uploadDir, ['jpg', 'jpeg', 'png', 'pdf'], 5242880, ['quality' => 75, 'maxWidth' => 800, 'maxHeight' => 800]);
         if ($uploadResult['success']) {
             $fileName = $uploadResult['filename'];
         } else {

@@ -257,9 +257,100 @@ function hasRole($roles) {
 }
 
 /**
+ * Compress and optionally resize image using GD library
+ */
+function compressImage($filepath, $quality = 75, $maxWidth = null, $maxHeight = null) {
+    if (!extension_loaded('gd') || !function_exists('imagecreatefromstring')) {
+        return false;
+    }
+
+    $info = @getimagesize($filepath);
+    if ($info === false) {
+        return false;
+    }
+    
+    $mime = $info['mime'];
+    $width = $info[0];
+    $height = $info[1];
+    
+    switch ($mime) {
+        case 'image/jpeg':
+            $image = @imagecreatefromjpeg($filepath);
+            break;
+        case 'image/png':
+            $image = @imagecreatefrompng($filepath);
+            break;
+        case 'image/gif':
+            $image = @imagecreatefromgif($filepath);
+            break;
+        default:
+            return false;
+    }
+    
+    if (!$image) {
+        return false;
+    }
+    
+    $newWidth = $width;
+    $newHeight = $height;
+    
+    if ($maxWidth && $width > $maxWidth) {
+        $newWidth = $maxWidth;
+        $newHeight = (int)round($height * ($maxWidth / $width));
+    }
+    
+    if ($maxHeight && $newHeight > $maxHeight) {
+        $newHeight = $maxHeight;
+        $newWidth = (int)round($width * ($maxHeight / $height));
+    }
+    
+    if ($newWidth != $width || $newHeight != $height) {
+        $newImage = imagecreatetruecolor($newWidth, $newHeight);
+        if (!$newImage) {
+            imagedestroy($image);
+            return false;
+        }
+        
+        if ($mime == 'image/png' || $mime == 'image/gif') {
+            imagealphablending($newImage, false);
+            imagesavealpha($newImage, true);
+            $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
+            if ($transparent !== false) {
+                imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $transparent);
+            }
+        }
+        
+        if (!imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height)) {
+            imagedestroy($image);
+            imagedestroy($newImage);
+            return false;
+        }
+        imagedestroy($image);
+        $image = $newImage;
+    }
+    
+    $success = false;
+    switch ($mime) {
+        case 'image/jpeg':
+            $success = imagejpeg($image, $filepath, $quality);
+            break;
+        case 'image/png':
+            $pngQuality = (int)max(0, min(9, 9 - round($quality / 10)));
+            $success = imagepng($image, $filepath, $pngQuality);
+            break;
+        case 'image/gif':
+            $success = imagegif($image, $filepath);
+            break;
+    }
+    
+    imagedestroy($image);
+    return $success;
+}
+
+/**
  * Upload file helper
  */
-function uploadFile($file, $destination, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'csv', 'pdf', 'xls', 'xlsx', 'doc', 'docx'], $maxSize = 5242880) {
+function uploadFile($file, $destination, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'csv', 'pdf', 'xls', 'xlsx', 'doc', 'docx'], $maxSize = 5242880, $compressOptions = null) {
     if ($file['error'] !== UPLOAD_ERR_OK) {
         return ['success' => false, 'message' => 'Gagal mengunggah file.'];
     }
@@ -311,6 +402,13 @@ function uploadFile($file, $destination, $allowedTypes = ['jpg', 'jpeg', 'png', 
     $filepath = $destination . '/' . $filename;
     
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        // Compress image if options are provided and it is a supported image extension
+        if ($compressOptions && in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+            $quality = $compressOptions['quality'] ?? 75;
+            $maxWidth = $compressOptions['maxWidth'] ?? null;
+            $maxHeight = $compressOptions['maxHeight'] ?? null;
+            compressImage($filepath, $quality, $maxWidth, $maxHeight);
+        }
         return ['success' => true, 'filename' => $filename];
     }
     

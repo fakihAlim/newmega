@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($abbreviation)) {
         $abbreviation = generateAbbreviation($companyName);
     } else {
-        $abbreviation = strtoupper(substr($abbreviation, 0, 3));
+        $abbreviation = strtoupper($abbreviation);
     }
     
     // Validation
@@ -102,8 +102,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Singkatan</label>
                         <div class="col-sm-8">
-                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($customer['abbreviation']) ?>" maxlength="10" style="text-transform: uppercase;">
-                            <small class="text-muted d-block mt-1">Digunakan di No. INV/Q (Max 10 Char).</small>
+                            <input type="text" name="abbreviation" class="form-control" value="<?= sanitize($customer['abbreviation']) ?>" maxlength="20" style="text-transform: uppercase;">
+                            <small class="text-muted d-block mt-1">Gunakan huruf kapital (Max 20 Char).</small>
                         </div>
                     </div>
                     

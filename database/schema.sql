@@ -81,9 +81,9 @@ CREATE TABLE IF NOT EXISTS items (
 CREATE TABLE IF NOT EXISTS vendors (
     id INT AUTO_INCREMENT PRIMARY KEY,
     company_name VARCHAR(150) NOT NULL,
-    abbreviation VARCHAR(3) NOT NULL,
+    abbreviation VARCHAR(15) NOT NULL,
     address TEXT,
-    contact_person VARCHAR(100),
+    pic_name VARCHAR(100),
     phone VARCHAR(30),
     email VARCHAR(100),
     bank_name VARCHAR(50),
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS vendors (
 CREATE TABLE IF NOT EXISTS customers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     company_name VARCHAR(150) NOT NULL,
-    abbreviation VARCHAR(3) NOT NULL,
+    abbreviation VARCHAR(20) NOT NULL,
     address TEXT,
     pic_name VARCHAR(100),
     phone VARCHAR(30),
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS material_request_items (
 -- =============================================
 CREATE TABLE IF NOT EXISTS purchase_orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    po_number VARCHAR(20) UNIQUE NOT NULL,
+    po_number VARCHAR(50) UNIQUE NOT NULL,
     vendor_id INT NOT NULL,
     company_id INT NOT NULL,
     po_date DATE NOT NULL,

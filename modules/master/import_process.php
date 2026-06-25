@@ -71,6 +71,16 @@ try {
     foreach ($rows as $index => $row) {
         $rowNum = $index + 3; // +3 karena index 0 = baris 3 di Excel
         
+        // Bersihkan data yang tidak sengaja tercopy dari instruksi template (misal: "Opsional. Cth: Rak A1")
+        $row = array_map(function($val) {
+            if (!is_string($val)) return $val;
+            $valLower = strtolower(trim($val));
+            if (strpos($valLower, 'opsional.') === 0 || strpos($valLower, 'wajib.') === 0 || strpos($valLower, 'wajib diisi') === 0) {
+                return '';
+            }
+            return $val;
+        }, $row);
+        
         // Skip baris kosong
         if (empty(array_filter($row))) continue;
         
@@ -104,16 +114,17 @@ try {
                 
             } elseif ($type === 'items') {
                 $catPrefix = strtoupper(trim($row[0] ?? ''));
-                $desc      = trim($row[1] ?? '');
-                $typeSpec  = trim($row[2] ?? '');
-                $uom       = trim($row[3] ?? '');
-                $stockType = strtolower(trim($row[4] ?? ''));
-                $minStock  = floatval($row[5] ?? 0);
-                $whLoc     = trim($row[6] ?? '');
-                $remark    = trim($row[7] ?? '');
+                $itemCode  = strtoupper(str_replace(' ', '', trim($row[1] ?? '')));
+                $desc      = trim($row[2] ?? '');
+                $typeSpec  = trim($row[3] ?? '');
+                $uom       = trim($row[4] ?? '');
+                $stockType = strtolower(trim($row[5] ?? ''));
+                $minStock  = floatval($row[6] ?? 0);
+                $whLoc     = trim($row[7] ?? '');
+                $remark    = trim($row[8] ?? '');
                 
-                if (empty($catPrefix) || empty($desc) || empty($uom)) {
-                    throw new Exception("Prefix Kategori, Deskripsi, dan UoM wajib diisi.");
+                if (empty($catPrefix) || empty($itemCode) || empty($desc) || empty($uom)) {
+                    throw new Exception("Prefix Kategori, Kode Barang, Deskripsi, dan UoM wajib diisi.");
                 }
                 
                 if (!in_array($stockType, ['stock', 'direct'])) {
@@ -136,24 +147,12 @@ try {
                     throw new Exception("Barang '$desc' dengan spesifikasi '$typeSpec' sudah ada di database.");
                 }
                 
-                // Generate Item Code
-                $stmtLast = $pdo->prepare("
-                    SELECT item_code 
-                    FROM items 
-                    WHERE category_id = ?
-                    ORDER BY CAST(SUBSTRING_INDEX(item_code, '-', -1) AS UNSIGNED) DESC 
-                    LIMIT 1
-                ");
-                $stmtLast->execute([$cat['id']]);
-                $lastCode = $stmtLast->fetchColumn();
-                
-                $nextSeq = 1;
-                if ($lastCode) {
-                    $parts = explode('-', $lastCode);
-                    $nextSeq = intval(end($parts)) + 1;
+                // Check if item_code already exists
+                $stmtCode = $pdo->prepare("SELECT id FROM items WHERE item_code = ?");
+                $stmtCode->execute([$itemCode]);
+                if ($stmtCode->fetch()) {
+                    throw new Exception("Kode barang '$itemCode' sudah digunakan di database.");
                 }
-                
-                $itemCode = $cat['prefix'] . '-' . str_pad($nextSeq, 3, '0', STR_PAD_LEFT);
                 
                 // Insert Item
                 $ins = $pdo->prepare("
@@ -236,10 +235,10 @@ try {
                 $stmt = $pdo->prepare("SELECT id FROM vendors WHERE abbreviation = ?");
                 $stmt->execute([$abbr]);
                 if ($stmt->fetch()) {
-                    $upd = $pdo->prepare("UPDATE vendors SET company_name=?, contact_person=?, phone=?, email=?, address=?, bank_name=?, bank_account=?, bank_holder=?, payment_terms=?, notes=? WHERE abbreviation=?");
+                    $upd = $pdo->prepare("UPDATE vendors SET company_name=?, pic_name=?, phone=?, email=?, address=?, bank_name=?, bank_account=?, bank_holder=?, payment_terms=?, notes=? WHERE abbreviation=?");
                     $upd->execute([$name, $pic, $phone, $email, $addr, $bName, $bAcc, $bHold, $terms, $notes, $abbr]);
                 } else {
-                    $ins = $pdo->prepare("INSERT INTO vendors (company_name, abbreviation, contact_person, phone, email, address, bank_name, bank_account, bank_holder, payment_terms, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $ins = $pdo->prepare("INSERT INTO vendors (company_name, abbreviation, pic_name, phone, email, address, bank_name, bank_account, bank_holder, payment_terms, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     $ins->execute([$name, $abbr, $pic, $phone, $email, $addr, $bName, $bAcc, $bHold, $terms, $notes]);
                 }
                 $successCount++;

@@ -58,8 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     if (empty($selected_tables)) {
         $error_msg = "Silakan pilih setidaknya satu tabel untuk dihapus.";
-    } elseif ($confirm_input !== 'HAPUS_PERMANEN') {
-        $error_msg = "Konfirmasi teks tidak cocok. Harap ketik 'HAPUS_PERMANEN' dengan benar.";
+    } elseif ($confirm_input !== DELETE_CONFIRM_KEYWORD) {
+        $error_msg = "Kata sakti tidak cocok. Eksekusi dibatalkan.";
     } else {
         try {
             $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
@@ -246,8 +246,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <p>Data dari tabel yang dicentang di atas akan dihapus secara menyeluruh dari database.</p>
                             
                             <div class="form-group mb-0">
-                                <label for="confirm_text">Ketik <strong class="text-danger">HAPUS_PERMANEN</strong> di bawah ini untuk konfirmasi:</label>
-                                <input type="text" class="form-control col-md-6" id="confirm_text" name="confirm_text" placeholder="Ketik di sini..." required autocomplete="off">
+                                <label for="confirm_text">Ketikkan kata sakti untuk menghapusnya:</label>
+                                <input type="password" class="form-control col-md-6" id="confirm_text" name="confirm_text" placeholder="Ketik di sini..." required autocomplete="off">
                             </div>
 
                             <button type="submit" class="btn btn-danger btn-lg mt-3 btn-block shadow-sm" onclick="return confirmExecution()">
@@ -280,8 +280,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
 
             const confirmText = document.getElementById('confirm_text').value.trim();
-            if (confirmText !== 'HAPUS_PERMANEN') {
-                alert("Harap ketik 'HAPUS_PERMANEN' secara persis untuk konfirmasi.");
+            const keyword = '<?= DELETE_CONFIRM_KEYWORD ?>';
+            if (confirmText !== keyword) {
+                alert("Kata sakti yang Anda masukkan salah.");
                 return false;
             }
 
