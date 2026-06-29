@@ -26,7 +26,8 @@ $projects = $pdo->query("SELECT id, name FROM projects ORDER BY name ASC")->fetc
 $conditions = [];
 $params = [];
 
-if (in_array($user['role'], ['gudang', 'project_manager'])) {
+$canSeeAllMR = canAccess('purchase_order', 'view') || canAccess('users', 'view');
+if (!$canSeeAllMR) {
     $conditions[] = "m.requested_by = ?";
     $params[] = $user['id'];
 }
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         setFlash('danger', 'MR tidak ditemukan.');
     } elseif (!in_array($mr['status'], ['draft', 'pending'])) {
         setFlash('danger', 'Hanya MR berstatus Draft atau Menunggu Approval yang dapat dihapus.');
-    } elseif ($user['role'] !== 'super_admin' && $mr['requested_by'] != $user['id']) {
+    } elseif (!canAccess('material_request', 'delete') && $mr['requested_by'] != $user['id']) {
         setFlash('danger', 'Anda tidak memiliki hak akses untuk menghapus MR ini.');
     } else {
         try {
@@ -207,14 +208,14 @@ require_once __DIR__ . '/../../../includes/header.php';
                                 <i class="fas fa-eye"></i>
                             </a>
 
-                            <?php if ($r['status'] === 'draft' && ($user['role'] === 'super_admin' || $user['id'] == $r['requested_by'])): ?>
+                            <?php if ($r['status'] === 'draft' && ($user['id'] == $r['requested_by'] || canAccess('material_request', 'edit'))): ?>
                                 <a href="<?= APP_URL ?>/modules/procurement/mr/edit.php?id=<?= $r['id'] ?>"
                                     class="btn btn-warning btn-sm" data-toggle="tooltip" title="Ubah Draft">
                                     <i class="fas fa-edit text-white"></i>
                                 </a>
                             <?php endif; ?>
 
-                            <?php if (in_array($r['status'], ['draft', 'pending']) && ($user['role'] === 'super_admin' || $user['id'] == $r['requested_by'])): ?>
+                            <?php if (in_array($r['status'], ['draft', 'pending']) && ($user['id'] == $r['requested_by'] || canAccess('material_request', 'delete'))): ?>
                                 <form method="POST" class="d-inline" id="deleteForm-<?= $r['id'] ?>">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= $r['id'] ?>">

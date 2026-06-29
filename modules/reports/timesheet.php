@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 requirePermission('report_timesheet');
 
 $user = getCurrentUser();
-$isAdmin = in_array('super_admin', $user['roles'] ?? [$user['role']]) || in_array('finance', $user['roles'] ?? [$user['role']]) || in_array('project_manager', $user['roles'] ?? [$user['role']]);
+$isAdmin = !in_array('karyawan', array_map('strtolower', $user['roles'] ?? [$user['role']]));
 
 // If employee, get their employee_id
 $employee_id = null;

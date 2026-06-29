@@ -20,7 +20,7 @@ if (!$mr) {
 $user = getCurrentUser();
 
 // Authorization: Only the requester or super admin can edit. 
-if ($user['role'] !== 'super_admin' && $mr['requested_by'] != $user['id']) {
+if (!canAccess('material_request', 'edit') && $mr['requested_by'] != $user['id']) {
     setFlash('danger', 'Anda tidak memiliki akses untuk mengubah MR ini.');
     header('Location: ' . APP_URL . '/modules/procurement/mr/index.php');
     exit;

@@ -144,7 +144,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <i class="fas fa-eye"></i>
                         </a>
                         
-                        <?php if (in_array($o['status'], ['draft', 'pending']) && ($user['role'] === 'super_admin' || $user['id'] == $o['created_by'])): ?>
+                        <?php if (in_array($o['status'], ['draft', 'pending']) && ($user['id'] == $o['created_by'] || canAccess('purchase_order', 'edit'))): ?>
                         <a href="<?= APP_URL ?>/modules/procurement/po/edit.php?id=<?= $o['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Ubah">
                             <i class="fas fa-edit text-white"></i>
                         </a>

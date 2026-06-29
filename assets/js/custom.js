@@ -34,6 +34,39 @@ $(document).ready(function () {
 
     // Initialize Select2 with default config
     if ($.fn.select2) {
+        // Define custom matcher to allow multi-word search (similar to DataTables)
+        function customMatcher(params, data) {
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+            if (typeof data.text === 'undefined') {
+                return null;
+            }
+            if (data.children && data.children.length > 0) {
+                var match = $.extend(true, {}, data);
+                for (var c = data.children.length - 1; c >= 0; c--) {
+                    var child = data.children[c];
+                    var matches = customMatcher(params, child);
+                    if (matches == null) {
+                        match.children.splice(c, 1);
+                    }
+                }
+                if (match.children.length > 0) {
+                    return match;
+                }
+                return customMatcher(params, data);
+            }
+            var searchTerms = params.term.toLowerCase().split(/\s+/).filter(Boolean);
+            var text = data.text.toLowerCase();
+            for (var i = 0; i < searchTerms.length; i++) {
+                if (text.indexOf(searchTerms[i]) === -1) {
+                    return null;
+                }
+            }
+            return data;
+        }
+        $.fn.select2.defaults.set('matcher', customMatcher);
+
         window.initSelect2 = function(selector, options = {}) {
             const defaults = {
                 theme: 'bootstrap4',

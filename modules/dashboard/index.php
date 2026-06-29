@@ -425,7 +425,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <?php if (!hasRole(['karyawan'])): ?>
 <!-- Summary Boxes (Row 1) -->
 <div class="row">
-    <?php if (hasRole(['super_admin', 'project_manager'])): ?>
+    <?php if (canAccess('master_projects')): ?>
     <div class="col-lg-3 col-6">
         <div class="small-box bg-info">
             <div class="inner">
@@ -440,7 +440,7 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
     <?php endif; ?>
     
-    <?php if (hasRole(['super_admin', 'finance', 'gudang', 'project_manager'])): ?>
+    <?php if (canAccess('material_request')): ?>
     <div class="col-lg-3 col-6">
         <div class="small-box bg-warning">
             <div class="inner">
@@ -455,7 +455,7 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
     <?php endif; ?>
     
-    <?php if (hasRole(['super_admin', 'finance'])): ?>
+    <?php if (canAccess('purchase_order')): ?>
     <div class="col-lg-3 col-6">
         <div class="small-box bg-success">
             <div class="inner">
@@ -470,7 +470,7 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
     <?php endif; ?>
     
-    <?php if (hasRole(['super_admin', 'gudang'])): ?>
+    <?php if (canAccess('stock_alerts')): ?>
     <div class="col-lg-3 col-6">
         <div class="small-box <?= $stats['low_stock'] > 0 ? 'bg-danger' : 'bg-secondary' ?>">
             <div class="inner">
@@ -486,7 +486,7 @@ require_once __DIR__ . '/../../includes/header.php';
     <?php endif; ?>
 </div>
 
-<?php if (hasRole(['super_admin', 'finance'])): ?>
+<?php if (canAccess('ledger')): ?>
 <!-- Financial Summary (Row 2) -->
 <div class="row">
     <div class="col-lg-3 col-6">
@@ -661,7 +661,7 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
 </div>
 
-<?php if (hasRole(['super_admin', 'gudang']) && !empty($lowStockItems)): ?>
+<?php if (canAccess('stock_alerts') && !empty($lowStockItems)): ?>
 <!-- Low Stock Alert -->
 <div class="row">
     <div class="col-md-12">
@@ -770,7 +770,7 @@ $(document).ready(function() {
         });
     });
 
-    <?php if (hasRole(['super_admin', 'finance', 'project_manager'])): ?>
+    <?php if (canAccess('ledger') || canAccess('master_projects')): ?>
     // 1. Chart: Cash Flow Trend
     if ($('#chart-cash-flow').length) {
         var optionsCashFlow = {

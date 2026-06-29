@@ -15,7 +15,7 @@ $stmt->execute([$user['id']]);
 $emp = $stmt->fetch();
 
 $isKaryawan = !empty($emp);
-$isAdmin = in_array('super_admin', $user['roles'] ?? [$user['role']]) || in_array('finance', $user['roles'] ?? [$user['role']]) || in_array('project_manager', $user['roles'] ?? [$user['role']]);
+$isAdmin = !in_array('karyawan', array_map('strtolower', $user['roles'] ?? [$user['role']]));
 
 $pageTitle = 'Input Timesheet';
 $breadcrumbs = [

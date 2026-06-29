@@ -28,7 +28,7 @@ if ($q['status'] !== 'draft') {
 $user = getCurrentUser();
 
 // Authorization: Only creator or super admin
-if ($user['role'] !== 'super_admin' && $q['created_by'] != $user['id']) {
+if (!canAccess('quotation', 'edit') && $q['created_by'] != $user['id']) {
     setFlash('danger', 'Anda tidak memiliki akses untuk mengubah quotation ini.');
     header('Location: index.php');
     exit;

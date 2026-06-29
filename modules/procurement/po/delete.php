@@ -20,7 +20,7 @@ if (!$po) {
 $user = getCurrentUser();
 
 // Authorization: Only creator or super admin
-if ($user['role'] !== 'super_admin' && $po['created_by'] != $user['id']) {
+if (!canAccess('purchase_order', 'delete') && $po['created_by'] != $user['id']) {
     setFlash('danger', 'Anda tidak memiliki akses untuk menghapus PO ini.');
     header('Location: ' . APP_URL . '/modules/procurement/po/index.php');
     exit;

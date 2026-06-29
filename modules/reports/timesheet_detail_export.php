@@ -55,7 +55,7 @@ if (!empty($project_id)) {
 }
 
 $user = getCurrentUser();
-$isAdmin = in_array('super_admin', $user['roles'] ?? [$user['role']]) || in_array('finance', $user['roles'] ?? [$user['role']]) || in_array('project_manager', $user['roles'] ?? [$user['role']]);
+$isAdmin = !in_array('karyawan', array_map('strtolower', $user['roles'] ?? [$user['role']]));
 if (!$isAdmin) {
     $stmt = $pdo->prepare("SELECT id FROM employees WHERE user_id = ?");
     $stmt->execute([$user['id']]);
