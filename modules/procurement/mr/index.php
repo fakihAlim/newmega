@@ -14,10 +14,10 @@ $breadcrumbs = [
 $user = getCurrentUser();
 
 // Set default filters
-$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
-$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$status = isset($_GET['status']) ? $_GET['status'] : 'pending';
+$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : (in_array($status, ['pending', '']) ? '' : date('Y-m-01'));
+$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : (in_array($status, ['pending', '']) ? '' : date('Y-m-d'));
 $projectId = $_GET['project_id'] ?? '';
-$status = $_GET['status'] ?? '';
 
 // Fetch projects for filter
 $projects = $pdo->query("SELECT id, name FROM projects ORDER BY name ASC")->fetchAll();
@@ -108,7 +108,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="form-horizontal">
             <div class="row">
@@ -131,8 +131,8 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
                 <div class="col-md-2 col-sm-6 mb-2">
                     <label style="font-size:12px;">Status</label>
-                    <select name="status" class="form-control form-control-sm select2">
-                        <option value="">-- Semua Status --</option>
+                    <select name="status" class="form-control form-control-sm" style="height: 31px !important; padding-top: 0 !important; padding-bottom: 0 !important;">
+                        <option value="">Semua Status</option>
                         <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
                         <option value="pending" <?= $status === 'pending' ? 'selected' : '' ?>>Pending</option>
                         <option value="approved" <?= $status === 'approved' ? 'selected' : '' ?>>Approved</option>
@@ -174,7 +174,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <?php foreach ($requests as $r): ?>
                     <tr>
                         <td><strong><?= sanitize($r['mr_number']) ?></strong></td>
-                        <td><?= date('d-m-Y', strtotime($r['request_date'])) ?></td>
+                        <td><?= formatDateIndo($r['request_date']) ?></td>
                         <td><?= sanitize($r['project_name']) ?></td>
                         <td><?= sanitize($r['requester_name']) ?></td>
                         <td>

@@ -79,7 +79,7 @@ renderReportPrintHeader('Rekap Piutang Customer (Outstanding)', $periodText);
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="row">
             <div class="col-md-2 col-sm-6 mb-2">
@@ -120,7 +120,7 @@ renderReportPrintHeader('Rekap Piutang Customer (Outstanding)', $periodText);
     </div>
 </div>
 
-<div class="card card-outline card-info">
+<div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title"><i class="fas fa-file-invoice-dollar mr-2"></i> Rekap Piutang Customer (Outstanding)</h3>
         <div class="ml-auto d-flex gap-2">

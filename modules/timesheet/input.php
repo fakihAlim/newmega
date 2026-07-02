@@ -168,9 +168,6 @@ require_once __DIR__ . '/../../includes/header.php';
 
     <!-- STEP 1: Header Global -->
     <div class="card card-outline card-primary mb-3">
-        <div class="card-header">
-            <h3 class="card-title text-primary font-weight-bold"><i class="fas fa-calendar-check mr-2"></i>Input Timesheet Bulk</h3>
-        </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
@@ -217,9 +214,8 @@ require_once __DIR__ . '/../../includes/header.php';
     <!-- STEP 2: Employee Selection -->
     <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="fas fa-users mr-2"></i>Pilih Karyawan</h3>
-            <span class="text-muted" style="font-size:12px;">*Data akan dimuat ulang otomatis jika Perusahaan/Proyek/Tanggal diubah.</span>
-        </div>
+            <h3 class="card-title">Pilih Karyawan</h3>
+        </div>     
         <div class="card-body">
             <div class="row align-items-end">
                 <div class="col-md-8">

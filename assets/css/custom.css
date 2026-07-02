@@ -696,6 +696,9 @@ body {
     padding-right: 40px !important;
     padding-left: 10px !important;
     margin: 0 5px !important;
+    height: 31px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;

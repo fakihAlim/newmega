@@ -91,7 +91,7 @@ renderReportPrintHeader('Laporan Pengeluaran Proyek', $periodText);
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="row">
             <div class="col-md-2 col-sm-6 mb-2">
@@ -131,12 +131,12 @@ renderReportPrintHeader('Laporan Pengeluaran Proyek', $periodText);
     </div>
 </div>
 
-<div class="card card-outline card-primary">
+<div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i> Pengeluaran Per Proyek</h3>
+        <h3 class="card-title"> Pengeluaran Per Proyek</h3>
         <div class="ml-auto d-flex gap-2">
             <a href="export_excel.php?<?= http_build_query(array_merge($_GET, ['type' => 'project_expense'])) ?>" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i> Export Excel</a>
-            <a href="export_csv.php?<?= http_build_query(array_merge($_GET, ['type' => 'project_expense'])) ?>" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> Export CSV</a>
+            <!-- <a href="export_csv.php?<?= http_build_query(array_merge($_GET, ['type' => 'project_expense'])) ?>" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> Export CSV</a> -->
             <button class="btn btn-default btn-sm ml-1" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak</button>
         </div>
     </div>
@@ -164,7 +164,11 @@ renderReportPrintHeader('Laporan Pengeluaran Proyek', $periodText);
                     $grandPaid += $p['total_paid'];
                 ?>
                 <tr>
-                    <td><strong><?= sanitize($p['name']) ?></strong></td>
+                    <td>
+                        <a href="<?= APP_URL ?>/modules/master/projects/dashboard.php?id=<?= $p['id'] ?>" class="text-primary font-weight-bold">
+                            <?= sanitize($p['name']) ?>
+                        </a>
+                    </td>
                     <td class="text-center"><?= getStatusBadge($p['status']) ?></td>
                     <td class="text-center"><?= $p['total_mr'] ?></td>
                     <td class="text-right"><?= formatRupiah($p['budget']) ?></td>

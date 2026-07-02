@@ -72,7 +72,7 @@ if ($itemId) {
     <?php renderReportPrintHeader('Kartu Stok: ' . sanitize($item['item_code']) . ' — ' . sanitize($item['description']), $periodText); ?>
     
     <!-- Filter Card for Kartu Stok -->
-    <div class="card d-print-none mb-3">
+    <div class="card card-outline card-primary d-print-none mb-3">
         <div class="card-body p-3">
             <form method="GET" action="" class="row">
                 <input type="hidden" name="item_id" value="<?= sanitize($itemId) ?>">
@@ -92,7 +92,7 @@ if ($itemId) {
         </div>
     </div>
 
-    <div class="card card-outline card-primary">
+    <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">
                 <i class="fas fa-clipboard-check mr-2"></i> 
@@ -208,7 +208,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
 <?php renderReportPrintHeader('Laporan Rekap Stok & Mutasi', $periodText); ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="row">
             <div class="col-md-2 col-sm-6 mb-2">
@@ -242,7 +242,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
     </div>
 </div>
 
-<div class="card card-outline card-primary">
+<div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title"><i class="fas fa-clipboard-check mr-2"></i> Rekap Stok & Mutasi</h3>
         <div class="ml-auto d-flex gap-2">

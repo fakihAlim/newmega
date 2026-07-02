@@ -87,7 +87,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
 <?php renderReportPrintHeader('Laporan Laba Rugi (Profit & Loss)', $periodText); ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="row">
             <div class="col-md-3 col-sm-6 mb-2">

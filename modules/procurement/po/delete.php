@@ -26,11 +26,17 @@ if (!canAccess('purchase_order', 'delete') && $po['created_by'] != $user['id']) 
     exit;
 }
 
-// Only Draft or Pending can be deleted
+// Only Draft or Pending can be deleted, OR Approved by Super Admin if no goods received yet
+$grCount = $pdo->prepare("SELECT COUNT(*) FROM goods_receivings WHERE po_id = ?");
+$grCount->execute([$id]);
+$hasReceiving = $grCount->fetchColumn() > 0;
+
 if (!in_array($po['status'], ['draft', 'pending'])) {
-    setFlash('danger', 'Hanya PO berstatus Draft atau Pending yang dapat dihapus.');
-    header('Location: ' . APP_URL . '/modules/procurement/po/index.php');
-    exit;
+    if (!($po['status'] === 'approved' && hasRole('super_admin') && !$hasReceiving)) {
+        setFlash('danger', 'Hanya PO berstatus Draft atau Pending yang dapat dihapus.');
+        header('Location: ' . APP_URL . '/modules/procurement/po/index.php');
+        exit;
+    }
 }
 
 try {

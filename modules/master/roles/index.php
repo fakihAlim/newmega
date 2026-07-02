@@ -45,7 +45,7 @@ $roles = $stmt->fetchAll();
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card">
+<div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-user-tag mr-2"></i>Daftar Peran</h3>
         <div class="card-tools">

@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../../includes/auth.php';
 requirePermission('report_vendor_outstanding');
 
-$pageTitle = 'Outstanding Vendor (Hutang)';
+$pageTitle = 'Outstanding Supplier (Hutang)';
 $breadcrumbs = [
     ['label' => 'Laporan', 'url' => '#'],
     ['label' => 'Outstanding Vendor']
@@ -72,11 +72,11 @@ $periodText = '';
 if ($filterStart || $filterEnd) {
     $periodText = 'Periode: ' . ($filterStart ? date('d-m-Y', strtotime($filterStart)) : 'Awal') . ' s/d ' . ($filterEnd ? date('d-m-Y', strtotime($filterEnd)) : 'Akhir');
 }
-renderReportPrintHeader('Rekap Hutang ke Vendor (Outstanding)', $periodText); 
+renderReportPrintHeader('Rekap Hutang ke Supplier', $periodText); 
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="row">
             <div class="col-md-2 col-sm-6 mb-2">
@@ -116,12 +116,11 @@ renderReportPrintHeader('Rekap Hutang ke Vendor (Outstanding)', $periodText);
     </div>
 </div>
 
-<div class="card card-outline card-warning">
+<div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title"><i class="fas fa-file-invoice mr-2"></i> Rekap Hutang ke Vendor (Outstanding)</h3>
+        <h3 class="card-title">Rekap Hutang ke Supplier (Outstanding)</h3>
         <div class="ml-auto d-flex gap-2">
             <a href="export_excel.php?<?= http_build_query(array_merge($_GET, ['type' => 'vendor_outstanding'])) ?>" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i> Export Excel</a>
-            <a href="export_csv.php?<?= http_build_query(array_merge($_GET, ['type' => 'vendor_outstanding'])) ?>" class="btn btn-info btn-sm ml-1"><i class="fas fa-file-csv mr-1"></i> Export CSV</a>
             <button class="btn btn-default btn-sm ml-1" onclick="window.print()"><i class="fas fa-print mr-1"></i> Cetak</button>
         </div>
     </div>
@@ -161,9 +160,6 @@ renderReportPrintHeader('Rekap Hutang ke Vendor (Outstanding)', $periodText);
                     <td class="text-right text-success"><?= formatRupiah($po['total_paid']) ?></td>
                     <td class="text-right font-weight-bold <?= $outstanding > 0 ? 'text-danger' : 'text-success' ?>" style="font-size:14px;">
                         <?= formatRupiah($outstanding) ?>
-                        <?php if ($outstanding <= 0): ?>
-                            <i class="fas fa-check-circle text-success ml-1"></i>
-                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

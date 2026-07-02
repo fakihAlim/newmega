@@ -142,6 +142,14 @@ require_once __DIR__ . '/permissions.php';
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
+        <?php if (isset($_SESSION['original_user'])): ?>
+        <div class="bg-gradient-warning text-dark text-center py-2 px-3 shadow-sm d-flex align-items-center justify-content-center" style="gap:10px; font-size: 14px; font-weight: 500; position: sticky; top: 57px; z-index: 1010; border-bottom: 2px solid #e08e0b;">
+            <span><i class="fas fa-user-secret mr-2"></i> Anda sedang bertindak sebagai: <strong><?= sanitize($_SESSION['user']['full_name']) ?> (@<?= sanitize($_SESSION['user']['username']) ?>)</strong></span>
+            <a href="<?= APP_URL ?>/modules/auth/impersonate.php?action=logout_as" class="btn btn-xs btn-dark font-weight-bold ml-2 shadow-sm">
+                <i class="fas fa-undo mr-1"></i> Kembali ke Admin
+            </a>
+        </div>
+        <?php endif; ?>
         <!-- Content Header -->
         <div class="content-header">
             <div class="container-fluid">

@@ -73,7 +73,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="form-horizontal">
             <div class="row">
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title"><i class="fas fa-hand-holding-usd mr-2"></i> Riwayat Penerimaan Customer</h3>
+        <h3 class="card-title"> Riwayat Penerimaan Customer</h3>
         <?php if (canAccess('customer_payments')): ?>
             <a href="<?= APP_URL ?>/modules/finance/customer_payments/create.php" class="btn btn-primary btn-sm ml-auto">
                 <i class="fas fa-plus mr-1"></i> Catat Penerimaan Baru

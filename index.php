@@ -1035,7 +1035,7 @@ try {
 
                 $('#modalTipsTitle').text(title);
                 $('#modalTipsMeta').html('<i class="far fa-calendar-alt"></i> ' + date + ' | Oleh: ' + author);
-                $('#modalTipsContent').text(content);
+                $('#modalTipsContent').html(content);
                 $('#modalTipsImage').attr('src', image);
             });
         });

@@ -25,7 +25,7 @@ $items = $stmt->fetchAll();
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-danger">
+<div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title text-danger font-weight-bold">Barang Kritis (Defisit)</h3>
     </div>

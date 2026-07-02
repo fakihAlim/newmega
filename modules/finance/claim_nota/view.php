@@ -156,10 +156,11 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <thead>
                                 <tr class="bg-light">
                                     <th width="12%" class="text-center">Tanggal</th>
-                                    <th width="50%">item</th>
+                                    <th width="20%">Toko</th>
+                                    <th width="35%">item</th>
                                     <th width="8%" class="text-center">Pcs</th>
-                                    <th width="15%" class="text-right">Harga</th>
-                                    <th width="15%" class="text-right">Jumlah</th>
+                                    <th width="12%" class="text-right">Harga</th>
+                                    <th width="13%" class="text-right">Jumlah</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -170,6 +171,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                                 ?>
                                     <tr>
                                         <td class="text-center"><?= date('d/m/Y', strtotime($item['item_date'])) ?></td>
+                                        <td><?= sanitize($item['store_name']) ?: '-' ?></td>
                                         <td>
                                             <?= sanitize($item['item_name']) ?>
                                             <?php if ($item['receipt_photo']): ?>

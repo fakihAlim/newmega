@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $itemDates       = $_POST['item_date'] ?? [];
     $projectIds      = $_POST['project_id'] ?? [];
     $groupNames      = $_POST['group_name'] ?? [];
+    $storeNames      = $_POST['store_name'] ?? [];
     $itemNames       = $_POST['item_name'] ?? [];
     $qtys            = $_POST['qty'] ?? [];
     $prices          = $_POST['price'] ?? [];
@@ -137,14 +138,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Re-insert items
             $stmtItem = $pdo->prepare("
-                INSERT INTO nota_claim_items (claim_id, item_date, project_id, group_name, item_name, qty, price, amount, receipt_photo)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO nota_claim_items (claim_id, item_date, project_id, group_name, store_name, item_name, qty, price, amount, receipt_photo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
             for ($i = 0; $i < count($itemNames); $i++) {
                 $i_date  = $itemDates[$i] ?? $claimDate;
                 $i_proj  = !empty($projectIds[$i]) ? $projectIds[$i] : null;
                 $i_group = !empty($groupNames[$i]) ? trim($groupNames[$i]) : 'Money change';
+                $i_store = !empty($storeNames[$i]) ? trim($storeNames[$i]) : null;
                 $i_name  = trim($itemNames[$i] ?? '');
                 $i_qty   = parseQty($qtys[$i] ?? '1');
                 $i_price = parseRupiah($prices[$i] ?? '0');
@@ -187,6 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $i_date,
                     $i_proj,
                     $i_group,
+                    $i_store,
                     $i_name,
                     $i_qty,
                     $i_price,
@@ -313,15 +316,16 @@ require_once __DIR__ . '/../../../includes/header.php';
                 <table class="table table-bordered table-sm" id="itemsTable">
                     <thead class="thead-dark">
                         <tr>
-                            <th width="12%">Tanggal Nota</th>
-                            <th width="18%">Pilih Proyek (Opsional)</th>
-                            <th width="18%">Kelompok Pengeluaran <span class="text-danger">*</span></th>
-                            <th width="20%">Nama Item/Deskripsi <span class="text-danger">*</span></th>
-                            <th width="8%">Pcs (Qty)</th>
-                            <th width="12%">Harga Satuan</th>
-                            <th width="12%">Jumlah</th>
-                            <th width="10%">Foto Nota</th>
-                            <th width="5%" class="text-center"><i class="fas fa-trash"></i></th>
+                            <th width="9%">Tanggal Nota</th>
+                            <th width="14%">Pilih Proyek (Opsional)</th>
+                            <th width="14%">Kelompok Pengeluaran <span class="text-danger">*</span></th>
+                            <th width="14%">Nama Toko</th>
+                            <th width="14%">Nama Item/Deskripsi <span class="text-danger">*</span></th>
+                            <th width="6%">Pcs (Qty)</th>
+                            <th width="10%">Harga Satuan</th>
+                            <th width="10%">Jumlah</th>
+                            <th width="7%">Foto Nota</th>
+                            <th width="2%" class="text-center"><i class="fas fa-trash"></i></th>
                         </tr>
                     </thead>
                     <tbody id="itemsBody">
@@ -340,6 +344,9 @@ require_once __DIR__ . '/../../../includes/header.php';
                                 </td>
                                 <td>
                                     <input type="text" name="group_name[]" class="form-control form-control-sm group-input" value="<?= htmlspecialchars($item['group_name']) ?>" list="groupSuggestions" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="store_name[]" class="form-control form-control-sm" value="<?= htmlspecialchars($item['store_name'] ?? '') ?>" placeholder="Nama toko">
                                 </td>
                                 <td>
                                     <input type="text" name="item_name[]" class="form-control form-control-sm" value="<?= htmlspecialchars($item['item_name']) ?>" required>
@@ -404,6 +411,9 @@ require_once __DIR__ . '/../../../includes/header.php';
         </td>
         <td>
             <input type="text" name="group_name[]" class="form-control form-control-sm group-input" value="Money change" placeholder="Cth: Money change / Developer" list="groupSuggestions" required>
+        </td>
+        <td>
+            <input type="text" name="store_name[]" class="form-control form-control-sm" placeholder="Nama toko (misal: Toko A)">
         </td>
         <td>
             <input type="text" name="item_name[]" class="form-control form-control-sm" placeholder="Deskripsi barang..." required>

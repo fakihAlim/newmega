@@ -116,9 +116,9 @@ require_once __DIR__ . '/../../../includes/header.php';
 <div class="row">
     <div class="col-md-12">
         <form action="" method="POST" id="formTransfer">
-            <div class="card card-warning card-outline">
+            <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <h3 class="card-title text-warning font-weight-bold"><i class="fas fa-truck-loading mr-2"></i> Pembuatan Surat Jalan Keluar (Proyek)</h3>
+                    <h3 class="card-title text-primary font-weight-bold">Pembuatan Surat Jalan Keluar (Proyek)</h3>
                 </div>
                 <div class="card-body bg-light">
                     <div class="row">
@@ -199,7 +199,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
                 <div class="card-footer text-right bg-white">
                     <a href="index.php" class="btn btn-default">Batal</a>
-                    <button type="submit" class="btn btn-warning font-weight-bold ml-2 text-dark"><i class="fas fa-save mr-1"></i> Simpan & Kirim Barang</button>
+                    <button type="submit" class="btn btn-primary font-weight-bold ml-2"><i class="fas fa-save mr-1"></i> Simpan & Kirim Barang</button>
                 </div>
             </div>
         </form>

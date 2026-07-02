@@ -11,13 +11,28 @@ $user = getCurrentUser();
 $stmtPOs = $pdo->query("
     SELECT po.id, po.po_number, po.total, po.po_date, v.company_name as vendor_name,
            v.bank_name as vendor_bank_name, v.bank_account as vendor_bank_account, v.bank_holder as vendor_bank_holder,
-           COALESCE(SUM(vp.amount), 0) as total_paid
+           COALESCE(SUM(vp.amount), 0) as total_paid,
+           CASE 
+               WHEN (SELECT COUNT(*) FROM goods_receivings WHERE po_id = po.id) = 0 THEN po.total
+               ELSE 
+                   CASE 
+                       WHEN po.subtotal > 0 THEN 
+                           (
+                               (SELECT COALESCE(SUM(gri.qty_received * (poi.unit_price - (CASE WHEN poi.qty > 0 THEN poi.discount_item / poi.qty ELSE 0 END))), 0) 
+                                FROM goods_receiving_items gri 
+                                JOIN goods_receivings gr ON gri.receiving_id = gr.id 
+                                JOIN purchase_order_items poi ON gri.po_item_id = poi.id 
+                                WHERE gr.po_id = po.id) * 1.0 / po.subtotal
+                           ) * po.total
+                       ELSE 0
+                   END
+           END AS total_billable
     FROM purchase_orders po
     JOIN vendors v ON po.vendor_id = v.id
     LEFT JOIN vendor_payments vp ON vp.po_id = po.id
     WHERE po.status IN ('approved', 'partially_received', 'completed')
     GROUP BY po.id
-    HAVING po.total > total_paid
+    HAVING total_billable > total_paid
     ORDER BY po.id DESC
 ");
 $eligiblePOs = $stmtPOs->fetchAll();
@@ -41,7 +56,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Re-validate outstanding
     $stmtCheck = $pdo->prepare("
-        SELECT po.total, COALESCE(SUM(vp.amount), 0) as total_paid
+        SELECT po.total, COALESCE(SUM(vp.amount), 0) as total_paid,
+               CASE 
+                   WHEN (SELECT COUNT(*) FROM goods_receivings WHERE po_id = po.id) = 0 THEN po.total
+                   ELSE 
+                       CASE 
+                           WHEN po.subtotal > 0 THEN 
+                               (
+                                   (SELECT COALESCE(SUM(gri.qty_received * (poi.unit_price - (CASE WHEN poi.qty > 0 THEN poi.discount_item / poi.qty ELSE 0 END))), 0) 
+                                    FROM goods_receiving_items gri 
+                                    JOIN goods_receivings gr ON gri.receiving_id = gr.id 
+                                    JOIN purchase_order_items poi ON gri.po_item_id = poi.id 
+                                    WHERE gr.po_id = po.id) * 1.0 / po.subtotal
+                               ) * po.total
+                           ELSE 0
+                       END
+               END AS total_billable
         FROM purchase_orders po
         LEFT JOIN vendor_payments vp ON vp.po_id = po.id
         WHERE po.id = ?
@@ -50,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmtCheck->execute([$poId]);
     $check = $stmtCheck->fetch();
     
-    $outstanding = $check['total'] - $check['total_paid'];
+    $outstanding = $check['total_billable'] - $check['total_paid'];
     
     if ($amount > $outstanding) {
         setFlash('danger', 'Jumlah pembayaran (' . formatRupiah($amount) . ') melebihi sisa outstanding (' . formatRupiah($outstanding) . ').');
@@ -108,13 +138,13 @@ require_once __DIR__ . '/../../../includes/header.php';
                                         <option value="">-- Pilih PO --</option>
                                         <?php foreach ($eligiblePOs as $po): ?>
                                             <option value="<?= $po['id'] ?>" 
-                                                    data-total="<?= $po['total'] ?>" 
+                                                    data-total="<?= $po['total_billable'] ?>" 
                                                     data-paid="<?= $po['total_paid'] ?>"
                                                     data-vendor="<?= sanitize($po['vendor_name']) ?>"
                                                     data-bank-name="<?= sanitize($po['vendor_bank_name']) ?>"
                                                     data-bank-account="<?= sanitize($po['vendor_bank_account']) ?>"
                                                     data-bank-holder="<?= sanitize($po['vendor_bank_holder']) ?>">
-                                                <?= sanitize($po['po_number']) ?> - <?= sanitize($po['vendor_name']) ?> (<?= formatRupiah($po['total']) ?>)
+                                                <?= sanitize($po['po_number']) ?> - <?= sanitize($po['vendor_name']) ?> (<?= formatRupiah($po['total_billable']) ?><?= $po['total_billable'] != $po['total'] ? ' [Aktual, Asli: ' . formatRupiah($po['total']) . ']' : '' ?>)
                                             </option>
                                         <?php endforeach; ?>
                                     </select>

@@ -72,6 +72,8 @@ $ledgerSql = "
     SELECT * FROM (
         -- Customer Payments (Debit)
         SELECT 
+            cp.id AS source_id,
+            'customer_payment' AS source_type,
             cp.payment_date AS tanggal,
             cp.reference_no AS no_referensi,
             CONCAT('Penerimaan Invoice ', inv.invoice_no, ' - ', cust.company_name) AS keterangan,
@@ -89,6 +91,8 @@ $ledgerSql = "
         
         -- Vendor Payments (Kredit)
         SELECT 
+            vp.id AS source_id,
+            'vendor_payment' AS source_type,
             vp.payment_date AS tanggal,
             vp.reference_no AS no_referensi,
             CONCAT('Pembayaran PO ', po.po_number, ' - ', v.company_name) AS keterangan,
@@ -106,6 +110,8 @@ $ledgerSql = "
         
         -- Claim Nota (Kredit)
         SELECT 
+            nc.id AS source_id,
+            'claim_nota' AS source_type,
             nc.claim_date AS tanggal,
             nc.claim_number AS no_referensi,
             CONCAT('Reimburse Nota - Karyawan: ', COALESCE(u.full_name, nc.employee_name)) AS keterangan,
@@ -149,7 +155,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="row">
             <div class="col-md-2 col-sm-6 mb-2">
@@ -229,14 +235,14 @@ require_once __DIR__ . '/../../../includes/header.php';
 <!-- Ledger Table Card -->
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center bg-white py-3">
-        <h3 class="card-title font-weight-bold text-dark"><i class="fas fa-book mr-2 text-info"></i>Mutasi Kas Rekening Koran</h3>
+        <h3 class="card-title font-weight-bold text-dark">Mutasi Kas Rekening Koran</h3>
         <div class="ml-auto d-print-none">
             <button type="button" class="btn btn-info btn-sm mr-2" onclick="window.print();"><i class="fas fa-print mr-1"></i> Cetak PDF</button>
             <a href="export_excel.php?start_date=<?= $startDate ?>&end_date=<?= $endDate ?>&company_id=<?= $companyId ?>&payment_method=<?= urlencode($paymentMethod) ?>" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i> Ekspor Excel</a>
         </div>
     </div>
     
-    <div class="card-body p-0">
+    <div class="card-body">
         <!-- Print Header -->
         <div class="report-print-header d-none d-print-block text-center mb-4">
             <h2 style="font-weight: 800; font-size: 18px; margin-bottom: 2px;">LAPORAN BUKU KAS (GENERAL LEDGER)</h2>
@@ -252,17 +258,17 @@ require_once __DIR__ . '/../../../includes/header.php';
         </div>
 
         <div class="table-responsive">
-            <table id="ledgerTable" class="table table-bordered table-striped table-hover table-sm w-100" >
+            <table id="ledgerTable" class="table table-bordered table-striped table-hover w-100" >
                 <thead class="bg-light">
                     <tr>
                         <th width="10%">Tanggal</th>
                         <th width="12%">No. Referensi</th>
-                        <th width="28%">Keterangan Mutasi</th>
+                        <th width="26%">Keterangan Mutasi</th>
                         <th width="15%">Perusahaan</th>
-                        <th width="10%">Metode</th>
-                        <th width="12%" class="text-right text-success">Debit (+)</th>
-                        <th width="12%" class="text-right text-danger">Kredit (-)</th>
-                        <th width="15%" class="text-right font-weight-bold">Saldo</th>
+                        <th width="9%">Metode</th>
+                        <th width="10%" class="text-right text-success">Debit (+)</th>
+                        <th width="10%" class="text-right text-danger">Kredit (-)</th>
+                        <th width="13%" class="text-right font-weight-bold">Saldo</th>
                     </tr>
                     <!-- Row Saldo Awal -->
                     <tr class="bg-light font-weight-bold" style="background-color: #f8f9fa;">
@@ -283,7 +289,25 @@ require_once __DIR__ . '/../../../includes/header.php';
                     ?>
                         <tr>
                             <td><?= date('d-m-Y', strtotime($t['tanggal'])) ?></td>
-                            <td><span class="badge badge-secondary"><?= sanitize($t['no_referensi']) ?></span></td>
+                            <td>
+                                <?php 
+                                $linkUrl = '#';
+                                if ($t['source_type'] === 'customer_payment') {
+                                    $linkUrl = APP_URL . '/modules/finance/customer_payments/view.php?id=' . $t['source_id'];
+                                } elseif ($t['source_type'] === 'vendor_payment') {
+                                    $linkUrl = APP_URL . '/modules/finance/vendor_payments/view.php?id=' . $t['source_id'];
+                                } elseif ($t['source_type'] === 'claim_nota') {
+                                    $linkUrl = APP_URL . '/modules/finance/claim_nota/view.php?id=' . $t['source_id'];
+                                }
+                                ?>
+                                <?php if ($linkUrl !== '#'): ?>
+                                    <a href="<?= $linkUrl ?>" class="badge badge-info" title="Lihat Dokumen">
+                                        <i class="fas fa-external-link-alt mr-1"></i><?= sanitize($t['no_referensi']) ?>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="badge badge-secondary"><?= sanitize($t['no_referensi']) ?></span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= sanitize($t['keterangan']) ?></td>
                             <td><?= sanitize($t['nama_perusahaan']) ?></td>
                             <td><span class="text-muted"><?= sanitize($t['metode']) ?></span></td>
@@ -335,6 +359,9 @@ require_once __DIR__ . '/../../../includes/header.php';
     .card {
         border: none !important;
         box-shadow: none !important;
+    }
+    .card-body {
+        padding: 0 !important;
     }
     .table td, .table th {
         padding: 5px 6px !important;

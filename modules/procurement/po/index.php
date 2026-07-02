@@ -14,10 +14,10 @@ $breadcrumbs = [
 $user = getCurrentUser();
 
 // Set default filters
-$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
-$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$status = isset($_GET['status']) ? $_GET['status'] : 'pending';
+$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : (in_array($status, ['pending', '']) ? '' : date('Y-m-01'));
+$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : (in_array($status, ['pending', '']) ? '' : date('Y-m-d'));
 $vendorId = $_GET['vendor_id'] ?? '';
-$status = $_GET['status'] ?? '';
 
 // Fetch vendors for filter
 $vendors = $pdo->query("SELECT id, company_name FROM vendors ORDER BY company_name ASC")->fetchAll();
@@ -49,7 +49,8 @@ if (!empty($conditions)) {
 
 // Fetch POs
 $sql = "
-    SELECT po.*, v.company_name as vendor_name, c.name as company_name, u.full_name as creator_name
+    SELECT po.*, v.company_name as vendor_name, c.name as company_name, u.full_name as creator_name,
+           (SELECT COUNT(*) FROM goods_receivings WHERE po_id = po.id) as gr_count
     FROM purchase_orders po
     JOIN vendors v ON po.vendor_id = v.id
     JOIN companies c ON po.company_id = c.id
@@ -65,7 +66,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="form-horizontal">
             <div class="row">
@@ -88,13 +89,15 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </div>
                 <div class="col-md-2 col-sm-6 mb-2">
                     <label style="font-size:12px;">Status</label>
-                    <select name="status" class="form-control form-control-sm select2">
-                        <option value="">-- Semua Status --</option>
+                    <select name="status" class="form-control form-control-sm" style="height: 31px !important; padding-top: 0 !important; padding-bottom: 0 !important;">
+                        <option value="">Semua Status</option>
                         <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
                         <option value="pending" <?= $status === 'pending' ? 'selected' : '' ?>>Pending</option>
                         <option value="approved" <?= $status === 'approved' ? 'selected' : '' ?>>Approved</option>
-                        <option value="rejected" <?= $status === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                        <option value="partially_received" <?= $status === 'partially_received' ? 'selected' : '' ?>>Partially Received</option>
                         <option value="completed" <?= $status === 'completed' ? 'selected' : '' ?>>Completed</option>
+                        <option value="rejected" <?= $status === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                        <option value="cancelled" <?= $status === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
                     </select>
                 </div>
                 <div class="col-md-2 col-sm-12 d-flex align-items-end mb-2">
@@ -131,7 +134,23 @@ require_once __DIR__ . '/../../../includes/header.php';
             <tbody>
                 <?php foreach ($orders as $o): ?>
                 <tr>
-                    <td><strong><?= sanitize($o['po_number']) ?></strong></td>
+                    <td>
+                        <?php
+                        $colorClass = 'text-dark';
+                        if ($o['status'] === 'approved' || $o['status'] === 'completed') {
+                            $colorClass = 'text-success';
+                        } elseif ($o['status'] === 'pending') {
+                            $colorClass = 'text-warning';
+                        } elseif ($o['status'] === 'rejected') {
+                            $colorClass = 'text-danger';
+                        } elseif ($o['status'] === 'draft') {
+                            $colorClass = 'text-secondary';
+                        }
+                        ?>
+                        <strong class="<?= $colorClass ?>" <?= $o['status'] === 'pending' ? 'style="color: #d97706 !important;"' : '' ?>>
+                            <?= sanitize($o['po_number']) ?>
+                        </strong>
+                    </td>
                     <td><?= date('d-m-Y', strtotime($o['po_date'])) ?></td>
                     <td><?= sanitize($o['vendor_name']) ?></td>
                     <td><?= sanitize($o['company_name']) ?></td>
@@ -144,7 +163,13 @@ require_once __DIR__ . '/../../../includes/header.php';
                             <i class="fas fa-eye"></i>
                         </a>
                         
-                        <?php if (in_array($o['status'], ['draft', 'pending']) && ($user['id'] == $o['created_by'] || canAccess('purchase_order', 'edit'))): ?>
+                        <?php 
+                        $canEdit = (in_array($o['status'], ['draft', 'pending']) && ($user['id'] == $o['created_by'] || canAccess('purchase_order', 'edit')));
+                        if (!$canEdit && $o['status'] === 'approved' && hasRole('super_admin') && $o['gr_count'] == 0) {
+                            $canEdit = true;
+                        }
+                        if ($canEdit): 
+                        ?>
                         <a href="<?= APP_URL ?>/modules/procurement/po/edit.php?id=<?= $o['id'] ?>" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Ubah">
                             <i class="fas fa-edit text-white"></i>
                         </a>
@@ -165,7 +190,14 @@ $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
     initSelect2('.select2');
-    initDataTable('#poTable');
+    initDataTable('#poTable', {
+        columnDefs: [
+            { responsivePriority: 1, targets: 0 }, // No. PO (Selalu tampil di HP)
+            { responsivePriority: 2, targets: 5 }, // Status (Selalu tampil di HP)
+            { responsivePriority: 3, targets: 6 }, // Aksi (Selalu tampil di HP)
+            { responsivePriority: 4, targets: 4 }  // Grand Total
+        ]
+    });
     
     // Delete PO handler
     $('.btn-delete-po').on('click', function() {

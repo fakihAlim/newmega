@@ -96,6 +96,12 @@ require_once __DIR__ . '/../../includes/header.php';
                     <td><small><?= formatDateTime($u['last_login']) ?></small></td>
                     <td><?= getStatusBadge($u['is_active'] ? 'active' : 'cancelled') ?></td>
                     <td class="text-center">
+                        <?php if (hasRole('super_admin') && $u['id'] != $_SESSION['user']['id'] && $u['is_active']): ?>
+                        <a href="<?= APP_URL ?>/modules/auth/impersonate.php?action=login_as&user_id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm shadow-sm" data-toggle="tooltip" title="Login As (Bertindak Sebagai)">
+                            <i class="fas fa-user-secret"></i>
+                        </a>
+                        <?php endif; ?>
+
                         <a href="<?= APP_URL ?>/modules/users/edit.php?id=<?= $u['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Ubah">
                             <i class="fas fa-edit"></i>
                         </a>

@@ -115,7 +115,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <td><strong>Project</strong></td>
                         <td>: <?= sanitize($mr['project_name']) ?></td>
                         <td><strong>Date</strong></td>
-                        <td>: <?= date('d-M-Y', strtotime($mr['request_date'])) ?></td>
+                        <td>: <?= formatDateIndo($mr['request_date']) ?></td>
                     </tr>
                     <tr>
                         <td><strong>Location</strong></td>
@@ -182,7 +182,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                         <?php if ($mr['status'] === 'approved' || $mr['status'] === 'completed'): ?>
                             <strong><?= sanitize($mr['approver_name']) ?></strong>
                             <p class="text-muted mb-0">Super Admin</p>
-                            <span style="font-size:12px; color:#666;">(<?= date('d-M-Y', strtotime($mr['approved_at'])) ?>)</span>
+                            <span style="font-size:12px; color:#666;">(<?= formatDateIndo($mr['approved_at']) ?>)</span>
                         <?php else: ?>
                             <strong class="text-muted">( Belum Disetujui )</strong>
                         <?php endif; ?>

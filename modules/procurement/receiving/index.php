@@ -5,6 +5,145 @@
 require_once __DIR__ . '/../../../includes/auth.php';
 requirePermission('receiving_list');
 
+// Handle AJAX Datatable request
+if (isset($_GET['draw'])) {
+    $draw = (int)($_GET['draw'] ?? 1);
+    $start = (int)($_GET['start'] ?? 0);
+    $length = (int)($_GET['length'] ?? 10);
+    $searchValue = $_GET['search']['value'] ?? '';
+    $orderColIndex = (int)($_GET['order'][0]['column'] ?? 0);
+    $orderDir = $_GET['order'][0]['dir'] ?? 'desc';
+
+    $columns = [
+        0 => 'gr.receive_date',
+        1 => 'gr.surat_jalan_no',
+        2 => 'po.po_number',
+        3 => 'v.company_name',
+        4 => 'gr.received_at',
+        5 => 'u.full_name'
+    ];
+    $orderBy = $columns[$orderColIndex] ?? 'gr.id';
+    if (!in_array($orderDir, ['asc', 'desc'])) {
+        $orderDir = 'desc';
+    }
+
+    $conditions = [];
+    $params = [];
+
+    // Filters from GET
+    $startDate = $_GET['start_date'] ?? '';
+    $endDate = $_GET['end_date'] ?? '';
+    $vendorId = $_GET['vendor_id'] ?? '';
+    $location = $_GET['location'] ?? '';
+
+    if ($startDate) {
+        $conditions[] = "gr.receive_date >= ?";
+        $params[] = $startDate;
+    }
+    if ($endDate) {
+        $conditions[] = "gr.receive_date <= ?";
+        $params[] = $endDate;
+    }
+    if ($vendorId) {
+        $conditions[] = "po.vendor_id = ?";
+        $params[] = $vendorId;
+    }
+    if ($location) {
+        if ($location === 'warehouse') {
+            $conditions[] = "gr.received_at = 'warehouse'";
+        } elseif ($location === 'project') {
+            $conditions[] = "gr.received_at != 'warehouse'";
+        }
+    }
+
+    // Global Search
+    if ($searchValue !== '') {
+        $conditions[] = "(gr.surat_jalan_no LIKE ? OR po.po_number LIKE ? OR v.company_name LIKE ? OR u.full_name LIKE ? OR p.name LIKE ?)";
+        $searchPattern = "%$searchValue%";
+        $params[] = $searchPattern;
+        $params[] = $searchPattern;
+        $params[] = $searchPattern;
+        $params[] = $searchPattern;
+        $params[] = $searchPattern;
+    }
+
+    $whereClause = "";
+    if (!empty($conditions)) {
+        $whereClause = "WHERE " . implode(" AND ", $conditions);
+    }
+
+    // Total records before filtering
+    $totalRecords = $pdo->query("SELECT COUNT(*) FROM goods_receivings")->fetchColumn();
+
+    // Total records after filtering
+    $countSql = "
+        SELECT COUNT(*) 
+        FROM goods_receivings gr
+        JOIN purchase_orders po ON gr.po_id = po.id
+        JOIN vendors v ON po.vendor_id = v.id
+        LEFT JOIN users u ON gr.received_by = u.id
+        LEFT JOIN projects p ON gr.project_id = p.id
+        $whereClause
+    ";
+    $stmt = $pdo->prepare($countSql);
+    $stmt->execute($params);
+    $recordsFiltered = $stmt->fetchColumn();
+
+    // Fetch data for current page
+    $dataSql = "
+        SELECT gr.*, po.po_number, v.company_name as vendor_name, u.full_name as receiver_name, p.name as project_name
+        FROM goods_receivings gr
+        JOIN purchase_orders po ON gr.po_id = po.id
+        JOIN vendors v ON po.vendor_id = v.id
+        LEFT JOIN users u ON gr.received_by = u.id
+        LEFT JOIN projects p ON gr.project_id = p.id
+        $whereClause
+        ORDER BY $orderBy $orderDir
+        LIMIT $length OFFSET $start
+    ";
+    
+    $stmt = $pdo->prepare($dataSql);
+    $stmt->execute($params);
+    $receivings = $stmt->fetchAll();
+
+    $data = [];
+    foreach ($receivings as $gr) {
+        $receiveDateHtml = formatDateIndo($gr['receive_date']);
+        $suratJalanHtml = '<strong>' . sanitize($gr['surat_jalan_no']) . '</strong>';
+        $poRefHtml = '<a href="' . APP_URL . '/modules/procurement/po/view.php?id=' . $gr['po_id'] . '" target="_blank" class="text-info font-weight-bold">' . sanitize($gr['po_number']) . '</a>';
+        $vendorHtml = sanitize($gr['vendor_name']);
+        
+        if ($gr['received_at'] === 'warehouse') {
+            $locationHtml = '<span class="badge badge-primary">Gudang Utama</span>';
+        } else {
+            $locationHtml = '<span class="badge badge-success">Proyek</span><br><small class="text-muted">' . sanitize($gr['project_name'] ?? '') . '</small>';
+        }
+        
+        $receiverHtml = sanitize($gr['receiver_name'] ?? '');
+        
+        $actionHtml = '<a href="' . APP_URL . '/modules/procurement/receiving/view.php?id=' . $gr['id'] . '" class="btn btn-info btn-sm" data-toggle="tooltip" title="Lihat Detail SJ"><i class="fas fa-eye"></i></a>';
+
+        $data[] = [
+            'receive_date' => $receiveDateHtml,
+            'surat_jalan_no' => $suratJalanHtml,
+            'po_number' => $poRefHtml,
+            'vendor_name' => $vendorHtml,
+            'received_at' => $locationHtml,
+            'receiver_name' => $receiverHtml,
+            'actions' => $actionHtml
+        ];
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'draw' => $draw,
+        'recordsTotal' => (int)$totalRecords,
+        'recordsFiltered' => (int)$recordsFiltered,
+        'data' => $data
+    ]);
+    exit;
+}
+
 $pageTitle = 'Penerimaan Barang (Goods Receipt)';
 $breadcrumbs = [
     ['label' => 'Procurement', 'url' => '#'],
@@ -14,8 +153,8 @@ $breadcrumbs = [
 $user = getCurrentUser();
 
 // Set default filters
-$startDate = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
-$endDate = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$startDate = $_GET['start_date'] ?? '';
+$endDate = $_GET['end_date'] ?? '';
 $vendorId = $_GET['vendor_id'] ?? '';
 $location = $_GET['location'] ?? ''; // 'warehouse' or 'project'
 
@@ -50,26 +189,14 @@ if (!empty($conditions)) {
     $whereClause = "WHERE " . implode(" AND ", $conditions);
 }
 
-// Fetch Goods Receivings
-$sql = "
-    SELECT gr.*, po.po_number, v.company_name as vendor_name, u.full_name as receiver_name, p.name as project_name
-    FROM goods_receivings gr
-    JOIN purchase_orders po ON gr.po_id = po.id
-    JOIN vendors v ON po.vendor_id = v.id
-    LEFT JOIN users u ON gr.received_by = u.id
-    LEFT JOIN projects p ON gr.project_id = p.id
-    $whereClause
-    ORDER BY gr.id DESC
-";
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$receivings = $stmt->fetchAll();
+// Fetch Goods Receivings (Disabled for Server-side Pagination)
+$receivings = [];
 
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="form-horizontal">
             <div class="row">
@@ -130,32 +257,6 @@ require_once __DIR__ . '/../../../includes/header.php';
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($receivings as $gr): ?>
-                <tr>
-                    <td><?= date('d-m-Y', strtotime($gr['receive_date'])) ?></td>
-                    <td><strong><?= sanitize($gr['surat_jalan_no']) ?></strong></td>
-                    <td>
-                        <a href="<?= APP_URL ?>/modules/procurement/po/view.php?id=<?= $gr['po_id'] ?>" target="_blank" class="text-info font-weight-bold">
-                            <?= sanitize($gr['po_number']) ?>
-                        </a>
-                    </td>
-                    <td><?= sanitize($gr['vendor_name']) ?></td>
-                    <td>
-                        <?php if ($gr['received_at'] === 'warehouse'): ?>
-                            <span class="badge badge-primary">Gudang Utama</span>
-                        <?php else: ?>
-                            <span class="badge badge-success">Proyek</span><br>
-                            <small class="text-muted"><?= sanitize($gr['project_name']) ?></small>
-                        <?php endif; ?>
-                    </td>
-                    <td><?= sanitize($gr['receiver_name']) ?></td>
-                    <td class="text-center">
-                        <a href="<?= APP_URL ?>/modules/procurement/receiving/view.php?id=<?= $gr['id'] ?>" class="btn btn-info btn-sm" data-toggle="tooltip" title="Lihat Detail SJ">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
@@ -166,7 +267,24 @@ $extraJS = <<<'JS'
 <script>
 $(document).ready(function() {
     initSelect2('.select2');
-    initDataTable('#grTable');
+    initDataTable('#grTable', {
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: 'index.php' + window.location.search,
+            type: 'GET'
+        },
+        columns: [
+            { data: 'receive_date' },
+            { data: 'surat_jalan_no' },
+            { data: 'po_number' },
+            { data: 'vendor_name' },
+            { data: 'received_at' },
+            { data: 'receiver_name' },
+            { data: 'actions', className: 'text-center', orderable: false, searchable: false }
+        ],
+        order: [[0, 'desc']]
+    });
 });
 </script>
 JS;

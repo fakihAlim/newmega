@@ -69,6 +69,16 @@ function isActiveClass($dirs, $pages = []) {
                     </a>
                 </li>
 
+                <!-- Tanya AI -->
+                <?php if (canAccess('ai_chat')): ?>
+                <li class="nav-item">
+                    <a href="<?= APP_URL ?>/modules/ai/chat.php" class="nav-link <?= isActiveClass(['ai']) ?>">
+                        <i class="nav-icon fas fa-robot"></i>
+                        <p>Tanya AI</p>
+                    </a>
+                </li>
+                <?php endif; ?>
+
                 <?php if (canAccess('master_items') || canAccess('master_vendors') || canAccess('master_customers') || canAccess('master_companies')): ?>
                 <!-- Master Data (Collapsible) -->
                 <li class="nav-item has-treeview <?= isMenuOpen(['categories','items','vendors','customers','companies','wages','employees']) ?>">

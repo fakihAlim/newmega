@@ -144,7 +144,7 @@ if (!empty($start_date) && !empty($end_date)) {
 }
 ?>
 
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="form-horizontal">
             <div class="row">

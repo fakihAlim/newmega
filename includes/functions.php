@@ -43,6 +43,37 @@ function formatDate($date, $format = 'd-M-Y') {
 }
 
 /**
+ * Format date to full Indonesian date (e.g., 29 Juni 2026)
+ */
+function formatDateIndo($date) {
+    if (empty($date) || $date === '0000-00-00' || $date === '0000-00-00 00:00:00') return '-';
+    
+    $months = [
+        1 => 'Januari',
+        2 => 'Februari',
+        3 => 'Maret',
+        4 => 'April',
+        5 => 'Mei',
+        6 => 'Juni',
+        7 => 'Juli',
+        8 => 'Agustus',
+        9 => 'September',
+        10 => 'Oktober',
+        11 => 'November',
+        12 => 'Desember'
+    ];
+    
+    $timestamp = strtotime($date);
+    if (!$timestamp) return '-';
+    
+    $d = date('j', $timestamp);
+    $m = (int)date('m', $timestamp);
+    $y = date('Y', $timestamp);
+    
+    return $d . ' ' . $months[$m] . ' ' . $y;
+}
+
+/**
  * Format datetime
  */
 function formatDateTime($datetime) {
@@ -56,6 +87,9 @@ function formatDateTime($datetime) {
 function generateAbbreviation($companyName, $pdo = null, $table = null, $column = 'abbreviation') {
     // Remove common prefixes
     $name = preg_replace('/^(PT\.?\s*|CV\.?\s*|UD\.?\s*|TB\.?\s*)/i', '', trim($companyName));
+    
+    // Remove non-alphanumeric characters and keep only letters, numbers, and spaces
+    $name = preg_replace('/[^a-zA-Z0-9\s]/', '', $name);
     $name = trim($name);
     
     // Split into words
@@ -471,6 +505,12 @@ function logActivity($action, $module = null, $description = null, $referenceTyp
     global $pdo;
     try {
         $user = getCurrentUser();
+        
+        // Append impersonation notice for audit trail
+        if (isset($_SESSION['original_user']) && $description !== null) {
+            $description .= " (Diinput oleh Admin: @" . $_SESSION['original_user']['username'] . " via Login As)";
+        }
+        
         $stmt = $pdo->prepare("
             INSERT INTO activity_logs (user_id, user_name, action, module, description, reference_type, reference_id, ip_address, user_agent, old_data, new_data)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

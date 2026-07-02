@@ -10,6 +10,7 @@ $AVAILABLE_MODULES = [
     'Dashboard' => [
         'dashboard' => 'Dashboard',
         'project_dashboard' => 'Dashboard Proyek',
+        'ai_chat' => 'Tanya AI',
     ],
     'Master Data' => [
         'master_categories' => 'Kategori',

@@ -81,7 +81,7 @@ $banners = $pdo->query("SELECT * FROM landing_banners ORDER BY order_num ASC, id
 require_once __DIR__ . '/../../includes/header.php';
 ?>
 
-<div class="card">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title">Pengaturan Hero Banner Landing Page</h3>
         <div class="ml-auto">

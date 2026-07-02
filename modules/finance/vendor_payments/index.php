@@ -57,7 +57,22 @@ $sql = "
     SELECT vp.*, 
            po.po_number, po.total as po_total, po.status as po_status,
            v.company_name as vendor_name,
-           u.full_name as payer_name
+           u.full_name as payer_name,
+           CASE 
+               WHEN (SELECT COUNT(*) FROM goods_receivings WHERE po_id = po.id) = 0 THEN po.total
+               ELSE 
+                   CASE 
+                       WHEN po.subtotal > 0 THEN 
+                           (
+                               (SELECT COALESCE(SUM(gri.qty_received * (poi.unit_price - (CASE WHEN poi.qty > 0 THEN poi.discount_item / poi.qty ELSE 0 END))), 0) 
+                                FROM goods_receiving_items gri 
+                                JOIN goods_receivings gr ON gri.receiving_id = gr.id 
+                                JOIN purchase_order_items poi ON gri.po_item_id = poi.id 
+                                WHERE gr.po_id = po.id) * 1.0 / po.subtotal
+                           ) * po.total
+                       ELSE 0
+                   END
+           END AS po_billable_total
     FROM vendor_payments vp
     JOIN purchase_orders po ON vp.po_id = po.id
     JOIN vendors v ON po.vendor_id = v.id
@@ -73,7 +88,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="form-horizontal">
             <div class="row">
@@ -114,7 +129,7 @@ require_once __DIR__ . '/../../../includes/header.php';
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title"><i class="fas fa-money-check-alt mr-2"></i> Riwayat Pembayaran Suplier</h3>
+        <h3 class="card-title">Riwayat Pembayaran Suplier</h3>
         <?php if (canAccess('vendor_payments')): ?>
             <a href="<?= APP_URL ?>/modules/finance/vendor_payments/create.php" class="btn btn-primary btn-sm ml-auto">
                 <i class="fas fa-plus mr-1"></i> Catat Pembayaran Baru
@@ -145,7 +160,12 @@ require_once __DIR__ . '/../../../includes/header.php';
                         </a>
                     </td>
                     <td><?= sanitize($p['vendor_name']) ?></td>
-                    <td class="text-right"><?= formatRupiah($p['po_total']) ?></td>
+                    <td class="text-right">
+                        <?= formatRupiah($p['po_billable_total']) ?>
+                        <?php if ($p['po_billable_total'] != $p['po_total']): ?>
+                            <br><small class="text-muted" title="Total PO Asli">Asli: <?= formatRupiah($p['po_total']) ?></small>
+                        <?php endif; ?>
+                    </td>
                     <td class="text-right font-weight-bold text-success"><?= formatRupiah($p['amount']) ?></td>
                     <td><?= sanitize($p['payment_method']) ?: '-' ?></td>
                     <td><?= sanitize($p['reference_no']) ?: '-' ?></td>

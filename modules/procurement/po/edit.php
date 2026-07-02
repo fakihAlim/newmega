@@ -26,11 +26,17 @@ if (!canAccess('purchase_order', 'edit') && $po['created_by'] != $user['id']) {
     exit;
 }
 
-// Logic: Only Draft or Pending can be edited
+// Logic: Only Draft or Pending can be edited, OR Approved PO by Super Admin if no goods received yet
+$grCount = $pdo->prepare("SELECT COUNT(*) FROM goods_receivings WHERE po_id = ?");
+$grCount->execute([$id]);
+$hasReceiving = $grCount->fetchColumn() > 0;
+
 if (!in_array($po['status'], ['draft', 'pending'])) {
-    setFlash('danger', 'PO yang sudah di-approve tidak dapat diubah.');
-    header('Location: ' . APP_URL . '/modules/procurement/po/index.php');
-    exit;
+    if (!($po['status'] === 'approved' && hasRole('super_admin') && !$hasReceiving)) {
+        setFlash('danger', 'PO yang sudah di-approve tidak dapat diubah.');
+        header('Location: ' . APP_URL . '/modules/procurement/po/index.php');
+        exit;
+    }
 }
 
 $pageTitle = 'Edit PO: ' . sanitize($po['po_number']);
@@ -89,6 +95,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $itemTotals  = $_POST['item_total'] ?? [];
     
     $status = ($action === 'submit') ? 'pending' : 'draft';
+    
+    // Maintain approved status for super admin edits
+    if ($po['status'] === 'approved' && hasRole('super_admin')) {
+        $status = 'approved';
+    }
     
     $errors = [];
     if (empty($vendorId)) $errors[] = "Vendor wajib dipilih.";
@@ -173,7 +184,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             logActivity('update', 'purchase_order', "Memperbarui Purchase Order: {$po['po_number']}", 'purchase_orders', $id);
             
-            $msg = $status === 'pending' ? "PO {$po['po_number']} berhasil di-submit untuk persetujuan." : "Draft PO {$po['po_number']} berhasil diperbarui.";
+            if ($status === 'approved') {
+                $msg = "Purchase Order {$po['po_number']} berhasil diperbarui.";
+            } else {
+                $msg = $status === 'pending' ? "PO {$po['po_number']} berhasil di-submit untuk persetujuan." : "Draft PO {$po['po_number']} berhasil diperbarui.";
+            }
             setFlash('success', $msg);
             header('Location: ' . APP_URL . '/modules/procurement/po/index.php');
             exit;

@@ -25,7 +25,7 @@ $items = $stmt->fetchAll();
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card card-outline card-info">
+<div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title">Stok Barang Gudang Utama</h3>
     </div>

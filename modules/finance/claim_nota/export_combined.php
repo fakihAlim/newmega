@@ -87,7 +87,7 @@ $spreadsheet->getDefaultStyle()->getFont()->setName('Arial')->setSize(10);
 
 // Document Title (Row 1)
 $sheet->setCellValue('A1', 'Nota Developer dan Kantor (Gabungan)');
-$sheet->mergeCells('A1:F1');
+$sheet->mergeCells('A1:G1');
 $sheet->getStyle('A1')->applyFromArray([
     'font' => ['bold' => true, 'size' => 14],
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]
@@ -173,7 +173,7 @@ $subtotalRows = []; // Keep track of the rows containing subtotals
 
 if (empty($groupedItems)) {
     $sheet->setCellValue('A' . $currentRow, 'Tidak ada data klaim nota yang cocok.');
-    $sheet->mergeCells("A{$currentRow}:F{$currentRow}");
+    $sheet->mergeCells("A{$currentRow}:G{$currentRow}");
     $sheet->getStyle('A' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 } else {
     foreach ($groupedItems as $groupName => $items) {
@@ -182,15 +182,16 @@ if (empty($groupedItems)) {
         $sheet->getStyle('A' . $currentRow)->getFont()->setBold(true)->setSize(11);
         $currentRow++;
 
-        // 2. Table Header Row (Tanggal, No. Klaim, item, Pcs, Harga, Jumlah)
+        // 2. Table Header Row (Tanggal, No. Klaim, Toko, item, Pcs, Harga, Jumlah)
         $sheet->setCellValue('A' . $currentRow, 'Tanggal');
         $sheet->setCellValue('B' . $currentRow, 'No. Klaim');
-        $sheet->setCellValue('C' . $currentRow, 'item (Deskripsi)');
-        $sheet->setCellValue('D' . $currentRow, 'Pcs');
-        $sheet->setCellValue('E' . $currentRow, 'Harga');
-        $sheet->setCellValue('F' . $currentRow, 'Jumlah');
+        $sheet->setCellValue('C' . $currentRow, 'Toko');
+        $sheet->setCellValue('D' . $currentRow, 'item (Deskripsi)');
+        $sheet->setCellValue('E' . $currentRow, 'Pcs');
+        $sheet->setCellValue('F' . $currentRow, 'Harga');
+        $sheet->setCellValue('G' . $currentRow, 'Jumlah');
         
-        $sheet->getStyle("A{$currentRow}:F{$currentRow}")->applyFromArray($headerStyle);
+        $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($headerStyle);
         $sheet->getRowDimension($currentRow)->setRowHeight(20);
         
         $startItemRow = $currentRow + 1;
@@ -200,23 +201,24 @@ if (empty($groupedItems)) {
         foreach ($items as $item) {
             $sheet->setCellValue('A' . $currentRow, date('d/m/Y', strtotime($item['item_date'])));
             $sheet->setCellValue('B' . $currentRow, $item['claim_number']);
-            $sheet->setCellValue('C' . $currentRow, $item['item_name'] . ' (Oleh: ' . $item['employee_name'] . ')');
-            $sheet->setCellValue('D' . $currentRow, $item['qty']);
-            $sheet->setCellValue('E' . $currentRow, $item['price']);
+            $sheet->setCellValue('C' . $currentRow, $item['store_name'] ?: '-');
+            $sheet->setCellValue('D' . $currentRow, $item['item_name'] . ' (Oleh: ' . $item['employee_name'] . ')');
+            $sheet->setCellValue('E' . $currentRow, $item['qty']);
+            $sheet->setCellValue('F' . $currentRow, $item['price']);
             
-            // Excel Formula for Jumlah: =Qty*Harga (D * E)
-            $sheet->setCellValue('F' . $currentRow, "=D{$currentRow}*E{$currentRow}");
+            // Excel Formula for Jumlah: =Qty*Harga (E * F)
+            $sheet->setCellValue('G' . $currentRow, "=E{$currentRow}*F{$currentRow}");
             
             // Formats
             $sheet->getStyle('A' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('D' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('E' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             
             // Currency formatting
-            $sheet->getStyle('E' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0.00');
             $sheet->getStyle('F' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0.00');
+            $sheet->getStyle('G' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0.00');
             
-            $sheet->getStyle("A{$currentRow}:F{$currentRow}")->applyFromArray($dataBorder);
+            $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($dataBorder);
             $sheet->getRowDimension($currentRow)->setRowHeight(18);
             $currentRow++;
         }
@@ -225,21 +227,22 @@ if (empty($groupedItems)) {
 
         // 4. Subtotal Row
         $sheet->setCellValue('A' . $currentRow, '');
-        $sheet->setCellValue('B' . $currentRow, 'Total');
-        $sheet->setCellValue('C' . $currentRow, '');
+        $sheet->setCellValue('B' . $currentRow, '');
+        $sheet->setCellValue('C' . $currentRow, 'Total');
         $sheet->setCellValue('D' . $currentRow, '');
         $sheet->setCellValue('E' . $currentRow, '');
+        $sheet->setCellValue('F' . $currentRow, '');
         
-        // Formula: =SUM(F{start}:F{end})
-        $sheet->setCellValue('F' . $currentRow, "=SUM(F{$startItemRow}:F{$endItemRow})");
+        // Formula: =SUM(G{start}:G{end})
+        $sheet->setCellValue('G' . $currentRow, "=SUM(G{$startItemRow}:G{$endItemRow})");
         
-        $sheet->getStyle('B' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('F' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0.00');
-        $sheet->getStyle("A{$currentRow}:F{$currentRow}")->applyFromArray($totalStyle);
+        $sheet->getStyle('C' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('G' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0.00');
+        $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($totalStyle);
         $sheet->getRowDimension($currentRow)->setRowHeight(20);
         
         // Store subtotal row for grand total calculation
-        $subtotalRows[] = 'F' . $currentRow;
+        $subtotalRows[] = 'G' . $currentRow;
         
         // Space between groups
         $currentRow += 2; 
@@ -247,19 +250,19 @@ if (empty($groupedItems)) {
 
     // 5. Grand Total Row
     $currentRow--; // step back to overwrite last extra blank row
-    $sheet->setCellValue('C' . $currentRow, 'Grand Total Laporan');
-    $sheet->mergeCells("C{$currentRow}:E{$currentRow}");
+    $sheet->setCellValue('D' . $currentRow, 'Grand Total Laporan');
+    $sheet->mergeCells("D{$currentRow}:F{$currentRow}");
 
     // Formula for Grand Total
     $grandTotalFormula = '=' . implode('+', $subtotalRows);
-    $sheet->setCellValue('F' . $currentRow, $grandTotalFormula);
+    $sheet->setCellValue('G' . $currentRow, $grandTotalFormula);
 
-    $sheet->getStyle("C{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-    $sheet->getStyle("C{$currentRow}:F{$currentRow}")->getFont()->setBold(true)->setSize(11);
-    $sheet->getStyle('F' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0.00');
+    $sheet->getStyle("D{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+    $sheet->getStyle("D{$currentRow}:G{$currentRow}")->getFont()->setBold(true)->setSize(11);
+    $sheet->getStyle('G' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0.00');
 
     // Apply borders to Grand Total Row
-    $sheet->getStyle("C{$currentRow}:F{$currentRow}")->applyFromArray([
+    $sheet->getStyle("D{$currentRow}:G{$currentRow}")->applyFromArray([
         'borders' => [
             'top' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']],
             'bottom' => ['borderStyle' => Border::BORDER_DOUBLE, 'color' => ['argb' => 'FF000000']]
@@ -275,50 +278,51 @@ if (empty($groupedItems)) {
     $currentRow += 3;
 
     $sheet->setCellValue('A' . $currentRow, 'Dibuat Oleh,');
-    $sheet->setCellValue('C' . $currentRow, 'Disetujui Oleh,');
-    $sheet->setCellValue('E' . $currentRow, 'Dibayar Oleh,');
+    $sheet->setCellValue('D' . $currentRow, 'Disetujui Oleh,');
+    $sheet->setCellValue('F' . $currentRow, 'Dibayar Oleh,');
     
-    $sheet->mergeCells("A{$currentRow}:B{$currentRow}");
-    $sheet->mergeCells("C{$currentRow}:D{$currentRow}");
-    $sheet->mergeCells("E{$currentRow}:F{$currentRow}");
+    $sheet->mergeCells("A{$currentRow}:C{$currentRow}");
+    $sheet->mergeCells("D{$currentRow}:E{$currentRow}");
+    $sheet->mergeCells("F{$currentRow}:G{$currentRow}");
     
-    $sheet->getStyle("A{$currentRow}:F{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-    $sheet->getStyle("A{$currentRow}:F{$currentRow}")->getFont()->setBold(true);
+    $sheet->getStyle("A{$currentRow}:G{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    $sheet->getStyle("A{$currentRow}:G{$currentRow}")->getFont()->setBold(true);
 
     $currentRow += 4;
 
     $sheet->setCellValue('A' . $currentRow, '( ____________________ )');
-    $sheet->setCellValue('C' . $currentRow, '( ____________________ )');
-    $sheet->setCellValue('E' . $currentRow, '( ____________________ )');
+    $sheet->setCellValue('D' . $currentRow, '( ____________________ )');
+    $sheet->setCellValue('F' . $currentRow, '( ____________________ )');
     
-    $sheet->mergeCells("A{$currentRow}:B{$currentRow}");
-    $sheet->mergeCells("C{$currentRow}:D{$currentRow}");
-    $sheet->mergeCells("E{$currentRow}:F{$currentRow}");
+    $sheet->mergeCells("A{$currentRow}:C{$currentRow}");
+    $sheet->mergeCells("D{$currentRow}:E{$currentRow}");
+    $sheet->mergeCells("F{$currentRow}:G{$currentRow}");
     
-    $sheet->getStyle("A{$currentRow}:F{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-    $sheet->getStyle("A{$currentRow}:F{$currentRow}")->getFont()->setBold(true);
+    $sheet->getStyle("A{$currentRow}:G{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    $sheet->getStyle("A{$currentRow}:G{$currentRow}")->getFont()->setBold(true);
 
     $currentRow++;
 
     $sheet->setCellValue('A' . $currentRow, 'Karyawan / Penerima');
-    $sheet->setCellValue('C' . $currentRow, 'Finance / Admin');
-    $sheet->setCellValue('E' . $currentRow, 'Kasir / Pembayar');
+    $sheet->setCellValue('D' . $currentRow, 'Finance / Admin');
+    $sheet->setCellValue('F' . $currentRow, 'Kasir / Pembayar');
     
-    $sheet->mergeCells("A{$currentRow}:B{$currentRow}");
-    $sheet->mergeCells("C{$currentRow}:D{$currentRow}");
-    $sheet->mergeCells("E{$currentRow}:F{$currentRow}");
+    $sheet->mergeCells("A{$currentRow}:C{$currentRow}");
+    $sheet->mergeCells("D{$currentRow}:E{$currentRow}");
+    $sheet->mergeCells("F{$currentRow}:G{$currentRow}");
     
-    $sheet->getStyle("A{$currentRow}:F{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    $sheet->getStyle("A{$currentRow}:G{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
     $sheet->getStyle("A{$currentRow}:F{$currentRow}")->getFont()->setItalic(true)->setSize(9);
 }
 
 // Set column dimensions
 $sheet->getColumnDimension('A')->setWidth(15);
 $sheet->getColumnDimension('B')->setWidth(18);
-$sheet->getColumnDimension('C')->setWidth(40);
-$sheet->getColumnDimension('D')->setWidth(8);
-$sheet->getColumnDimension('E')->setWidth(18);
-$sheet->getColumnDimension('F')->setWidth(20);
+$sheet->getColumnDimension('C')->setWidth(25); // Toko
+$sheet->getColumnDimension('D')->setWidth(30); // Item
+$sheet->getColumnDimension('E')->setWidth(8);  // Qty
+$sheet->getColumnDimension('F')->setWidth(18); // Harga
+$sheet->getColumnDimension('G')->setWidth(20); // Jumlah
 
 // Headers for file download
 $filename = 'Laporan_Gabungan_Claim_Nota_' . date('Ymd');

@@ -153,10 +153,11 @@ require_once __DIR__ . '/../../../includes/header.php';
                                     <tr class="bg-light">
                                         <th width="12%" class="text-center">Tanggal</th>
                                         <th width="15%" class="text-center">No. Klaim</th>
-                                        <th width="35%">item (Deskripsi)</th>
+                                        <th width="15%">Toko</th>
+                                        <th width="25%">item (Deskripsi)</th>
                                         <th width="8%" class="text-center">Pcs</th>
-                                        <th width="15%" class="text-right">Harga</th>
-                                        <th width="15%" class="text-right">Jumlah</th>
+                                        <th width="12%" class="text-right">Harga</th>
+                                        <th width="13%" class="text-right">Jumlah</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -168,6 +169,7 @@ require_once __DIR__ . '/../../../includes/header.php';
                                         <tr>
                                             <td class="text-center"><?= date('d/m/Y', strtotime($item['item_date'])) ?></td>
                                             <td class="text-center text-xs"><strong><?= sanitize($item['claim_number']) ?></strong></td>
+                                            <td><?= sanitize($item['store_name']) ?: '-' ?></td>
                                             <td>
                                                 <?= sanitize($item['item_name']) ?> <span class="text-muted text-xs">(Oleh: <?= sanitize($item['employee_name']) ?>)</span>
                                                 <?php if ($item['receipt_photo']): ?>

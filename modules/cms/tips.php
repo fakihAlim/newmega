@@ -89,10 +89,13 @@ $tips = $pdo->query("SELECT * FROM landing_tips ORDER BY published_date DESC, id
 require_once __DIR__ . '/../../includes/header.php';
 ?>
 
-<div class="card">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title">Pengaturan Artikel Tips & Trick</h3>
         <div class="ml-auto">
+            <button type="button" class="btn btn-purple btn-sm mr-1" id="btnAiGenerate" style="background-color: #6f42c1; color: white; border-color: #6f42c1;">
+                <i class="fas fa-robot mr-1"></i> Buat dengan AI
+            </button>
             <button type="button" class="btn btn-primary btn-sm" id="btnTambah">
                 <i class="fas fa-plus mr-1"></i> Tambah Artikel
             </button>
@@ -233,6 +236,47 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
 </div>
 
+<!-- Modal AI Generate -->
+<div class="modal fade" id="aiGenerateModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 4px;">
+            <div class="modal-header text-white" style="background-color: #6f42c1; border-bottom: 2px solid #5a32a3;">
+                <h5 class="modal-title text-white"><i class="fas fa-robot mr-1"></i> Buat Artikel dengan AI</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Topik / Kata Kunci Artikel <span class="text-danger">*</span></label>
+                    <input type="text" id="aiTopic" class="form-control" placeholder="Contoh: Merawat Dinding Retak Rambut" required>
+                    <small class="text-muted">Masukkan topik tips, langkah-langkah, atau problem konstruksi yang ingin ditulis oleh AI.</small>
+                </div>
+                <div class="form-group mt-3">
+                    <label>Gaya Penulisan (Tone)</label>
+                    <select id="aiTone" class="form-control">
+                        <option value="Edukatif">Edukatif & Informatif</option>
+                        <option value="Profesional">Profesional / Ahli</option>
+                        <option value="Santai">Santai / Ramah</option>
+                        <option value="Formal">Formal</option>
+                    </select>
+                </div>
+                
+                <div id="aiLoading" class="text-center my-4" style="display: none;">
+                    <div class="spinner-border" role="status" style="color: #6f42c1;">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted font-italic">AI sedang menulis artikel Anda secara detail... Mohon tunggu sebentar.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Batal</button>
+                <button type="button" id="btnAiProcess" class="btn btn-purple btn-sm" style="background-color: #6f42c1; color: white;"><i class="fas fa-magic mr-1"></i> Mulai Generate</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Hidden Action Form -->
 <form id="actionForm" method="POST" style="display: none;">
     <input type="hidden" name="action" value="delete">
@@ -263,6 +307,83 @@ $(document).ready(function() {
         $('#inputDate').val(new Date().toISOString().substring(0, 10));
         $('#modalTitle').text('Tambah Artikel Baru');
         $('#formModal').modal('show');
+    });
+
+    // AI Generate Modal Show
+    $('#btnAiGenerate').click(function() {
+        $('#aiTopic').val('');
+        $('#aiLoading').hide();
+        $('#btnAiProcess').show();
+        $('#aiGenerateModal').modal('show');
+    });
+
+    // AI Generate Process Action
+    $('#btnAiProcess').click(function() {
+        const topic = $('#aiTopic').val().trim();
+        const tone = $('#aiTone').val();
+        
+        if (topic === '') {
+            showError('Topik artikel wajib diisi.');
+            return;
+        }
+
+        $('#btnAiProcess').hide();
+        $('#aiLoading').show();
+
+        $.ajax({
+            url: APP_URL + '/api/ai_generate_article.php',
+            method: 'POST',
+            data: { topic: topic, tone: tone },
+            dataType: 'json',
+            success: function(response) {
+                $('#aiLoading').hide();
+                $('#btnAiProcess').show();
+                
+                if (response.error) {
+                    showError(response.error);
+                    return;
+                }
+                
+                if (response.success && response.data) {
+                    // Reset and populate standard form
+                    $('#tipsForm')[0].reset();
+                    $('#formAction').val('create');
+                    $('#formId').val('');
+                    $('#formCurrentImage').val('');
+                    
+                    $('#inputTitle').val(response.data.title);
+                    $('#inputContent').val(response.data.content);
+                    $('#inputExcerpt').val(response.data.excerpt);
+                    $('#inputAuthor').val('AI Writer');
+                    $('#inputDate').val(new Date().toISOString().substring(0, 10));
+                    
+                    if (response.data.image_url) {
+                        $('#inputImageUrlText').val(response.data.image_url);
+                        $('#formCurrentImage').val(response.data.image_url);
+                        $('#imgPreview').attr('src', response.data.image_url);
+                        $('#previewContainer').show();
+                        $('.custom-file-label').html('Gambar terpilih dari Unsplash');
+                    } else {
+                        $('#previewContainer').hide();
+                        $('.custom-file-label').html('Pilih file...');
+                    }
+
+                    $('#modalTitle').text('Tambah Artikel Baru (Generated by AI)');
+                    
+                    // Properly chain modals to prevent scroll lock
+                    $('#aiGenerateModal').one('hidden.bs.modal', function() {
+                        $('#formModal').modal('show');
+                    }).modal('hide');
+                } else {
+                    showError('Gagal memproses response AI.');
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#aiLoading').hide();
+                $('#btnAiProcess').show();
+                showError('Terjadi kesalahan koneksi ke server.');
+            }
+        });
     });
 
     // Populate form for edit

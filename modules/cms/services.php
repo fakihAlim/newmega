@@ -62,7 +62,7 @@ $services = $pdo->query("SELECT * FROM landing_services ORDER BY order_num ASC, 
 require_once __DIR__ . '/../../includes/header.php';
 ?>
 
-<div class="card">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title">Pengaturan Spesialisasi / Layanan</h3>
         <div class="ml-auto">

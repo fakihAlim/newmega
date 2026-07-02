@@ -39,14 +39,18 @@ $year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
 $company_id = (isset($_GET['company_id']) && $_GET['company_id'] !== '') ? (int)$_GET['company_id'] : '';
 $project_id = (isset($_GET['project_id']) && $_GET['project_id'] !== '') ? (int)$_GET['project_id'] : '';
 
-$start_date = '';
-if (!empty($_GET['start_date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['start_date'])) {
-    $start_date = $_GET['start_date'];
+$start_date = date('Y-m-01');
+if (isset($_GET['start_date']) && $_GET['start_date'] !== '') {
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['start_date'])) {
+        $start_date = $_GET['start_date'];
+    }
 }
 
-$end_date = '';
-if (!empty($_GET['end_date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['end_date'])) {
-    $end_date = $_GET['end_date'];
+$end_date = date('Y-m-d');
+if (isset($_GET['end_date']) && $_GET['end_date'] !== '') {
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['end_date'])) {
+        $end_date = $_GET['end_date'];
+    }
 }
 
 // Build Query
@@ -126,7 +130,7 @@ foreach ($data as $row) {
 require_once __DIR__ . '/../../includes/header.php';
 ?>
 
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" action="" class="row">
             <div class="col-md-2 col-sm-6 mb-2">
@@ -180,9 +184,9 @@ require_once __DIR__ . '/../../includes/header.php';
             <a href="<?= APP_URL ?>/modules/reports/timesheet_detail.php?month=<?= $month ?>&year=<?= $year ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>&company_id=<?= $company_id ?>&project_id=<?= $project_id ?>" class="btn btn-info btn-sm mr-1"><i class="fas fa-calendar-alt mr-1"></i> Detail Timesheet</a>
             <button onclick="window.print()" class="btn btn-secondary btn-sm"><i class="fas fa-print mr-1"></i> Print</button>
             <button type="button" class="btn btn-success btn-sm ml-1" data-toggle="modal" data-target="#importModal">
-                <i class="fas fa-file-excel mr-1"></i> Import CSV
+                <i class="fas fa-file-excel mr-1"></i> Import Excel
             </button>
-            <a href="<?= APP_URL ?>/modules/timesheet/export_csv.php?month=<?= $month ?>&year=<?= $year ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>&company_id=<?= $company_id ?>&project_id=<?= $project_id ?>" class="btn btn-success btn-sm ml-1"><i class="fas fa-download mr-1"></i> Export CSV</a>
+            <a href="<?= APP_URL ?>/modules/timesheet/export_excel.php?month=<?= $month ?>&year=<?= $year ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>&company_id=<?= $company_id ?>&project_id=<?= $project_id ?>" class="btn btn-success btn-sm ml-1"><i class="fas fa-download mr-1"></i> Export Excel</a>
         </div>
     </div>
     <div class="card-body p-0">
@@ -288,30 +292,30 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
 </div>
 
-<!-- Import CSV Modal -->
+<!-- Import Excel Modal -->
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <form action="<?= APP_URL ?>/modules/timesheet/import_csv.php" method="POST" enctype="multipart/form-data">
+        <form action="<?= APP_URL ?>/modules/timesheet/import_excel.php" method="POST" enctype="multipart/form-data">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Import Timesheet (CSV)</h5>
+                    <h5 class="modal-title">Import Timesheet (Excel)</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info" style="font-size: 13px;">
-                        <i class="fas fa-info-circle mr-1"></i> Format CSV wajib menggunakan kolom:
+                        <i class="fas fa-info-circle mr-1"></i> Format Excel wajib menggunakan kolom/header:
                         <br><strong>Username_Karyawan, ID_Company, ID_Proyek, Tanggal (YYYY-MM-DD), Tipe_Kerja (full/half), Jam_Lembur, Catatan</strong>
                     </div>
                     <div class="form-group mb-4">
-                        <a href="<?= APP_URL ?>/modules/timesheet/template_csv.php" class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-download mr-1"></i> Download Template CSV
+                        <a href="<?= APP_URL ?>/modules/timesheet/template_excel.php" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-download mr-1"></i> Download Template Excel
                         </a>
                     </div>
                     <div class="form-group">
-                        <label>Upload File CSV <span class="text-danger">*</span></label>
-                        <input type="file" name="file" class="form-control-file" accept=".csv" required>
+                        <label>Upload File Excel <span class="text-danger">*</span></label>
+                        <input type="file" name="file" class="form-control-file" accept=".xlsx, .xls" required>
                     </div>
                 </div>
                 <div class="modal-footer">

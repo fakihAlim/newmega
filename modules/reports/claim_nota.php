@@ -101,7 +101,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
 <?php renderReportPrintHeader('Laporan Claim Nota'); ?>
 
 <!-- Filter Card -->
-<div class="card d-print-none mb-3">
+<div class="card card-outline card-primary d-print-none mb-3">
     <div class="card-body p-3">
         <form method="GET" class="row">
             <input type="hidden" name="tab" value="<?= sanitize($activeTab) ?>">
@@ -168,7 +168,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
 <div class="tab-content mt-0">
     <?php if ($activeTab === 'detail'): ?>
     <!-- Detail Tab -->
-    <div class="card card-outline card-primary" style="border-top-left-radius:0;">
+    <div class="card" style="border-top-left-radius:0;">
         <div class="card-body">
             <table id="reportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">
@@ -226,7 +226,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
     
     <?php elseif ($activeTab === 'employee'): ?>
     <!-- Per Karyawan Tab -->
-    <div class="card card-outline card-primary" style="border-top-left-radius:0;">
+    <div class="card" style="border-top-left-radius:0;">
         <div class="card-body">
             <table id="reportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">
@@ -273,7 +273,7 @@ require_once __DIR__ . '/../../includes/report_print.php';
 
     <?php elseif ($activeTab === 'project'): ?>
     <!-- Per Proyek Tab -->
-    <div class="card card-outline card-primary" style="border-top-left-radius:0;">
+    <div class="card" style="border-top-left-radius:0;">
         <div class="card-body">
             <table id="reportTable" class="table table-bordered table-striped table-hover table-sm w-100" >
                 <thead class="bg-light">

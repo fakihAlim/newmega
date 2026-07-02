@@ -58,7 +58,8 @@ Available categories (group_name) you should use if they match, or suggest a sui
 
 Please extract:
 1. The transaction date (format: YYYY-MM-DD). If not found, output null.
-2. The list of items purchased. For each item, specify:
+2. The name of the store/shop where the purchase was made. If not found, output null.
+3. The list of items purchased. For each item, specify:
    - item_name: Description of the product or service purchased (clean up formatting, keep it concise).
    - qty: Quantity purchased. If not clear, default to 1.
    - price: Unit price. If not listed, calculate it by dividing the total item cost by qty.
@@ -67,6 +68,7 @@ Please extract:
 Respond ONLY with a raw JSON object (without markdown code blocks or additional text) using this exact schema:
 {
     \"claim_date\": \"YYYY-MM-DD or null\",
+    \"store_name\": \"string or null\",
     \"items\": [
         {
             \"item_name\": \"string\",

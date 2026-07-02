@@ -76,7 +76,7 @@ require_once __DIR__ . '/../../../includes/header.php';
             </div>
             <div class="col-sm-6 text-right">
                 <div style="font-size: 14px;">
-                    <strong>Tanggal Terima:</strong> <?= date('d F Y', strtotime($gr['receive_date'])) ?><br>
+                    <strong>Tanggal Terima:</strong> <?= formatDateIndo($gr['receive_date']) ?><br>
                     <strong>Referensi PO:</strong> <?= sanitize($gr['po_number']) ?><br>
                     <strong>Lokasi Terima:</strong> 
                     <?php if ($gr['received_at'] === 'warehouse'): ?>
@@ -91,7 +91,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         <!-- Vendor & Penerima -->
         <div class="row mb-4">
             <div class="col-sm-6">
-                <h6 class="text-uppercase font-weight-bold pb-1" style="border-bottom:1px solid #eee;">Diterima Dari (Vendor)</h6>
+                <h6 class="text-uppercase font-weight-bold pb-1" style="border-bottom:1px solid #eee;">Diterima Dari (Supplier)</h6>
                 <div style="font-size: 14px;">
                     <strong><?= sanitize($gr['vendor_name']) ?></strong><br>
                     <?= nl2br(sanitize($gr['vendor_address'])) ?><br>
@@ -153,7 +153,7 @@ require_once __DIR__ . '/../../../includes/header.php';
         <!-- Signatures -->
         <div class="row mt-5 text-center" style="font-size:14px;">
             <div class="col-sm-4">
-                <p class="mb-5">Pengirim (Sopir Vendor),</p>
+                <p class="mb-5">Pengirim (Sopir Supplier),</p>
                 <strong>( ......................................... )</strong>
             </div>
             <div class="col-sm-4 offset-sm-4">

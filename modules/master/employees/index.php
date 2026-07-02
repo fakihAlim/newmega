@@ -46,7 +46,7 @@ $employees = $pdo->query("
 require_once __DIR__ . '/../../../includes/header.php';
 ?>
 
-<div class="card">
+<div class="card card-outline card-primary">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title">Daftar Karyawan Lapangan</h3>
         <div class="ml-auto">
